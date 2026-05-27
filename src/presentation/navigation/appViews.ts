@@ -1,4 +1,4 @@
-import { Award, BarChart3, CalendarDays, Gift, GitBranch, Home, ListChecks, PlusCircle, Settings, Sparkles, Sun, UserRound } from "lucide-react";
+import { Award, BarChart3, CalendarDays, Gift, GitBranch, Home, ListChecks, MoreHorizontal, PlusCircle, Settings, Sparkles, Sun, UserRound } from "lucide-react";
 import type { ComponentType } from "react";
 
 export type AppView =
@@ -35,3 +35,7 @@ export const navItems: NavItem[] = [
   { id: "status", label: "Status", Icon: UserRound },
   { id: "settings", label: "Config", Icon: Settings },
 ];
+
+export const primaryMobileNavIds: AppView[] = ["home", "today", "missions", "create", "skills"];
+
+export const MoreIcon = MoreHorizontal;
