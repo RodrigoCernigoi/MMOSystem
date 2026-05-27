@@ -1,5 +1,5 @@
 import { motion } from "motion/react";
-import { Archive, Check, ExternalLink, Pencil, Trash2 } from "lucide-react";
+import { Archive, Check, Crosshair, ExternalLink, Pencil, Trash2 } from "lucide-react";
 import type { Quest } from "../../domain/task";
 import { cardMotion } from "../motion/transitions";
 import { attributeLabels, difficultyLabels, questKindLabels, statusLabels } from "../viewModels";
@@ -11,6 +11,7 @@ type QuestCardProps = {
   onArchiveQuest?: (id: string) => Promise<void>;
   onDeleteQuest?: (id: string) => Promise<void>;
   onOpenProject?: (projectId: string) => void;
+  onOpenFocus?: (id: string) => void;
   projectTitle?: string;
   isUrgent?: boolean;
   isCompact?: boolean;
@@ -23,6 +24,7 @@ export const QuestCard = ({
   onArchiveQuest,
   onDeleteQuest,
   onOpenProject,
+  onOpenFocus,
   projectTitle,
   isUrgent = false,
   isCompact = false,
@@ -58,6 +60,11 @@ export const QuestCard = ({
           <button type="button" onClick={() => onCompleteQuest(quest.id)} title="Concluir missao">
             <Check size={18} />
           </button>
+          {onOpenFocus && (
+            <button type="button" onClick={() => onOpenFocus(quest.id)} title="Modo foco">
+              <Crosshair size={18} />
+            </button>
+          )}
           {onEditQuest && (
             <button type="button" onClick={() => onEditQuest(quest)} title="Editar missao">
               <Pencil size={18} />

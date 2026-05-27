@@ -14,10 +14,11 @@ type TodayViewProps = {
   quests: Quest[];
   onCompleteQuest: (id: string) => Promise<void>;
   onEndDay: (date: string) => Promise<unknown>;
+  onOpenFocus: (id: string) => void;
   reviewRequestId?: number;
 };
 
-export const TodayView = ({ player, quests, onCompleteQuest, onEndDay, reviewRequestId = 0 }: TodayViewProps) => {
+export const TodayView = ({ player, quests, onCompleteQuest, onEndDay, onOpenFocus, reviewRequestId = 0 }: TodayViewProps) => {
   const [isReviewOpen, setIsReviewOpen] = useState(false);
   const [activeTab, setActiveTab] = useState<"habits" | "missions" | "projects">("habits");
   const today = toDateKey(new Date());
@@ -168,13 +169,13 @@ export const TodayView = ({ player, quests, onCompleteQuest, onEndDay, reviewReq
                 <>
                   {pendingHabits.map((quest) => (
                     <div className="habit-card-wrap" key={quest.id}>
-                      <QuestCard quest={quest} onCompleteQuest={onCompleteQuest} />
+                      <QuestCard quest={quest} onCompleteQuest={onCompleteQuest} onOpenFocus={onOpenFocus} />
                       <span>Streak: {calculateHabitStreak(quest)} dias</span>
                     </div>
                   ))}
                   {doneHabits.map((quest) => (
                     <div className="habit-card-wrap" key={quest.id}>
-                      <QuestCard quest={quest} onCompleteQuest={onCompleteQuest} />
+                      <QuestCard quest={quest} onCompleteQuest={onCompleteQuest} onOpenFocus={onOpenFocus} />
                       <span>Concluido hoje · Streak: {calculateHabitStreak(quest)} dias</span>
                     </div>
                   ))}
@@ -187,7 +188,9 @@ export const TodayView = ({ player, quests, onCompleteQuest, onEndDay, reviewReq
               {dueToday.length === 0 ? (
                 <div className="empty-state visual-empty-state">Nenhuma missao para hoje.</div>
               ) : (
-                dueToday.map((quest) => <QuestCard key={quest.id} quest={quest} onCompleteQuest={onCompleteQuest} />)
+                dueToday.map((quest) => (
+                  <QuestCard key={quest.id} quest={quest} onCompleteQuest={onCompleteQuest} onOpenFocus={onOpenFocus} />
+                ))
               )}
             </div>
           )}
@@ -199,7 +202,9 @@ export const TodayView = ({ player, quests, onCompleteQuest, onEndDay, reviewReq
                 quests
                   .filter((quest) => quest.status === "open" && quest.projectId)
                   .slice(0, 5)
-                  .map((quest) => <QuestCard key={quest.id} quest={quest} onCompleteQuest={onCompleteQuest} />)
+                  .map((quest) => (
+                    <QuestCard key={quest.id} quest={quest} onCompleteQuest={onCompleteQuest} onOpenFocus={onOpenFocus} />
+                  ))
               )}
             </div>
           )}

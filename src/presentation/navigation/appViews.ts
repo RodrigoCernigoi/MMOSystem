@@ -4,6 +4,7 @@ import type { ComponentType } from "react";
 export type AppView =
   | "home"
   | "today"
+  | "focus"
   | "missions"
   | "calendar"
   | "create"

@@ -1222,6 +1222,85 @@ h2 {
   color: #9fb5d0;
 }
 
+.history-calendar {
+  display: grid;
+  grid-template-columns: repeat(7, minmax(38px, 1fr));
+  gap: 10px;
+}
+
+.history-day {
+  position: relative;
+  display: grid;
+  min-height: 54px;
+  align-content: space-between;
+  border: 1px solid rgba(148, 163, 184, 0.18);
+  border-radius: 8px;
+  padding: 8px;
+  background: rgba(15, 23, 42, 0.68);
+  color: #dbeafe;
+  overflow: hidden;
+}
+
+.history-day::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  opacity: 0.12;
+  background: linear-gradient(135deg, #22d3ee, #a3e635);
+}
+
+.history-day span,
+.history-day small,
+.history-day strong {
+  position: relative;
+  z-index: 1;
+}
+
+.history-day span {
+  font-size: 0.78rem;
+  color: #9fb5d0;
+}
+
+.history-day small,
+.history-day strong {
+  justify-self: end;
+}
+
+.history-day-level-1::before {
+  opacity: 0.22;
+}
+
+.history-day-level-2::before {
+  opacity: 0.34;
+}
+
+.history-day-level-3::before {
+  opacity: 0.48;
+}
+
+.history-day-level-4::before {
+  opacity: 0.66;
+}
+
+.history-day-closed {
+  border-color: rgba(163, 230, 53, 0.42);
+  box-shadow: 0 0 18px rgba(132, 204, 22, 0.12);
+}
+
+.calendar-legend {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  margin-top: 14px;
+  color: #9fb5d0;
+}
+
+.calendar-legend span {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+}
+
 .habit-card-wrap {
   display: grid;
   gap: 6px;
@@ -1450,6 +1529,216 @@ h2 {
   align-items: end;
 }
 
+.focus-screen {
+  position: relative;
+  min-height: calc(100vh - 48px);
+  display: grid;
+  gap: 24px;
+  align-content: start;
+  overflow: hidden;
+  border: 1px solid rgba(125, 211, 252, 0.2);
+  border-radius: 8px;
+  padding: 24px;
+  background:
+    radial-gradient(circle at 50% 18%, rgba(45, 212, 191, 0.2), transparent 34%),
+    radial-gradient(circle at 18% 78%, rgba(163, 230, 53, 0.16), transparent 28%),
+    linear-gradient(135deg, rgba(2, 6, 23, 0.96), rgba(8, 47, 73, 0.9));
+}
+
+.focus-screen::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background-image:
+    linear-gradient(rgba(125, 211, 252, 0.07) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(125, 211, 252, 0.07) 1px, transparent 1px);
+  background-size: 46px 46px;
+  opacity: 0.42;
+}
+
+.focus-orbit {
+  position: absolute;
+  pointer-events: none;
+  border: 1px solid rgba(125, 211, 252, 0.22);
+  border-radius: 999px;
+  filter: drop-shadow(0 0 18px rgba(34, 211, 238, 0.25));
+}
+
+.focus-orbit-one {
+  width: 420px;
+  height: 420px;
+  top: 96px;
+  left: 50%;
+  transform: translateX(-50%);
+  animation: spin-slow 18s linear infinite;
+}
+
+.focus-orbit-two {
+  width: 300px;
+  height: 300px;
+  top: 156px;
+  left: 50%;
+  border-color: rgba(163, 230, 53, 0.2);
+  transform: translateX(-50%) rotate(20deg);
+  animation: spin-slow 14s linear infinite reverse;
+}
+
+.focus-topbar,
+.focus-core,
+.focus-bottom-grid,
+.focus-empty-card {
+  position: relative;
+  z-index: 1;
+}
+
+.focus-topbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+}
+
+.ghost-button,
+.secondary-button {
+  background: rgba(15, 23, 42, 0.62);
+  color: #dbeafe;
+}
+
+.focus-core {
+  display: grid;
+  grid-template-columns: minmax(220px, 340px) minmax(0, 1fr);
+  gap: 28px;
+  align-items: center;
+  max-width: 1060px;
+  width: 100%;
+  margin: 0 auto;
+  border: 1px solid rgba(125, 211, 252, 0.22);
+  border-radius: 8px;
+  padding: 28px;
+  background: rgba(2, 6, 23, 0.58);
+  box-shadow: 0 24px 80px rgba(0, 0, 0, 0.32);
+  backdrop-filter: blur(10px);
+}
+
+.focus-timer {
+  display: grid;
+  place-items: center;
+  width: min(100%, 320px);
+  aspect-ratio: 1;
+  justify-self: center;
+  border-radius: 999px;
+  background:
+    radial-gradient(circle at center, rgba(15, 23, 42, 0.94) 0 57%, transparent 58%),
+    conic-gradient(#a3e635 var(--progress), rgba(45, 212, 191, 0.26) 0);
+  box-shadow:
+    0 0 36px rgba(34, 211, 238, 0.22),
+    inset 0 0 36px rgba(163, 230, 53, 0.08);
+}
+
+.focus-timer span {
+  font-size: clamp(2.4rem, 7vw, 4.8rem);
+  font-weight: 900;
+  line-height: 1;
+  color: #f8fafc;
+}
+
+.focus-timer small {
+  margin-top: 86px;
+  color: #9fb5d0;
+}
+
+.focus-mission {
+  display: grid;
+  gap: 16px;
+}
+
+.focus-mission h1 {
+  margin: 0;
+  font-size: clamp(2rem, 6vw, 4.4rem);
+  line-height: 0.95;
+}
+
+.focus-mission p {
+  max-width: 620px;
+  color: #bfdbfe;
+}
+
+.focus-duration-row,
+.focus-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
+.focus-chip {
+  min-height: 38px;
+  padding: 0 14px;
+  background: rgba(15, 23, 42, 0.66);
+  color: #dbeafe;
+}
+
+.focus-chip-active {
+  border-color: rgba(163, 230, 53, 0.58);
+  background: rgba(63, 98, 18, 0.42);
+  color: #ecfccb;
+}
+
+.focus-bottom-grid {
+  display: grid;
+  grid-template-columns: minmax(0, 0.9fr) minmax(280px, 0.7fr);
+  gap: 18px;
+  max-width: 1060px;
+  width: 100%;
+  margin: 0 auto;
+}
+
+.focus-checklist,
+.focus-queue,
+.focus-empty-card {
+  display: grid;
+  gap: 12px;
+  border: 1px solid rgba(148, 163, 184, 0.2);
+  border-radius: 8px;
+  padding: 18px;
+  background: rgba(15, 23, 42, 0.62);
+}
+
+.focus-checklist span,
+.focus-queue-item {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  color: #cbd5e1;
+}
+
+.focus-queue-item {
+  justify-content: space-between;
+  width: 100%;
+  border-color: rgba(148, 163, 184, 0.14);
+  background: rgba(2, 6, 23, 0.42);
+  text-align: left;
+}
+
+.focus-queue-item span {
+  overflow-wrap: anywhere;
+}
+
+.focus-queue-item-active {
+  border-color: rgba(45, 212, 191, 0.52);
+  background: rgba(20, 184, 166, 0.16);
+}
+
+.focus-screen-empty {
+  place-items: center;
+}
+
+.focus-empty-card {
+  max-width: 520px;
+  justify-items: center;
+  text-align: center;
+}
+
 .review-chart-day {
   display: grid;
   gap: 8px;
@@ -1549,6 +1838,15 @@ h2 {
   }
   to {
     transform: rotate(360deg) scale(1.1);
+  }
+}
+
+@keyframes spin-slow {
+  from {
+    rotate: 0deg;
+  }
+  to {
+    rotate: 360deg;
   }
 }
 
@@ -2552,6 +2850,64 @@ h2 {
   .review-chart {
     grid-template-columns: repeat(7, minmax(34px, 1fr));
     overflow-x: auto;
+  }
+
+  .history-calendar {
+    grid-template-columns: repeat(7, minmax(34px, 1fr));
+    gap: 7px;
+  }
+
+  .history-day {
+    min-height: 46px;
+    padding: 7px;
+  }
+
+  .focus-screen {
+    min-height: calc(100dvh - 104px);
+    padding: 14px;
+  }
+
+  .focus-topbar {
+    align-items: stretch;
+    flex-direction: column;
+  }
+
+  .focus-core,
+  .focus-bottom-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .focus-core {
+    gap: 18px;
+    padding: 16px;
+  }
+
+  .focus-timer {
+    width: min(82vw, 250px);
+  }
+
+  .focus-timer small {
+    margin-top: 64px;
+  }
+
+  .focus-mission h1 {
+    font-size: clamp(2rem, 13vw, 3rem);
+  }
+
+  .focus-actions button,
+  .focus-duration-row button {
+    flex: 1;
+    min-width: 96px;
+  }
+
+  .focus-orbit-one {
+    width: 300px;
+    height: 300px;
+  }
+
+  .focus-orbit-two {
+    width: 210px;
+    height: 210px;
   }
 
   .daily-report-row {

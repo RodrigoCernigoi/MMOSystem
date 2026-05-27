@@ -18,6 +18,7 @@ import { emitVisualEvent, intensityMultiplier, useVisualPreferences } from "./vi
 const AchievementsView = lazy(() => import("./screens/AchievementsView").then((module) => ({ default: module.AchievementsView })));
 const CalendarView = lazy(() => import("./screens/CalendarView").then((module) => ({ default: module.CalendarView })));
 const CreateQuestView = lazy(() => import("./screens/CreateQuestView").then((module) => ({ default: module.CreateQuestView })));
+const FocusView = lazy(() => import("./screens/FocusView").then((module) => ({ default: module.FocusView })));
 const MissionsView = lazy(() => import("./screens/MissionsView").then((module) => ({ default: module.MissionsView })));
 const ProjectsView = lazy(() => import("./screens/ProjectsView").then((module) => ({ default: module.ProjectsView })));
 const RewardsView = lazy(() => import("./screens/RewardsView").then((module) => ({ default: module.RewardsView })));
@@ -46,6 +47,7 @@ export const App = () => {
   const [dailyReviewRequestId, setDailyReviewRequestId] = useState(0);
   const [createQuestIntent, setCreateQuestIntent] = useState<CreateQuestIntent | null>(null);
   const [appFocus, setAppFocus] = useState<AppFocus | null>(null);
+  const [focusQuestId, setFocusQuestId] = useState<string | null>(null);
   const { preferences, setPreferences } = useVisualPreferences();
   useToneGameFeel({ intensity: preferences.audioIntensity, volume: preferences.audioVolume });
 
@@ -98,6 +100,12 @@ export const App = () => {
     emitVisualEvent("ui-navigate");
   }, []);
 
+  const handleOpenFocusMode = useCallback((questId: string) => {
+    setFocusQuestId(questId);
+    setActiveView("focus");
+    emitVisualEvent("ui-confirm");
+  }, []);
+
   if (isLoading || !player) {
     return <main className="loading">Inicializando sistema...</main>;
   }
@@ -119,7 +127,17 @@ export const App = () => {
         quests={quests}
         onCompleteQuest={handleCompleteQuest}
         onEndDay={endDay}
+        onOpenFocus={handleOpenFocusMode}
         reviewRequestId={dailyReviewRequestId}
+      />
+    ),
+    focus: (
+      <FocusView
+        player={player}
+        quests={quests}
+        initialQuestId={focusQuestId}
+        onCompleteQuest={handleCompleteQuest}
+        onNavigate={handleNavigate}
       />
     ),
     missions: (
@@ -130,10 +148,11 @@ export const App = () => {
         onUpdateQuest={updateQuest}
         onArchiveQuest={archiveQuest}
         onDeleteQuest={deleteQuest}
+        onOpenFocus={handleOpenFocusMode}
         onFocusNavigate={handleFocusNavigate}
       />
     ),
-    calendar: <CalendarView quests={quests} />,
+    calendar: <CalendarView player={player} quests={quests} />,
     create: (
       <CreateQuestView
         error={error}

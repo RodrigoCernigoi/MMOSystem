@@ -30,6 +30,7 @@ type MissionsViewProps = {
   onUpdateQuest: (id: string, input: UpdateQuestInput) => Promise<void>;
   onArchiveQuest: (id: string) => Promise<void>;
   onDeleteQuest: (id: string) => Promise<void>;
+  onOpenFocus: (id: string) => void;
   onFocusNavigate?: (view: AppView, focus: AppFocus) => void;
 };
 
@@ -48,6 +49,7 @@ export const MissionsView = ({
   onUpdateQuest,
   onArchiveQuest,
   onDeleteQuest,
+  onOpenFocus,
   onFocusNavigate,
 }: MissionsViewProps) => {
   const [filter, setFilter] = useState<MissionFilter>("open");
@@ -245,6 +247,7 @@ export const MissionsView = ({
               onEditQuest={setEditingQuest}
               onArchiveQuest={onArchiveQuest}
               onDeleteQuest={handleDelete}
+              onOpenFocus={onOpenFocus}
               onOpenProject={
                 quest.projectId
                   ? (projectId) => onFocusNavigate?.("projects", { type: "project", id: projectId })
