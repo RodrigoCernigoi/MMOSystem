@@ -5,6 +5,7 @@ import { useDashboard } from "./useDashboard";
 import type { RewardFeedback } from "./useDashboard";
 import { useToneGameFeel } from "./audio/useToneGameFeel";
 import { AppShell } from "./components/AppShell";
+import { QuickActions } from "./components/QuickActions";
 import { RewardToast } from "./components/RewardToast";
 import { SplashScreen } from "./components/SplashScreen";
 import { viewMotion } from "./motion/transitions";
@@ -41,6 +42,7 @@ export const App = () => {
   const [activeView, setActiveView] = useState<AppView>("home");
   const [rewardFeedback, setRewardFeedback] = useState<RewardFeedback | null>(null);
   const [showSplash, setShowSplash] = useState(true);
+  const [dailyReviewRequestId, setDailyReviewRequestId] = useState(0);
   const { preferences, setPreferences } = useVisualPreferences();
   useToneGameFeel({ intensity: preferences.audioIntensity, volume: preferences.audioVolume });
 
@@ -75,6 +77,12 @@ export const App = () => {
     emitVisualEvent("ui-navigate");
   }, []);
 
+  const handleOpenDailyReview = useCallback(() => {
+    setActiveView("today");
+    setDailyReviewRequestId((current) => current + 1);
+    emitVisualEvent("ui-confirm");
+  }, []);
+
   if (isLoading || !player) {
     return <main className="loading">Inicializando sistema...</main>;
   }
@@ -88,7 +96,15 @@ export const App = () => {
         onNavigate={handleNavigate}
       />
     ),
-    today: <TodayView player={player} quests={quests} onCompleteQuest={handleCompleteQuest} onEndDay={endDay} />,
+    today: (
+      <TodayView
+        player={player}
+        quests={quests}
+        onCompleteQuest={handleCompleteQuest}
+        onEndDay={endDay}
+        reviewRequestId={dailyReviewRequestId}
+      />
+    ),
     missions: (
       <MissionsView
         quests={quests}
@@ -138,6 +154,7 @@ export const App = () => {
       <AnimatePresence>
         <RewardToast reward={rewardFeedback} />
       </AnimatePresence>
+      <QuickActions onNavigate={handleNavigate} onOpenDailyReview={handleOpenDailyReview} />
     </AppShell>
       )}
     </AnimatePresence>

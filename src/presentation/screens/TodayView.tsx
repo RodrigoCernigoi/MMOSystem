@@ -1,5 +1,5 @@
 import { Coins, Target, Trophy } from "lucide-react";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { calculateHabitStreak } from "../../domain/habitStats";
 import { isHabitDoneToday, isQuestForToday, toDateKey } from "../../domain/schedule";
 import type { Player } from "../../domain/player";
@@ -13,9 +13,10 @@ type TodayViewProps = {
   quests: Quest[];
   onCompleteQuest: (id: string) => Promise<void>;
   onEndDay: (date: string) => Promise<unknown>;
+  reviewRequestId?: number;
 };
 
-export const TodayView = ({ player, quests, onCompleteQuest, onEndDay }: TodayViewProps) => {
+export const TodayView = ({ player, quests, onCompleteQuest, onEndDay, reviewRequestId = 0 }: TodayViewProps) => {
   const [isReviewOpen, setIsReviewOpen] = useState(false);
   const today = toDateKey(new Date());
   const todayQuests = quests.filter((quest) => isQuestForToday(quest, today));
@@ -25,6 +26,12 @@ export const TodayView = ({ player, quests, onCompleteQuest, onEndDay }: TodayVi
   const doneHabits = todayQuests.filter((quest) => quest.kind === "habit" && isHabitDoneToday(quest, today));
   const dueToday = todayQuests.filter((quest) => quest.kind !== "habit");
   const plannedXp = todayQuests.length * 50;
+
+  useEffect(() => {
+    if (reviewRequestId > 0) {
+      setIsReviewOpen(true);
+    }
+  }, [reviewRequestId]);
 
   return (
     <div className="view-grid view-grid-wide">
