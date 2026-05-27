@@ -946,6 +946,26 @@ h2 {
   margin-top: 18px;
 }
 
+.mission-toolbar {
+  display: grid;
+  grid-template-columns: minmax(240px, 1.4fr) repeat(3, minmax(150px, 0.7fr));
+  gap: 10px;
+  margin-bottom: 14px;
+}
+
+.mission-toolbar select {
+  min-height: 44px;
+  border: 1px solid rgba(148, 163, 184, 0.26);
+  background: rgba(15, 23, 42, 0.84);
+  color: #f8fafc;
+  padding: 0 10px;
+  outline: none;
+}
+
+.mission-search {
+  min-height: 44px;
+}
+
 .quest-card,
 .empty-state {
   border: 1px solid rgba(148, 163, 184, 0.2);
@@ -1021,8 +1041,20 @@ h2 {
   background: rgba(127, 29, 29, 0.2);
 }
 
+.quest-card-urgent {
+  border-color: rgba(250, 204, 21, 0.48);
+  box-shadow:
+    0 0 0 1px rgba(250, 204, 21, 0.12),
+    0 0 28px rgba(250, 204, 21, 0.08);
+}
+
 .quest-card-archived {
   opacity: 0.62;
+}
+
+.quest-card-compact {
+  min-height: 108px;
+  padding: 15px;
 }
 
 .quest-meta {
@@ -1039,6 +1071,12 @@ h2 {
   padding: 7px 10px;
   font-size: 0.78rem;
   font-weight: 800;
+}
+
+.quest-meta .quest-urgency-chip {
+  border-color: rgba(250, 204, 21, 0.38);
+  background: rgba(113, 63, 18, 0.3);
+  color: #fde68a;
 }
 
 .quest-card h3 {
@@ -2410,6 +2448,32 @@ h2 {
 
   .edit-quest-form {
     grid-template-columns: 1fr;
+  }
+
+  .mission-toolbar {
+    grid-template-columns: 1fr;
+  }
+
+  .quest-card {
+    align-items: stretch;
+    flex-direction: column;
+    gap: 12px;
+  }
+
+  .quest-card-compact {
+    min-height: auto;
+    padding: 14px;
+  }
+
+  .quest-actions {
+    display: grid;
+    grid-template-columns: repeat(4, minmax(44px, 1fr));
+    justify-content: stretch;
+    width: 100%;
+  }
+
+  .quest-actions button {
+    min-height: 42px;
   }
 
   .quest-form button,

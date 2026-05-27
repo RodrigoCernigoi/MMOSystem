@@ -130,6 +130,7 @@ export const App = () => {
         onUpdateQuest={updateQuest}
         onArchiveQuest={archiveQuest}
         onDeleteQuest={deleteQuest}
+        onFocusNavigate={handleFocusNavigate}
       />
     ),
     calendar: <CalendarView quests={quests} />,
