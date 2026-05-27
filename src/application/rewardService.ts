@@ -1,0 +1,84 @@
+import type { PlayerRepository, RewardRepository, Clock, IdProvider } from "./ports";
+import type { CreateRewardInput, Reward } from "../domain/reward";
+
+export type RewardService = ReturnType<typeof createRewardService>;
+
+type RewardServiceDependencies = {
+  rewardRepository: RewardRepository;
+  playerRepository: PlayerRepository;
+  idProvider: IdProvider;
+  clock: Clock;
+};
+
+export const createRewardService = ({
+  rewardRepository,
+  playerRepository,
+  idProvider,
+  clock,
+}: RewardServiceDependencies) => ({
+  async getRewards() {
+    const [rewards, player] = await Promise.all([rewardRepository.list(), playerRepository.get()]);
+    return {
+      rewards: rewards.filter((reward) => !reward.archivedAt),
+      player,
+    };
+  },
+
+  async createReward(input: CreateRewardInput): Promise<Reward> {
+    const reward: Reward = {
+      id: idProvider.createId(),
+      title: input.title.trim(),
+      description: input.description.trim(),
+      cost: Math.max(1, Math.floor(input.cost)),
+      createdAt: clock.now().toISOString(),
+    };
+
+    if (!reward.title) {
+      throw new Error("Reward title is required.");
+    }
+
+    const rewards = await rewardRepository.list();
+    await rewardRepository.saveAll([reward, ...rewards]);
+    return reward;
+  },
+
+  async redeemReward(rewardId: string) {
+    const [rewards, player] = await Promise.all([rewardRepository.list(), playerRepository.get()]);
+    const reward = rewards.find((item) => item.id === rewardId && !item.archivedAt);
+
+    if (!reward) {
+      throw new Error("Reward not found.");
+    }
+
+    if (player.coins < reward.cost) {
+      throw new Error("Moedas insuficientes.");
+    }
+
+    const updatedPlayer = {
+      ...player,
+      coins: player.coins - reward.cost,
+      redeemedRewards: [
+        {
+          id: idProvider.createId(),
+          rewardId: reward.id,
+          title: reward.title,
+          cost: reward.cost,
+          redeemedAt: clock.now().toISOString(),
+        },
+        ...(player.redeemedRewards ?? []),
+      ],
+    };
+
+    await playerRepository.save(updatedPlayer);
+    return updatedPlayer;
+  },
+
+  async archiveReward(rewardId: string) {
+    const rewards = await rewardRepository.list();
+    await rewardRepository.saveAll(
+      rewards.map((reward) =>
+        reward.id === rewardId ? { ...reward, archivedAt: clock.now().toISOString() } : reward,
+      ),
+    );
+  },
+});

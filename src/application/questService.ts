@@ -1,0 +1,249 @@
+import { unlockAvailableAchievements } from "../domain/achievements";
+import { applyQuestFailure, applyQuestReward, getRewardForQuest } from "../domain/progression";
+import type { Player } from "../domain/player";
+import type { CreateQuestInput, Quest, UpdateQuestInput } from "../domain/task";
+import type { Clock, IdProvider, PlayerRepository, QuestRepository, QuestSuggestionGateway } from "./ports";
+
+export type QuestService = ReturnType<typeof createQuestService>;
+
+type QuestServiceDependencies = {
+  questRepository: QuestRepository;
+  playerRepository: PlayerRepository;
+  idProvider: IdProvider;
+  clock: Clock;
+  questSuggestionGateway: QuestSuggestionGateway;
+};
+
+export const createQuestService = ({
+  questRepository,
+  playerRepository,
+  idProvider,
+  clock,
+  questSuggestionGateway,
+}: QuestServiceDependencies) => ({
+  async getDashboard(): Promise<{ player: Player; quests: Quest[] }> {
+    const [player, quests] = await Promise.all([playerRepository.get(), questRepository.list()]);
+    const now = clock.now();
+    const today = now.toISOString().slice(0, 10);
+    let updatedPlayer = player;
+    let changed = false;
+
+    const updatedQuests = quests.map((quest) => {
+      if (quest.status === "completed" && quest.recurrence !== "none" && quest.completedAt) {
+        const completedDate = quest.completedAt.slice(0, 10);
+        const shouldRenewDaily = quest.recurrence === "daily" && completedDate < today;
+        const shouldRenewWeekly = quest.recurrence === "weekly" && isDifferentWeek(new Date(quest.completedAt), now);
+
+        if (shouldRenewDaily || shouldRenewWeekly) {
+          changed = true;
+          return {
+            ...quest,
+            status: "open" as const,
+            completedAt: undefined,
+            failedAt: undefined,
+            lastRenewedAt: now.toISOString(),
+          };
+        }
+      }
+
+      if (quest.status !== "open" || !quest.dueAt || quest.kind === "habit") {
+        return quest;
+      }
+
+      if (new Date(quest.dueAt).getTime() >= now.getTime()) {
+        return quest;
+      }
+
+      changed = true;
+      updatedPlayer = applyQuestFailure(updatedPlayer, quest);
+      return { ...quest, status: "failed" as const, failedAt: now.toISOString() };
+    });
+
+    if (changed) {
+      await Promise.all([playerRepository.save(updatedPlayer), questRepository.saveAll(updatedQuests)]);
+    }
+
+    return { player: updatedPlayer, quests: updatedQuests };
+  },
+
+  async createQuest(input: CreateQuestInput): Promise<Quest> {
+    const quest: Quest = {
+      id: idProvider.createId(),
+      title: input.title.trim(),
+      kind: input.kind,
+      attribute: input.attribute,
+      difficulty: input.difficulty,
+      recurrence: input.recurrence,
+      status: "open",
+      createdAt: clock.now().toISOString(),
+      dueAt: input.dueAt || undefined,
+      projectId: input.projectId || undefined,
+      importance: input.importance?.trim() || undefined,
+      habitLog: [],
+    };
+
+    if (!quest.title) {
+      throw new Error("Quest title is required.");
+    }
+
+    const quests = await questRepository.list();
+    await questRepository.saveAll([quest, ...quests]);
+    return quest;
+  },
+
+  async suggestQuest(goal: string): Promise<CreateQuestInput> {
+    return questSuggestionGateway.suggestQuest(goal);
+  },
+
+  async updateQuest(questId: string, input: UpdateQuestInput): Promise<Quest> {
+    const quests = await questRepository.list();
+    const quest = quests.find((item) => item.id === questId);
+
+    if (!quest) {
+      throw new Error("Quest not found.");
+    }
+
+    if (quest.status !== "open") {
+      throw new Error("Only open quests can be edited.");
+    }
+
+    const updatedQuest: Quest = {
+      ...quest,
+      ...input,
+      title: input.title === undefined ? quest.title : input.title.trim(),
+      dueAt: input.dueAt || undefined,
+      projectId: input.projectId || undefined,
+      importance: input.importance === undefined ? quest.importance : input.importance.trim() || undefined,
+    };
+
+    if (!updatedQuest.title) {
+      throw new Error("Quest title is required.");
+    }
+
+    await questRepository.saveAll(quests.map((item) => (item.id === questId ? updatedQuest : item)));
+    return updatedQuest;
+  },
+
+  async archiveQuest(questId: string): Promise<Quest> {
+    const quests = await questRepository.list();
+    const quest = quests.find((item) => item.id === questId);
+
+    if (!quest) {
+      throw new Error("Quest not found.");
+    }
+
+    const archivedQuest: Quest = {
+      ...quest,
+      status: "archived",
+    };
+
+    await questRepository.saveAll(quests.map((item) => (item.id === questId ? archivedQuest : item)));
+    return archivedQuest;
+  },
+
+  async deleteQuest(questId: string): Promise<void> {
+    const quests = await questRepository.list();
+    await questRepository.saveAll(quests.filter((item) => item.id !== questId));
+  },
+
+  async completeQuest(questId: string): Promise<{ player: Player; quest: Quest }> {
+    const [player, quests] = await Promise.all([playerRepository.get(), questRepository.list()]);
+    const quest = quests.find((item) => item.id === questId);
+
+    if (!quest) {
+      throw new Error("Quest not found.");
+    }
+
+    if (quest.status !== "open") {
+      return { player, quest };
+    }
+
+    const today = clock.now().toISOString().slice(0, 10);
+    if (quest.kind === "habit") {
+      if ((quest.habitLog ?? []).includes(today)) {
+        return { player, quest };
+      }
+
+      const completedHabit: Quest = {
+        ...quest,
+        habitLog: [today, ...(quest.habitLog ?? [])],
+        completedAt: clock.now().toISOString(),
+      };
+      const reward = getRewardForQuest(completedHabit, player.streak);
+      const rewardedPlayer = applyQuestReward(player, completedHabit);
+      const updatedQuests = quests.map((item) => (item.id === questId ? completedHabit : item));
+      const updatedPlayer = unlockAvailableAchievements(
+        recordDailyCompletion(rewardedPlayer, today, completedHabit.id, "habit", reward.xp, reward.coins),
+        updatedQuests,
+      );
+
+      await Promise.all([playerRepository.save(updatedPlayer), questRepository.saveAll(updatedQuests)]);
+      return { player: updatedPlayer, quest: completedHabit };
+    }
+
+    const completedQuest: Quest = {
+      ...quest,
+      status: "completed",
+      completedAt: clock.now().toISOString(),
+    };
+    const reward = getRewardForQuest(completedQuest, player.streak);
+    const rewardedPlayer = applyQuestReward(player, completedQuest);
+    const updatedQuests = quests.map((item) => (item.id === questId ? completedQuest : item));
+    const updatedPlayer = unlockAvailableAchievements(
+      recordDailyCompletion(rewardedPlayer, today, completedQuest.id, "quest", reward.xp, reward.coins),
+      updatedQuests,
+    );
+
+    await Promise.all([
+      playerRepository.save(updatedPlayer),
+      questRepository.saveAll(updatedQuests),
+    ]);
+
+    return { player: updatedPlayer, quest: completedQuest };
+  },
+});
+
+const isDifferentWeek = (left: Date, right: Date) => {
+  const startOfWeek = (date: Date) => {
+    const next = new Date(date);
+    next.setHours(0, 0, 0, 0);
+    next.setDate(next.getDate() - next.getDay());
+    return next.toISOString().slice(0, 10);
+  };
+
+  return startOfWeek(left) !== startOfWeek(right);
+};
+
+const recordDailyCompletion = (
+  player: Player,
+  date: string,
+  questId: string,
+  type: "quest" | "habit",
+  xpEarned: number,
+  coinsEarned: number,
+): Player => {
+  const existingEntry = player.dailyHistory.find((entry) => entry.date === date);
+  const nextEntry = existingEntry ?? {
+    date,
+    completedQuestIds: [],
+    completedHabitIds: [],
+    xpEarned: 0,
+    coinsEarned: 0,
+  };
+  const completedQuestIds =
+    type === "quest" ? Array.from(new Set([...nextEntry.completedQuestIds, questId])) : nextEntry.completedQuestIds;
+  const completedHabitIds =
+    type === "habit" ? Array.from(new Set([...nextEntry.completedHabitIds, questId])) : nextEntry.completedHabitIds;
+  const updatedEntry = {
+    ...nextEntry,
+    completedQuestIds,
+    completedHabitIds,
+    xpEarned: nextEntry.xpEarned + xpEarned,
+    coinsEarned: nextEntry.coinsEarned + coinsEarned,
+  };
+
+  return {
+    ...player,
+    dailyHistory: [updatedEntry, ...player.dailyHistory.filter((entry) => entry.date !== date)].slice(0, 90),
+  };
+};
