@@ -5,6 +5,7 @@ import { useDashboard } from "./useDashboard";
 import type { RewardFeedback } from "./useDashboard";
 import { useToneGameFeel } from "./audio/useToneGameFeel";
 import { AppShell } from "./components/AppShell";
+import { OnboardingOverlay } from "./components/OnboardingOverlay";
 import { QuickActions } from "./components/QuickActions";
 import { RewardToast } from "./components/RewardToast";
 import { SplashScreen } from "./components/SplashScreen";
@@ -44,6 +45,7 @@ export const App = () => {
   const [activeView, setActiveView] = useState<AppView>("home");
   const [rewardFeedback, setRewardFeedback] = useState<RewardFeedback | null>(null);
   const [showSplash, setShowSplash] = useState(true);
+  const [showOnboarding, setShowOnboarding] = useState(false);
   const [dailyReviewRequestId, setDailyReviewRequestId] = useState(0);
   const [createQuestIntent, setCreateQuestIntent] = useState<CreateQuestIntent | null>(null);
   const [appFocus, setAppFocus] = useState<AppFocus | null>(null);
@@ -55,6 +57,15 @@ export const App = () => {
     const timeoutId = window.setTimeout(() => setShowSplash(false), 3000);
     return () => window.clearTimeout(timeoutId);
   }, []);
+
+  useEffect(() => {
+    if (showSplash || isLoading) {
+      return;
+    }
+
+    const hasCompletedOnboarding = localStorage.getItem("mmo-system:onboarding-complete") === "true";
+    setShowOnboarding(!hasCompletedOnboarding && quests.length === 0);
+  }, [isLoading, quests.length, showSplash]);
 
   useEffect(() => {
     if (!rewardFeedback) {
@@ -98,6 +109,12 @@ export const App = () => {
     setAppFocus(focus);
     setActiveView(view);
     emitVisualEvent("ui-navigate");
+  }, []);
+
+  const handleFinishOnboarding = useCallback(() => {
+    localStorage.setItem("mmo-system:onboarding-complete", "true");
+    setShowOnboarding(false);
+    emitVisualEvent("ui-confirm");
   }, []);
 
   const handleOpenFocusMode = useCallback((questId: string) => {
@@ -210,6 +227,9 @@ export const App = () => {
         <RewardToast reward={rewardFeedback} />
       </AnimatePresence>
       <QuickActions onNavigate={handleNavigate} onOpenDailyReview={handleOpenDailyReview} />
+      <AnimatePresence>
+        {showOnboarding && <OnboardingOverlay onCreateQuest={createQuest} onDone={handleFinishOnboarding} />}
+      </AnimatePresence>
     </AppShell>
       )}
     </AnimatePresence>

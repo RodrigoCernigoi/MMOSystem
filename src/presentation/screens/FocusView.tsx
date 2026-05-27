@@ -1,8 +1,10 @@
 import { motion } from "motion/react";
-import { ArrowLeft, CheckCircle2, Clock3, Crosshair, Pause, Play, RotateCcw, Sparkles, Target } from "lucide-react";
+import { ArrowLeft, CheckCircle2, Clock3, Crosshair, Pause, Play, RotateCcw, Sparkles, Target, Zap } from "lucide-react";
 import { useEffect, useMemo, useState } from "react";
+import { defaultFocusChecklist } from "../../domain/focusSession";
 import type { Player } from "../../domain/player";
 import type { Quest } from "../../domain/task";
+import { useFocusSessions } from "../useFocusSessions";
 import type { AppView } from "../navigation/appViews";
 import { attributeLabels, difficultyLabels, questKindLabels } from "../viewModels";
 
@@ -29,6 +31,11 @@ export const FocusView = ({ player, quests, initialQuestId, onCompleteQuest, onN
   const [durationMinutes, setDurationMinutes] = useState(25);
   const [elapsedSeconds, setElapsedSeconds] = useState(0);
   const [isRunning, setIsRunning] = useState(false);
+  const [startedAt, setStartedAt] = useState<string | null>(null);
+  const [interruptionCount, setInterruptionCount] = useState(0);
+  const [note, setNote] = useState("");
+  const [checklist, setChecklist] = useState(defaultFocusChecklist);
+  const { sessions, addSession } = useFocusSessions();
   const activeQuest = openQuests.find((quest) => quest.id === activeQuestId) ?? initialQuest;
   const durationSeconds = durationMinutes * 60;
   const progress = Math.min(100, Math.round((elapsedSeconds / durationSeconds) * 100));
@@ -61,6 +68,10 @@ export const FocusView = ({ player, quests, initialQuestId, onCompleteQuest, onN
   const resetTimer = () => {
     setElapsedSeconds(0);
     setIsRunning(false);
+    setStartedAt(null);
+    setInterruptionCount(0);
+    setNote("");
+    setChecklist(defaultFocusChecklist);
   };
 
   const handleSelectQuest = (id: string) => {
@@ -73,8 +84,48 @@ export const FocusView = ({ player, quests, initialQuestId, onCompleteQuest, onN
       return;
     }
 
+    recordSession(true);
     await onCompleteQuest(activeQuest.id);
     resetTimer();
+  };
+
+  const handleStartPause = () => {
+    if (!isRunning && !startedAt) {
+      setStartedAt(new Date().toISOString());
+    }
+
+    setIsRunning((current) => !current);
+  };
+
+  const recordSession = (completedQuest: boolean) => {
+    if (!activeQuest || elapsedSeconds === 0) {
+      return;
+    }
+
+    addSession({
+      id: crypto.randomUUID(),
+      questId: activeQuest.id,
+      questTitle: activeQuest.title,
+      startedAt: startedAt ?? new Date().toISOString(),
+      endedAt: new Date().toISOString(),
+      plannedMinutes: durationMinutes,
+      elapsedSeconds,
+      interruptionCount,
+      checklist,
+      note: note.trim() || undefined,
+      completedQuest,
+    });
+  };
+
+  const handleFinishSession = () => {
+    recordSession(false);
+    resetTimer();
+  };
+
+  const toggleChecklistItem = (id: string) => {
+    setChecklist((current) =>
+      current.map((item) => (item.id === id ? { ...item, checked: !item.checked } : item)),
+    );
   };
 
   if (!activeQuest) {
@@ -146,9 +197,13 @@ export const FocusView = ({ player, quests, initialQuestId, onCompleteQuest, onN
             ))}
           </div>
           <div className="focus-actions">
-            <button type="button" onClick={() => setIsRunning((current) => !current)}>
+            <button type="button" onClick={handleStartPause}>
               {isRunning ? <Pause size={18} /> : <Play size={18} />}
               {isRunning ? "Pausar" : "Iniciar"}
+            </button>
+            <button className="secondary-button" type="button" onClick={() => setInterruptionCount((current) => current + 1)}>
+              <Zap size={18} />
+              Interrupcao {interruptionCount}
             </button>
             <button className="secondary-button" type="button" onClick={resetTimer}>
               <RotateCcw size={18} />
@@ -159,6 +214,16 @@ export const FocusView = ({ player, quests, initialQuestId, onCompleteQuest, onN
               Concluir
             </button>
           </div>
+          <textarea
+            className="focus-note"
+            value={note}
+            onChange={(event) => setNote(event.target.value)}
+            placeholder="Nota rapida: resultado, dificuldade, ajuste para a proxima sessao"
+            aria-label="Nota da sessao de foco"
+          />
+          <button className="secondary-button" type="button" onClick={handleFinishSession}>
+            Salvar sessao sem concluir
+          </button>
         </div>
       </motion.div>
 
@@ -166,18 +231,15 @@ export const FocusView = ({ player, quests, initialQuestId, onCompleteQuest, onN
         <article className="focus-checklist">
           <p className="eyebrow">Execucao</p>
           <h2>Sequencia de acao</h2>
-          <span>
-            <Crosshair size={16} />
-            Definir o menor proximo passo
-          </span>
-          <span>
-            <Clock3 size={16} />
-            Manter uma janela sem troca de contexto
-          </span>
-          <span>
-            <Target size={16} />
-            Registrar conclusao quando terminar
-          </span>
+          {checklist.map((item) => (
+            <label className="focus-check-item" key={item.id}>
+              <input type="checkbox" checked={item.checked} onChange={() => toggleChecklistItem(item.id)} />
+              {item.id === "next-step" && <Crosshair size={16} />}
+              {item.id === "no-context-switch" && <Clock3 size={16} />}
+              {item.id === "record-result" && <Target size={16} />}
+              <span>{item.label}</span>
+            </label>
+          ))}
         </article>
         <article className="focus-queue">
           <p className="eyebrow">Fila</p>
@@ -193,6 +255,15 @@ export const FocusView = ({ player, quests, initialQuestId, onCompleteQuest, onN
               <small>Rank {difficultyLabels[quest.difficulty]}</small>
             </button>
           ))}
+          <div className="focus-session-log">
+            <p className="eyebrow">Sessoes recentes</p>
+            {sessions.slice(0, 3).map((session) => (
+              <span key={session.id}>
+                {Math.round(session.elapsedSeconds / 60)} min · {session.questTitle}
+              </span>
+            ))}
+            {sessions.length === 0 && <span>Nenhuma sessao registrada ainda.</span>}
+          </div>
         </article>
       </div>
     </section>
