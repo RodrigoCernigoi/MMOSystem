@@ -4,6 +4,8 @@ import { FormEvent, memo, useMemo, useState } from "react";
 import { CheckCircle2, Lock, PlusCircle, Search, Sparkles, X } from "lucide-react";
 import type { Attribute } from "../../domain/task";
 import type { SkillNode } from "../../domain/progressionSystem";
+import type { AppView } from "../navigation/appViews";
+import type { AppFocus } from "../navigation/navigationIntent";
 import { attributeLabels, attributeOptions } from "../viewModels";
 import { useProgressionSystem } from "../useProgressionSystem";
 import { emitVisualEvent } from "../visualPreferences";
@@ -44,7 +46,12 @@ const nodeTypes = {
   skill: SkillTreeNode,
 };
 
-export const SkillsView = () => {
+type SkillsViewProps = {
+  focus?: Extract<AppFocus, { type: "skill" }> | null;
+  onFocusNavigate?: (view: AppView, focus: AppFocus) => void;
+};
+
+export const SkillsView = ({ focus, onFocusNavigate }: SkillsViewProps) => {
   const { progression, isLoading, error, createSkill, unlockSkill } = useProgressionSystem();
   const [selectedPrerequisiteIds, setSelectedPrerequisiteIds] = useState<string[]>([]);
   const [selectedSkillId, setSelectedSkillId] = useState<string | null>(null);
@@ -52,7 +59,10 @@ export const SkillsView = () => {
   const [activeFilter, setActiveFilter] = useState<SkillFilter>("all");
   const [searchTerm, setSearchTerm] = useState("");
   const [isCreatorOpen, setIsCreatorOpen] = useState(false);
-  const selectedSkill = progression.skills.find((skill) => skill.id === selectedSkillId) ?? progression.skills[0];
+  const selectedSkill =
+    progression.skills.find((skill) => skill.id === selectedSkillId) ??
+    progression.skills.find((skill) => skill.id === focus?.id) ??
+    progression.skills[0];
   const selectedMasterQuest = selectedSkill
     ? progression.masterQuests.find((masterQuest) => masterQuest.unlocksSkillId === selectedSkill.id)
     : undefined;
@@ -72,6 +82,9 @@ export const SkillsView = () => {
       return matchesAttribute && matchesSearch;
     });
     const visibleSkillIds = new Set(directlyMatchedSkills.map((skill) => skill.id));
+    if (focus?.id) {
+      visibleSkillIds.add(focus.id);
+    }
 
     directlyMatchedSkills.forEach((skill) => {
       skill.prerequisiteSkillIds.forEach((id) => visibleSkillIds.add(id));
@@ -134,7 +147,7 @@ export const SkillsView = () => {
     );
 
     return { nodes: treeNodes, edges: treeEdges, visibleSkillCount: visibleSkills.length };
-  }, [activeFilter, progression.masterQuests, progression.skills, searchTerm]);
+  }, [activeFilter, focus?.id, progression.masterQuests, progression.skills, searchTerm]);
 
   const togglePrerequisite = (skillId: string) => {
     setSelectedPrerequisiteIds((current) =>
@@ -318,7 +331,14 @@ export const SkillsView = () => {
             <h3>{selectedSkill.title}</h3>
             <p>{selectedSkill.description}</p>
             <span>{attributeLabels[selectedSkill.attribute]}</span>
-            {selectedMasterQuest && <span>Missao Mestra: {selectedMasterQuest.title}</span>}
+            {selectedMasterQuest && (
+              <button
+                type="button"
+                onClick={() => onFocusNavigate?.("projects", { type: "masterQuest", id: selectedMasterQuest.id })}
+              >
+                Ver Missao Mestra: {selectedMasterQuest.title}
+              </button>
+            )}
             {selectedSkill.prerequisiteSkillIds.length > 0 && (
               <div className="skill-prereq-list">
                 <strong>Pre-requisitos</strong>

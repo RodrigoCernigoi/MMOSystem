@@ -381,6 +381,164 @@ button:active {
   gap: 12px;
 }
 
+.context-action-grid {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 12px;
+}
+
+.context-action-grid button {
+  display: grid;
+  min-height: 108px;
+  align-content: center;
+  gap: 8px;
+  border: 1px solid rgba(148, 163, 184, 0.18);
+  background:
+    linear-gradient(135deg, rgba(34, 211, 238, 0.08), transparent),
+    rgba(15, 23, 42, 0.66);
+  color: #e2e8f0;
+  padding: 14px;
+  text-align: left;
+}
+
+.context-action-grid button:hover {
+  border-color: rgba(45, 212, 191, 0.34);
+  background:
+    linear-gradient(135deg, rgba(20, 184, 166, 0.14), transparent),
+    rgba(15, 23, 42, 0.8);
+}
+
+.context-action-grid span {
+  color: #9fb5d0;
+  font-size: 0.86rem;
+}
+
+.tabs-shell {
+  display: grid;
+  gap: 16px;
+}
+
+.tabs-list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.tab-button {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  min-height: 42px;
+  overflow: hidden;
+  border: 1px solid rgba(148, 163, 184, 0.18);
+  background: rgba(15, 23, 42, 0.58);
+  color: #cbd5e1;
+  padding: 0 12px;
+  font-weight: 900;
+}
+
+.tab-button span,
+.tab-button strong {
+  position: relative;
+  z-index: 1;
+}
+
+.tab-button strong {
+  display: grid;
+  min-width: 24px;
+  height: 24px;
+  place-items: center;
+  background: rgba(2, 6, 12, 0.48);
+  color: #bef264;
+  font-size: 0.75rem;
+}
+
+.tab-button i {
+  position: absolute;
+  inset: 0;
+  background: rgba(20, 184, 166, 0.2);
+  box-shadow: inset 0 -2px 0 #14b8a6;
+}
+
+.tab-button-active {
+  border-color: rgba(45, 212, 191, 0.34);
+  color: #f8fafc;
+}
+
+.tabs-content {
+  min-width: 0;
+}
+
+.collapsible-panel {
+  display: grid;
+  gap: 12px;
+}
+
+.collapsible-trigger {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 14px;
+  min-height: 58px;
+  width: 100%;
+  border: 1px solid rgba(148, 163, 184, 0.18);
+  background:
+    linear-gradient(135deg, rgba(34, 211, 238, 0.08), transparent),
+    rgba(15, 23, 42, 0.68);
+  color: #e2e8f0;
+  padding: 0 14px;
+  text-align: left;
+}
+
+.collapsible-trigger span {
+  display: grid;
+  gap: 3px;
+}
+
+.collapsible-trigger small {
+  color: #94a3b8;
+  font-size: 0.72rem;
+  font-weight: 900;
+  text-transform: uppercase;
+}
+
+.collapsible-trigger svg {
+  transition: transform var(--motion-medium) ease;
+}
+
+.collapsible-chevron-open {
+  transform: rotate(180deg);
+}
+
+.collapsible-body {
+  overflow: hidden;
+}
+
+.collapsible-body > div {
+  padding-top: 4px;
+}
+
+.visual-empty-state {
+  position: relative;
+  overflow: hidden;
+  min-height: 128px;
+  place-content: center;
+}
+
+.visual-empty-state::before {
+  content: "";
+  position: absolute;
+  width: 90px;
+  height: 90px;
+  border: 1px solid rgba(125, 211, 252, 0.2);
+  background:
+    radial-gradient(circle, rgba(34, 211, 238, 0.18), transparent 58%),
+    rgba(15, 23, 42, 0.35);
+  transform: translateY(-34px) rotate(45deg);
+  opacity: 0.65;
+}
+
 .content-panel {
   padding: 24px;
 }
@@ -1321,6 +1479,13 @@ h2 {
   border-color: rgba(125, 211, 252, 0.28);
 }
 
+.focused-card {
+  border-color: rgba(190, 242, 100, 0.58);
+  box-shadow:
+    0 0 0 1px rgba(190, 242, 100, 0.18),
+    0 0 42px rgba(132, 204, 22, 0.18);
+}
+
 .progression-card span,
 .boss-card span,
 .skill-node span {
@@ -2114,6 +2279,24 @@ h2 {
 
   .summary-strip {
     grid-template-columns: 1fr;
+  }
+
+  .context-action-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .context-action-grid button {
+    min-height: 86px;
+  }
+
+  .tabs-list {
+    flex-wrap: nowrap;
+    overflow-x: auto;
+    padding-bottom: 2px;
+  }
+
+  .tab-button {
+    flex: 0 0 auto;
   }
 
   .skill-constellation-toolbar,

@@ -10,6 +10,7 @@ import { RewardToast } from "./components/RewardToast";
 import { SplashScreen } from "./components/SplashScreen";
 import { viewMotion } from "./motion/transitions";
 import type { AppView } from "./navigation/appViews";
+import type { AppFocus, CreateQuestIntent } from "./navigation/navigationIntent";
 import { HomeView } from "./screens/HomeView";
 import { TodayView } from "./screens/TodayView";
 import { emitVisualEvent, intensityMultiplier, useVisualPreferences } from "./visualPreferences";
@@ -43,6 +44,8 @@ export const App = () => {
   const [rewardFeedback, setRewardFeedback] = useState<RewardFeedback | null>(null);
   const [showSplash, setShowSplash] = useState(true);
   const [dailyReviewRequestId, setDailyReviewRequestId] = useState(0);
+  const [createQuestIntent, setCreateQuestIntent] = useState<CreateQuestIntent | null>(null);
+  const [appFocus, setAppFocus] = useState<AppFocus | null>(null);
   const { preferences, setPreferences } = useVisualPreferences();
   useToneGameFeel({ intensity: preferences.audioIntensity, volume: preferences.audioVolume });
 
@@ -83,6 +86,18 @@ export const App = () => {
     emitVisualEvent("ui-confirm");
   }, []);
 
+  const handleCreateQuestWithIntent = useCallback((intent: CreateQuestIntent) => {
+    setCreateQuestIntent(intent);
+    setActiveView("create");
+    emitVisualEvent("ui-confirm");
+  }, []);
+
+  const handleFocusNavigate = useCallback((view: AppView, focus: AppFocus) => {
+    setAppFocus(focus);
+    setActiveView(view);
+    emitVisualEvent("ui-navigate");
+  }, []);
+
   if (isLoading || !player) {
     return <main className="loading">Inicializando sistema...</main>;
   }
@@ -94,6 +109,8 @@ export const App = () => {
         quests={quests}
         onCompleteQuest={handleCompleteQuest}
         onNavigate={handleNavigate}
+        onCreateQuestIntent={handleCreateQuestWithIntent}
+        onFocusNavigate={handleFocusNavigate}
       />
     ),
     today: (
@@ -116,9 +133,27 @@ export const App = () => {
       />
     ),
     calendar: <CalendarView quests={quests} />,
-    create: <CreateQuestView error={error} onCreateQuest={createQuest} onSuggestQuest={suggestQuest} />,
-    projects: <ProjectsView />,
-    skills: <SkillsView />,
+    create: (
+      <CreateQuestView
+        error={error}
+        onCreateQuest={createQuest}
+        onSuggestQuest={suggestQuest}
+        intent={createQuestIntent}
+      />
+    ),
+    projects: (
+      <ProjectsView
+        focus={appFocus?.type === "project" || appFocus?.type === "masterQuest" ? appFocus : null}
+        onCreateQuestIntent={handleCreateQuestWithIntent}
+        onFocusNavigate={handleFocusNavigate}
+      />
+    ),
+    skills: (
+      <SkillsView
+        focus={appFocus?.type === "skill" ? appFocus : null}
+        onFocusNavigate={handleFocusNavigate}
+      />
+    ),
     rewards: <RewardsView />,
     reports: <ReportsView player={player} />,
     achievements: <AchievementsView player={player} />,

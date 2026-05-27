@@ -8,13 +8,23 @@ import type {
   MasterQuest,
   Project,
 } from "../../domain/progressionSystem";
+import type { AppView } from "../navigation/appViews";
+import type { AppFocus, CreateQuestIntent } from "../navigation/navigationIntent";
 import { attributeOptions, attributeLabels } from "../viewModels";
 import { useProgressionSystem } from "../useProgressionSystem";
+import { CollapsiblePanel } from "../components/CollapsiblePanel";
 import { SkillUnlockToast } from "../components/SkillUnlockToast";
+import { Tabs } from "../components/Tabs";
 import { cardMotion } from "../motion/transitions";
 import { emitVisualEvent } from "../visualPreferences";
 
-export const ProjectsView = () => {
+type ProjectsViewProps = {
+  focus?: Extract<AppFocus, { type: "project" | "masterQuest" }> | null;
+  onCreateQuestIntent?: (intent: CreateQuestIntent) => void;
+  onFocusNavigate?: (view: AppView, focus: AppFocus) => void;
+};
+
+export const ProjectsView = ({ focus, onCreateQuestIntent, onFocusNavigate }: ProjectsViewProps) => {
   const {
     progression,
     quests,
@@ -38,7 +48,12 @@ export const ProjectsView = () => {
   const [editingMasterQuest, setEditingMasterQuest] = useState<MasterQuest | null>(null);
   const [editingMasterQuestProjectIds, setEditingMasterQuestProjectIds] = useState<string[]>([]);
   const [unlockedSkillTitle, setUnlockedSkillTitle] = useState<string | null>(null);
+  const [isProjectCreatorOpen, setIsProjectCreatorOpen] = useState(false);
+  const [isMasterQuestCreatorOpen, setIsMasterQuestCreatorOpen] = useState(false);
+  const [activeListTab, setActiveListTab] = useState<"projects" | "masters" | "bosses">("projects");
   const previousUnlockedSkillIds = useRef<Set<string> | null>(null);
+  const focusedProjectRef = useRef<HTMLDivElement | null>(null);
+  const focusedMasterQuestRef = useRef<HTMLDivElement | null>(null);
 
   const openQuests = quests.filter((quest) => quest.status !== "archived");
   const activeProjects = progression.projects.filter((project) => project.status !== "archived");
@@ -63,6 +78,16 @@ export const ProjectsView = () => {
     }
   }, [progression.skills]);
 
+  useEffect(() => {
+    if (focus?.type === "project") {
+      focusedProjectRef.current?.scrollIntoView({ behavior: "smooth", block: "center" });
+    }
+
+    if (focus?.type === "masterQuest") {
+      focusedMasterQuestRef.current?.scrollIntoView({ behavior: "smooth", block: "center" });
+    }
+  }, [focus]);
+
   const toggleValue = (value: string, values: string[], setValues: (next: string[]) => void) => {
     setValues(values.includes(value) ? values.filter((item) => item !== value) : [...values, value]);
   };
@@ -79,6 +104,7 @@ export const ProjectsView = () => {
 
     await createProject(input);
     setSelectedQuestIds([]);
+    setIsProjectCreatorOpen(false);
     event.currentTarget.reset();
   };
 
@@ -105,6 +131,7 @@ export const ProjectsView = () => {
     await createMasterQuest(input);
     setSelectedProjectIds([]);
     setSelectedSkillPrereqIds([]);
+    setIsMasterQuestCreatorOpen(false);
     event.currentTarget.reset();
   };
 
@@ -169,47 +196,48 @@ export const ProjectsView = () => {
     <div className="view-grid view-grid-wide">
       <SkillUnlockToast skillTitle={unlockedSkillTitle} />
       <section className="content-panel">
-        <div className="section-heading">
-          <div>
-            <p className="eyebrow">Real life arcs</p>
-            <h1>Projetos</h1>
-          </div>
-        </div>
         {error && <div className="error-banner">{error}</div>}
-        <form className="stacked-form" onSubmit={handleCreateProject}>
-          <input name="title" placeholder="Ex: melhorar vida social" aria-label="Titulo do projeto" />
-          <textarea name="description" placeholder="Descricao curta" aria-label="Descricao do projeto" />
-          <select name="attribute" defaultValue="discipline">
-            {attributeOptions.map((option) => (
-              <option key={option.value} value={option.value}>
-                {option.label}
-              </option>
-            ))}
-          </select>
-          <div className="check-list">
-            {openQuests.map((quest) => (
-              <label key={quest.id}>
-                <input
-                  type="checkbox"
-                  checked={selectedQuestIds.includes(quest.id)}
-                  onChange={() => toggleValue(quest.id, selectedQuestIds, setSelectedQuestIds)}
-                />
-                <span>{quest.title}</span>
-              </label>
-            ))}
-          </div>
-          <button type="submit">Criar projeto</button>
-        </form>
+        <CollapsiblePanel
+          eyebrow="Real life arcs"
+          title="Criar projeto"
+          isOpen={isProjectCreatorOpen}
+          onToggle={() => setIsProjectCreatorOpen((current) => !current)}
+        >
+          <form className="stacked-form" onSubmit={handleCreateProject}>
+            <input name="title" placeholder="Ex: melhorar vida social" aria-label="Titulo do projeto" />
+            <textarea name="description" placeholder="Descricao curta" aria-label="Descricao do projeto" />
+            <select name="attribute" defaultValue="discipline">
+              {attributeOptions.map((option) => (
+                <option key={option.value} value={option.value}>
+                  {option.label}
+                </option>
+              ))}
+            </select>
+            <div className="check-list">
+              {openQuests.map((quest) => (
+                <label key={quest.id}>
+                  <input
+                    type="checkbox"
+                    checked={selectedQuestIds.includes(quest.id)}
+                    onChange={() => toggleValue(quest.id, selectedQuestIds, setSelectedQuestIds)}
+                  />
+                  <span>{quest.title}</span>
+                </label>
+              ))}
+            </div>
+            <button type="submit">Criar projeto</button>
+          </form>
+        </CollapsiblePanel>
       </section>
 
       <section className="content-panel">
-        <div className="section-heading">
-          <div>
-            <p className="eyebrow">Master quests</p>
-            <h1>Missoes Mestras</h1>
-          </div>
-        </div>
-        <form className="stacked-form" onSubmit={handleCreateMasterQuest}>
+        <CollapsiblePanel
+          eyebrow="Master quests"
+          title="Criar Missao Mestra"
+          isOpen={isMasterQuestCreatorOpen}
+          onToggle={() => setIsMasterQuestCreatorOpen((current) => !current)}
+        >
+          <form className="stacked-form" onSubmit={handleCreateMasterQuest}>
           <input name="title" placeholder="Ex: construir uma vida social ativa" aria-label="Titulo da missao mestra" />
           <textarea name="description" placeholder="Meta real que representa uma virada de fase" aria-label="Descricao" />
           <select name="attribute" defaultValue="social">
@@ -248,8 +276,9 @@ export const ProjectsView = () => {
               </label>
             ))}
           </div>
-          <button type="submit">Criar missao mestra</button>
-        </form>
+            <button type="submit">Criar missao mestra</button>
+          </form>
+        </CollapsiblePanel>
       </section>
 
       <section className="content-panel span-all">
@@ -319,6 +348,16 @@ export const ProjectsView = () => {
           </form>
         )}
 
+        <Tabs
+          activeId={activeListTab}
+          onChange={setActiveListTab}
+          items={[
+            { id: "projects", label: "Projetos", indicator: progression.projects.length },
+            { id: "masters", label: "Mestras", indicator: progression.masterQuests.length },
+            { id: "bosses", label: "Bosses", indicator: progression.bosses.length },
+          ]}
+        >
+        {activeListTab === "projects" && (
         <div className="progression-section">
           <div className="section-heading compact-heading">
             <div>
@@ -328,7 +367,13 @@ export const ProjectsView = () => {
           </div>
           <div className="progression-list">
             {progression.projects.map((project) => (
-              <motion.article className="progression-card" key={project.id} layout {...cardMotion}>
+              <motion.article
+                className={focus?.type === "project" && focus.id === project.id ? "progression-card focused-card" : "progression-card"}
+                key={project.id}
+                layout
+                ref={focus?.type === "project" && focus.id === project.id ? focusedProjectRef : undefined}
+                {...cardMotion}
+              >
                 <span>{attributeLabels[project.attribute]}</span>
                 <strong>{project.title}</strong>
                 <p>{project.description}</p>
@@ -336,6 +381,21 @@ export const ProjectsView = () => {
                   <div style={{ width: `${calculateProjectProgress(project, quests)}%` }} />
                 </div>
                 <div className="inline-actions">
+                  <button
+                    type="button"
+                    onClick={() =>
+                      onCreateQuestIntent?.({
+                        projectId: project.id,
+                        attribute: project.attribute,
+                        kind: "single",
+                        recurrence: "none",
+                        difficulty: "normal",
+                        importance: `Avancar no projeto: ${project.title}`,
+                      })
+                    }
+                  >
+                    Criar missao vinculada
+                  </button>
                   <button type="button" onClick={() => startEditingProject(project)}>
                     Editar
                   </button>
@@ -350,7 +410,9 @@ export const ProjectsView = () => {
             ))}
           </div>
         </div>
+        )}
 
+        {activeListTab === "masters" && (
         <div className="progression-section">
           <div className="section-heading compact-heading">
             <div>
@@ -360,12 +422,24 @@ export const ProjectsView = () => {
           </div>
           <div className="progression-list">
           {progression.masterQuests.map((masterQuest) => (
-            <motion.article className="progression-card" key={masterQuest.id} layout {...cardMotion}>
+            <motion.article
+              className={focus?.type === "masterQuest" && focus.id === masterQuest.id ? "progression-card focused-card" : "progression-card"}
+              key={masterQuest.id}
+              layout
+              ref={focus?.type === "masterQuest" && focus.id === masterQuest.id ? focusedMasterQuestRef : undefined}
+              {...cardMotion}
+            >
               <span>{attributeLabels[masterQuest.attribute]}</span>
               <strong>{masterQuest.title}</strong>
               <p>{masterQuest.description}</p>
               <p className="muted-text">Perk associado: {masterQuest.unlocksSkillId ? "habilidade vinculada" : "sem perk"}</p>
               <div className="inline-actions">
+                <button
+                  type="button"
+                  onClick={() => onFocusNavigate?.("skills", { type: "skill", id: masterQuest.unlocksSkillId })}
+                >
+                  Ver skill
+                </button>
                 <button type="button" onClick={() => startEditingMasterQuest(masterQuest)}>
                   Editar
                 </button>
@@ -385,7 +459,9 @@ export const ProjectsView = () => {
           ))}
           </div>
         </div>
+        )}
 
+        {activeListTab === "bosses" && (
         <div className="progression-section">
           <div className="section-heading compact-heading">
             <div>
@@ -411,6 +487,8 @@ export const ProjectsView = () => {
           ))}
           </div>
         </div>
+        )}
+        </Tabs>
       </section>
     </div>
   );

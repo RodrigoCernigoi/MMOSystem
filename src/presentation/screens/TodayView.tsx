@@ -7,6 +7,7 @@ import type { Quest } from "../../domain/task";
 import { QuestCard } from "../components/QuestCard";
 import { DailyReviewOverlay } from "../components/DailyReviewOverlay";
 import { Metric } from "../components/Metric";
+import { Tabs } from "../components/Tabs";
 
 type TodayViewProps = {
   player: Player;
@@ -18,6 +19,7 @@ type TodayViewProps = {
 
 export const TodayView = ({ player, quests, onCompleteQuest, onEndDay, reviewRequestId = 0 }: TodayViewProps) => {
   const [isReviewOpen, setIsReviewOpen] = useState(false);
+  const [activeTab, setActiveTab] = useState<"habits" | "missions" | "projects">("habits");
   const today = toDateKey(new Date());
   const todayQuests = quests.filter((quest) => isQuestForToday(quest, today));
   const todayHistory = player.dailyHistory.find((entry) => entry.date === today);
@@ -67,66 +69,70 @@ export const TodayView = ({ player, quests, onCompleteQuest, onEndDay, reviewReq
         </div>
       </section>
 
-      <section className="content-panel">
-        <div className="section-heading">
-          <div>
-            <p className="eyebrow">Habitos</p>
-            <h2>Check-in de hoje</h2>
-          </div>
-        </div>
-        <div className="quest-list">
-          {pendingHabits.length === 0 ? (
-            <div className="empty-state">Habitos de hoje em dia.</div>
-          ) : (
-            pendingHabits.map((quest) => (
-              <div className="habit-card-wrap" key={quest.id}>
-                <QuestCard quest={quest} onCompleteQuest={onCompleteQuest} />
-                <span>Streak: {calculateHabitStreak(quest)} dias</span>
-              </div>
-            ))
-          )}
-          {doneHabits.map((quest) => (
-            <div className="habit-card-wrap" key={quest.id}>
-              <QuestCard quest={quest} onCompleteQuest={onCompleteQuest} />
-              <span>Concluido hoje · Streak: {calculateHabitStreak(quest)} dias</span>
-            </div>
-          ))}
-        </div>
-      </section>
-
-      <section className="content-panel">
-        <div className="section-heading">
-          <div>
-            <p className="eyebrow">Missoes</p>
-            <h2>Agenda de hoje</h2>
-          </div>
-        </div>
-        <div className="quest-list">
-          {dueToday.length === 0 ? (
-            <div className="empty-state">Nenhuma missao para hoje.</div>
-          ) : (
-            dueToday.map((quest) => <QuestCard key={quest.id} quest={quest} onCompleteQuest={onCompleteQuest} />)
-          )}
-        </div>
-      </section>
-
       <section className="content-panel span-all">
         <div className="section-heading">
           <div>
-            <p className="eyebrow">Projetos em foco</p>
-            <h2>Missoes vinculadas</h2>
+            <p className="eyebrow">Cockpit</p>
+            <h2>Foco do dia</h2>
           </div>
         </div>
-        <div className="quest-list">
-          {quests.filter((quest) => quest.status === "open" && quest.projectId).length === 0 ? (
-            <div className="empty-state">Nenhuma missao de projeto em aberto.</div>
-          ) : (
-            quests
-              .filter((quest) => quest.status === "open" && quest.projectId)
-              .slice(0, 5)
-              .map((quest) => <QuestCard key={quest.id} quest={quest} onCompleteQuest={onCompleteQuest} />)
+        <Tabs
+          activeId={activeTab}
+          onChange={setActiveTab}
+          items={[
+            { id: "habits", label: "Habitos", indicator: pendingHabits.length },
+            { id: "missions", label: "Missoes", indicator: dueToday.length },
+            {
+              id: "projects",
+              label: "Projetos",
+              indicator: quests.filter((quest) => quest.status === "open" && quest.projectId).length,
+            },
+          ]}
+        >
+          {activeTab === "habits" && (
+            <div className="quest-list">
+              {pendingHabits.length === 0 && doneHabits.length === 0 ? (
+                <div className="empty-state visual-empty-state">Habitos de hoje em dia.</div>
+              ) : (
+                <>
+                  {pendingHabits.map((quest) => (
+                    <div className="habit-card-wrap" key={quest.id}>
+                      <QuestCard quest={quest} onCompleteQuest={onCompleteQuest} />
+                      <span>Streak: {calculateHabitStreak(quest)} dias</span>
+                    </div>
+                  ))}
+                  {doneHabits.map((quest) => (
+                    <div className="habit-card-wrap" key={quest.id}>
+                      <QuestCard quest={quest} onCompleteQuest={onCompleteQuest} />
+                      <span>Concluido hoje · Streak: {calculateHabitStreak(quest)} dias</span>
+                    </div>
+                  ))}
+                </>
+              )}
+            </div>
           )}
-        </div>
+          {activeTab === "missions" && (
+            <div className="quest-list">
+              {dueToday.length === 0 ? (
+                <div className="empty-state visual-empty-state">Nenhuma missao para hoje.</div>
+              ) : (
+                dueToday.map((quest) => <QuestCard key={quest.id} quest={quest} onCompleteQuest={onCompleteQuest} />)
+              )}
+            </div>
+          )}
+          {activeTab === "projects" && (
+            <div className="quest-list">
+              {quests.filter((quest) => quest.status === "open" && quest.projectId).length === 0 ? (
+                <div className="empty-state visual-empty-state">Nenhuma missao de projeto em aberto.</div>
+              ) : (
+                quests
+                  .filter((quest) => quest.status === "open" && quest.projectId)
+                  .slice(0, 5)
+                  .map((quest) => <QuestCard key={quest.id} quest={quest} onCompleteQuest={onCompleteQuest} />)
+              )}
+            </div>
+          )}
+        </Tabs>
       </section>
       <DailyReviewOverlay
         isOpen={isReviewOpen}

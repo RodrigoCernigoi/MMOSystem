@@ -1,15 +1,17 @@
 import { WandSparkles } from "lucide-react";
 import type { CreateQuestInput } from "../../domain/task";
 import { QuestForm } from "../components/QuestForm";
+import type { CreateQuestIntent } from "../navigation/navigationIntent";
 import { useProgressionSystem } from "../useProgressionSystem";
 
 type CreateQuestViewProps = {
   error: string | null;
   onCreateQuest: (input: CreateQuestInput) => Promise<void>;
   onSuggestQuest: (goal: string) => Promise<CreateQuestInput>;
+  intent?: CreateQuestIntent | null;
 };
 
-export const CreateQuestView = ({ error, onCreateQuest, onSuggestQuest }: CreateQuestViewProps) => {
+export const CreateQuestView = ({ error, onCreateQuest, onSuggestQuest, intent }: CreateQuestViewProps) => {
   const { progression } = useProgressionSystem();
 
   return (
@@ -26,6 +28,7 @@ export const CreateQuestView = ({ error, onCreateQuest, onSuggestQuest }: Create
         onCreateQuest={onCreateQuest}
         onSuggestQuest={onSuggestQuest}
         projects={progression.projects.filter((project) => project.status === "active")}
+        intent={intent}
       />
     </section>
   );
