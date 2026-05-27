@@ -1,4 +1,4 @@
-import { Coins, Target, Trophy } from "lucide-react";
+import { CheckCircle2, Coins, Compass, PlusCircle, Target, Trophy } from "lucide-react";
 import { useEffect, useState } from "react";
 import { calculateHabitStreak } from "../../domain/habitStats";
 import { isHabitDoneToday, isQuestForToday, toDateKey } from "../../domain/schedule";
@@ -27,7 +27,47 @@ export const TodayView = ({ player, quests, onCompleteQuest, onEndDay, reviewReq
   const pendingHabits = todayQuests.filter((quest) => quest.kind === "habit" && !isHabitDoneToday(quest, today));
   const doneHabits = todayQuests.filter((quest) => quest.kind === "habit" && isHabitDoneToday(quest, today));
   const dueToday = todayQuests.filter((quest) => quest.kind !== "habit");
-  const plannedXp = todayQuests.length * 50;
+  const projectQuests = quests.filter((quest) => quest.status === "open" && quest.projectId);
+  const completedToday = (todayHistory?.completedQuestIds.length ?? 0) + (todayHistory?.completedHabitIds.length ?? 0);
+  const totalToday = pendingHabits.length + doneHabits.length + dueToday.length;
+  const progressPercent = totalToday === 0 ? (todayReview ? 100 : 0) : Math.round((completedToday / totalToday) * 100);
+  const nextQuest = pendingHabits[0] ?? dueToday[0] ?? projectQuests[0];
+  const nextAction = nextQuest
+    ? {
+        eyebrow: nextQuest.kind === "habit" ? "Proximo check-in" : "Proxima missao",
+        title: nextQuest.title,
+        detail: nextQuest.importance || "Concluir esta acao move o dia para frente.",
+        label: "Concluir agora",
+        Icon: Target,
+        onClick: () => void onCompleteQuest(nextQuest.id),
+      }
+    : todayReview
+      ? {
+          eyebrow: "Dia fechado",
+          title: "Progresso registrado",
+          detail: `Rank ${todayReview.rank} computado no relatorio diario.`,
+          label: "Ver fechamento",
+          Icon: CheckCircle2,
+          onClick: () => setIsReviewOpen(true),
+        }
+      : completedToday > 0
+        ? {
+            eyebrow: "Ritual de fechamento",
+            title: "Encerrar o dia",
+            detail: "Compute XP, moedas, rank e o resumo do dia.",
+            label: "Encerrar dia",
+            Icon: Trophy,
+            onClick: () => setIsReviewOpen(true),
+          }
+        : {
+            eyebrow: "Sem acoes para hoje",
+            title: "Criar uma nova missao",
+            detail: "Adicione uma acao simples para manter o sistema vivo.",
+            label: "Ir para Criar",
+            Icon: PlusCircle,
+            onClick: () => setActiveTab("missions"),
+          };
+  const NextIcon = nextAction.Icon;
 
   useEffect(() => {
     if (reviewRequestId > 0) {
@@ -37,7 +77,7 @@ export const TodayView = ({ player, quests, onCompleteQuest, onEndDay, reviewReq
 
   return (
     <div className="view-grid view-grid-wide">
-      <section className="content-panel span-all">
+      <section className="content-panel span-all daily-cockpit">
         <div className="section-heading">
           <div>
             <p className="eyebrow">Hoje</p>
@@ -47,10 +87,41 @@ export const TodayView = ({ player, quests, onCompleteQuest, onEndDay, reviewReq
             {todayReview ? "Ver fechamento" : "Encerrar dia"}
           </button>
         </div>
-        <div className="summary-strip">
-          <Metric icon={<Target size={18} />} label="Pendentes" value={todayQuests.length} />
+        <div className="daily-cockpit-grid">
+          <div className="daily-progress-card">
+            <div>
+              <p className="eyebrow">Progresso do dia</p>
+              <strong>{progressPercent}%</strong>
+              <span>
+                {completedToday}/{Math.max(totalToday, completedToday)} acoes computadas
+              </span>
+            </div>
+            <div className="daily-progress-ring" style={{ ["--progress" as string]: `${progressPercent}%` }}>
+              <span>{progressPercent}</span>
+            </div>
+            <div className="daily-progress-track">
+              <div style={{ width: `${progressPercent}%` }} />
+            </div>
+          </div>
+          <div className="next-action-card">
+            <div className="next-action-icon">
+              <NextIcon size={24} />
+            </div>
+            <div>
+              <p className="eyebrow">{nextAction.eyebrow}</p>
+              <h2>{nextAction.title}</h2>
+              <p>{nextAction.detail}</p>
+            </div>
+            <button type="button" onClick={nextAction.onClick}>
+              <Compass size={18} />
+              {nextAction.label}
+            </button>
+          </div>
+        </div>
+        <div className="summary-strip compact-summary">
+          <Metric icon={<Target size={18} />} label="Pendentes" value={Math.max(0, totalToday - completedToday)} />
           <Metric icon={<Trophy size={18} />} label="Habitos" value={pendingHabits.length} />
-          <Metric icon={<Coins size={18} />} label="XP previsto" value={plannedXp} />
+          <Metric icon={<Coins size={18} />} label="Moedas hoje" value={todayHistory?.coinsEarned ?? 0} />
         </div>
       </section>
 
