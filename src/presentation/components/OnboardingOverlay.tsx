@@ -77,6 +77,11 @@ export const OnboardingOverlay = ({ onCreateQuest, onDone }: OnboardingOverlayPr
             <p className="eyebrow">Primeira sincronizacao</p>
             <h1>Vamos calibrar seu sistema</h1>
             <p>Escolha uma area da vida para ser o ponto inicial do seu construtor de habitos.</p>
+            <div className="onboarding-mini-flow">
+              <span>1. Missao</span>
+              <span>2. Foco</span>
+              <span>3. Encerrar dia</span>
+            </div>
             <select value={lifeArea} onChange={(event) => setLifeArea(event.target.value as Attribute)}>
               {attributeOptions.map((option) => (
                 <option key={option.value} value={option.value}>

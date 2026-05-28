@@ -9,6 +9,8 @@ import { OnboardingOverlay } from "./components/OnboardingOverlay";
 import { QuickActions } from "./components/QuickActions";
 import { RewardToast } from "./components/RewardToast";
 import { SplashScreen } from "./components/SplashScreen";
+import { SyncStatusBadge } from "./components/SyncStatusBadge";
+import type { SyncStatus } from "./components/SyncStatusBadge";
 import { viewMotion } from "./motion/transitions";
 import type { AppView } from "./navigation/appViews";
 import type { AppFocus, CreateQuestIntent } from "./navigation/navigationIntent";
@@ -50,6 +52,8 @@ export const App = () => {
   const [createQuestIntent, setCreateQuestIntent] = useState<CreateQuestIntent | null>(null);
   const [appFocus, setAppFocus] = useState<AppFocus | null>(null);
   const [focusQuestId, setFocusQuestId] = useState<string | null>(null);
+  const [syncStatus, setSyncStatus] = useState<SyncStatus>("idle");
+  const [syncDetail, setSyncDetail] = useState<string | null>(null);
   const { preferences, setPreferences } = useVisualPreferences();
   useToneGameFeel({ intensity: preferences.audioIntensity, volume: preferences.audioVolume });
 
@@ -76,16 +80,65 @@ export const App = () => {
     return () => window.clearTimeout(timeoutId);
   }, [rewardFeedback]);
 
+  useEffect(() => {
+    if (syncStatus !== "saving") {
+      return;
+    }
+
+    const timeoutId = window.setTimeout(() => setSyncStatus("idle"), 900);
+    return () => window.clearTimeout(timeoutId);
+  }, [syncStatus]);
+
+  const runSyncedAction = useCallback(async <T,>(action: () => Promise<T>) => {
+    setSyncStatus("saving");
+    setSyncDetail(null);
+
+    try {
+      const result = await action();
+      setSyncStatus("saving");
+      return result;
+    } catch (actionError) {
+      setSyncStatus("error");
+      setSyncDetail(actionError instanceof Error ? actionError.message : "Erro ao sincronizar dados.");
+      throw actionError;
+    }
+  }, []);
+
   const handleCompleteQuest = useCallback(
     async (id: string) => {
-      const reward = await completeQuest(id);
+      const reward = await runSyncedAction(() => completeQuest(id));
       setRewardFeedback(reward);
       emitVisualEvent("quest-complete");
       if (reward.leveledUp) {
         emitVisualEvent("level-up");
       }
     },
-    [completeQuest],
+    [completeQuest, runSyncedAction],
+  );
+
+  const handleCreateQuest = useCallback(
+    (input: Parameters<typeof createQuest>[0]) => runSyncedAction(() => createQuest(input)),
+    [createQuest, runSyncedAction],
+  );
+
+  const handleUpdateQuest = useCallback(
+    (id: string, input: Parameters<typeof updateQuest>[1]) => runSyncedAction(() => updateQuest(id, input)),
+    [runSyncedAction, updateQuest],
+  );
+
+  const handleArchiveQuest = useCallback(
+    (id: string) => runSyncedAction(() => archiveQuest(id)),
+    [archiveQuest, runSyncedAction],
+  );
+
+  const handleDeleteQuest = useCallback(
+    (id: string) => runSyncedAction(() => deleteQuest(id)),
+    [deleteQuest, runSyncedAction],
+  );
+
+  const handleEndDay = useCallback(
+    (date: string) => runSyncedAction(() => endDay(date)),
+    [endDay, runSyncedAction],
   );
 
   const handleNavigate = useCallback((view: AppView) => {
@@ -143,7 +196,7 @@ export const App = () => {
         player={player}
         quests={quests}
         onCompleteQuest={handleCompleteQuest}
-        onEndDay={endDay}
+        onEndDay={handleEndDay}
         onOpenFocus={handleOpenFocusMode}
         reviewRequestId={dailyReviewRequestId}
       />
@@ -162,9 +215,9 @@ export const App = () => {
         quests={quests}
         error={error}
         onCompleteQuest={handleCompleteQuest}
-        onUpdateQuest={updateQuest}
-        onArchiveQuest={archiveQuest}
-        onDeleteQuest={deleteQuest}
+        onUpdateQuest={handleUpdateQuest}
+        onArchiveQuest={handleArchiveQuest}
+        onDeleteQuest={handleDeleteQuest}
         onOpenFocus={handleOpenFocusMode}
         onFocusNavigate={handleFocusNavigate}
       />
@@ -173,7 +226,7 @@ export const App = () => {
     create: (
       <CreateQuestView
         error={error}
-        onCreateQuest={createQuest}
+        onCreateQuest={handleCreateQuest}
         onSuggestQuest={suggestQuest}
         intent={createQuestIntent}
       />
@@ -227,8 +280,9 @@ export const App = () => {
         <RewardToast reward={rewardFeedback} />
       </AnimatePresence>
       <QuickActions onNavigate={handleNavigate} onOpenDailyReview={handleOpenDailyReview} />
+      <SyncStatusBadge status={syncStatus} detail={syncDetail} />
       <AnimatePresence>
-        {showOnboarding && <OnboardingOverlay onCreateQuest={createQuest} onDone={handleFinishOnboarding} />}
+        {showOnboarding && <OnboardingOverlay onCreateQuest={handleCreateQuest} onDone={handleFinishOnboarding} />}
       </AnimatePresence>
     </AppShell>
       )}

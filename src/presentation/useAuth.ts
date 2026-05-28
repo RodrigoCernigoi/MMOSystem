@@ -33,26 +33,34 @@ export const useAuth = () => {
 
   const signIn = useCallback(async (email: string, password: string) => {
     if (!supabase) {
-      return;
+      return { ok: false, error: "Supabase nao esta configurado." };
     }
 
     const { error } = await supabase.auth.signInWithPassword({ email, password });
 
     if (error) {
       setState((current) => ({ ...current, error: error.message }));
+      return { ok: false, error: error.message };
     }
+
+    setState((current) => ({ ...current, error: null }));
+    return { ok: true, error: null };
   }, []);
 
   const signUp = useCallback(async (email: string, password: string) => {
     if (!supabase) {
-      return;
+      return { ok: false, error: "Supabase nao esta configurado." };
     }
 
     const { error } = await supabase.auth.signUp({ email, password });
 
     if (error) {
       setState((current) => ({ ...current, error: error.message }));
+      return { ok: false, error: error.message };
     }
+
+    setState((current) => ({ ...current, error: null }));
+    return { ok: true, error: null };
   }, []);
 
   const signOut = useCallback(async () => {
