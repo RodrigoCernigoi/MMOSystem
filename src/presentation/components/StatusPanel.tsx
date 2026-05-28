@@ -7,6 +7,8 @@ import type { UpdatePlayerProfileInput } from "../../application/questService";
 import type { Attribute, Quest } from "../../domain/task";
 import { useFocusSessions } from "../useFocusSessions";
 import { useProgressionSystem } from "../useProgressionSystem";
+import type { AppView } from "../navigation/appViews";
+import type { AppFocus } from "../navigation/navigationIntent";
 import { attributeLabels } from "../viewModels";
 import { Metric } from "./Metric";
 
@@ -14,6 +16,7 @@ type StatusPanelProps = {
   player: Player;
   quests: Quest[];
   onUpdateProfile?: (input: UpdatePlayerProfileInput) => Promise<unknown>;
+  onFocusNavigate?: (view: AppView, focus: AppFocus) => void;
 };
 
 const avatarOptions = [
@@ -25,7 +28,7 @@ const avatarOptions = [
 
 const avatarLabel = (value?: string) => avatarOptions.find((option) => option.value === value)?.label ?? "Spark";
 
-export const StatusPanel = ({ player, quests, onUpdateProfile }: StatusPanelProps) => {
+export const StatusPanel = ({ player, quests, onUpdateProfile, onFocusNavigate }: StatusPanelProps) => {
   const [isEditingProfile, setIsEditingProfile] = useState(false);
   const { progression } = useProgressionSystem();
   const { sessions } = useFocusSessions();
@@ -56,16 +59,23 @@ export const StatusPanel = ({ player, quests, onUpdateProfile }: StatusPanelProp
   const evidenceItems = [
     ...unlockedSkills
       .filter((skill) => skill.evidence)
-      .map((skill) => ({ label: "Skill adquirida", title: skill.title, detail: skill.evidence ?? "" })),
+      .map((skill) => ({
+        label: "Skill adquirida",
+        title: skill.title,
+        detail: skill.evidence ?? "",
+        focus: { view: "skills" as AppView, focus: { type: "skill" as const, id: skill.id } },
+      })),
     ...completedMasterQuests.map((masterQuest) => ({
       label: "Missao Mestra",
       title: masterQuest.title,
       detail: masterQuest.completedAt ? new Date(masterQuest.completedAt).toLocaleDateString("pt-BR") : "Concluida",
+      focus: { view: "projects" as AppView, focus: { type: "masterQuest" as const, id: masterQuest.id } },
     })),
     ...completedProjects.map((project) => ({
       label: "Projeto finalizado",
       title: project.title,
       detail: project.description,
+      focus: { view: "projects" as AppView, focus: { type: "project" as const, id: project.id } },
     })),
     ...sessions
       .filter((session) => session.completedQuest || session.elapsedSeconds >= 25 * 60)
@@ -74,6 +84,7 @@ export const StatusPanel = ({ player, quests, onUpdateProfile }: StatusPanelProp
         label: "Sessao de foco",
         title: session.questTitle,
         detail: `${Math.round(session.elapsedSeconds / 60)} min registrados`,
+        focus: null,
       })),
   ].slice(0, 6);
   const identitySummary = dominantAttribute
@@ -240,6 +251,11 @@ export const StatusPanel = ({ player, quests, onUpdateProfile }: StatusPanelProp
               <span>{item.label}</span>
               <strong>{item.title}</strong>
               <p>{item.detail}</p>
+              {item.focus && onFocusNavigate && (
+                <button type="button" onClick={() => onFocusNavigate(item.focus.view, item.focus.focus)}>
+                  Abrir registro
+                </button>
+              )}
             </article>
           ))
         )}

@@ -253,7 +253,14 @@ export const App = () => {
     rewards: <RewardsView />,
     reports: <ReportsView player={player} />,
     achievements: <AchievementsView player={player} />,
-    status: <StatusView player={player} quests={quests} onUpdateProfile={handleUpdatePlayerProfile} />,
+    status: (
+      <StatusView
+        player={player}
+        quests={quests}
+        onUpdateProfile={handleUpdatePlayerProfile}
+        onFocusNavigate={handleFocusNavigate}
+      />
+    ),
     settings: <SettingsView preferences={preferences} onChangePreferences={setPreferences} />,
   };
   const failedQuestCount = quests.filter((quest) => quest.status === "failed").length;
