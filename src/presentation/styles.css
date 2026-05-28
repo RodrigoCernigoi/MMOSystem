@@ -13,11 +13,18 @@
   box-sizing: border-box;
 }
 
+html {
+  max-width: 100%;
+  overflow-x: hidden;
+}
+
 body {
   margin: 0;
   min-width: 320px;
   min-height: 100vh;
   min-height: 100dvh;
+  max-width: 100%;
+  overflow-x: hidden;
   background:
     linear-gradient(135deg, rgba(37, 99, 235, 0.24), transparent 32%),
     linear-gradient(315deg, rgba(20, 184, 166, 0.18), transparent 30%),
@@ -28,6 +35,8 @@ body {
   position: relative;
   min-height: 100vh;
   min-height: 100dvh;
+  max-width: 100%;
+  overflow-x: hidden;
   isolation: isolate;
 }
 
@@ -256,8 +265,11 @@ button:active {
   isolation: isolate;
   display: grid;
   grid-template-columns: 220px minmax(0, 1fr);
+  width: 100%;
+  max-width: 100%;
   min-height: 100vh;
   min-height: 100dvh;
+  overflow-x: hidden;
 }
 
 .pixi-game-layer {
@@ -339,7 +351,20 @@ button:active {
   position: relative;
   z-index: 1;
   min-width: 0;
+  max-width: 100%;
+  overflow-x: hidden;
   padding: 24px;
+}
+
+.view-transition,
+.content-panel,
+.status-panel,
+.quest-board,
+.welcome-panel,
+.tabs-shell,
+.tabs-content {
+  min-width: 0;
+  max-width: 100%;
 }
 
 .mobile-tabbar,
@@ -2938,6 +2963,8 @@ h2 {
 
   .view-transition {
     min-width: 0;
+    max-width: 100%;
+    overflow-x: hidden;
   }
 
   .view-grid,
@@ -2969,6 +2996,7 @@ h2 {
 
   .quick-actions-panel {
     width: min(300px, calc(100vw - 24px));
+    max-width: calc(100vw - 24px);
     max-height: min(48vh, 380px);
     overflow: auto;
   }
@@ -3052,10 +3080,15 @@ h2 {
     grid-auto-columns: minmax(138px, 54vw);
     grid-template-columns: none;
     gap: 10px;
+    width: 100%;
+    max-width: 100%;
+    min-width: 0;
     overflow-x: auto;
+    overflow-y: hidden;
     overscroll-behavior-x: contain;
     margin-top: 0;
     padding-bottom: 4px;
+    -webkit-overflow-scrolling: touch;
   }
 
   .attribute-row {
@@ -3094,10 +3127,15 @@ h2 {
     grid-auto-columns: minmax(150px, 68vw);
     grid-template-columns: none;
     gap: 10px;
+    width: 100%;
+    max-width: 100%;
+    min-width: 0;
     overflow-x: auto;
+    overflow-y: hidden;
     overscroll-behavior-x: contain;
     padding-bottom: 4px;
     scroll-snap-type: x proximity;
+    -webkit-overflow-scrolling: touch;
   }
 
   .summary-strip > *,
@@ -3173,9 +3211,14 @@ h2 {
     grid-auto-flow: column;
     grid-auto-columns: minmax(150px, 48vw);
     grid-template-columns: none;
+    width: 100%;
+    max-width: 100%;
+    min-width: 0;
     overflow-x: auto;
+    overflow-y: hidden;
     overscroll-behavior-x: contain;
     padding-bottom: 3px;
+    -webkit-overflow-scrolling: touch;
   }
 
   .mission-search {
@@ -3232,8 +3275,14 @@ h2 {
 
   .tabs-list {
     flex-wrap: nowrap;
+    width: 100%;
+    max-width: 100%;
+    min-width: 0;
     overflow-x: auto;
+    overflow-y: hidden;
+    overscroll-behavior-x: contain;
     padding-bottom: 2px;
+    -webkit-overflow-scrolling: touch;
   }
 
   .tab-button {
@@ -3270,8 +3319,14 @@ h2 {
   .constellation-tabs {
     justify-content: flex-start;
     flex-wrap: nowrap;
+    width: 100%;
+    max-width: 100%;
+    min-width: 0;
     overflow-x: auto;
+    overflow-y: hidden;
+    overscroll-behavior-x: contain;
     padding-bottom: 3px;
+    -webkit-overflow-scrolling: touch;
   }
 
   .constellation-tabs button {
@@ -3284,8 +3339,14 @@ h2 {
     grid-auto-flow: column;
     grid-auto-columns: minmax(126px, 42vw);
     grid-template-columns: none;
+    width: 100%;
+    max-width: 100%;
+    min-width: 0;
     overflow-x: auto;
+    overflow-y: hidden;
+    overscroll-behavior-x: contain;
     padding-bottom: 4px;
+    -webkit-overflow-scrolling: touch;
   }
 
   .constellation-card {
@@ -3295,6 +3356,8 @@ h2 {
   .skill-flow-shell {
     height: min(56dvh, 520px);
     min-height: 340px;
+    max-width: 100%;
+    overflow: hidden;
   }
 
   .flow-skill-node {
@@ -3339,6 +3402,8 @@ h2 {
   }
 
   .daily-review-panel {
+    width: 100%;
+    max-width: calc(100vw - 20px);
     max-height: calc(100dvh - 20px);
     padding: 18px;
   }
@@ -3353,7 +3418,9 @@ h2 {
 
   .review-chart {
     grid-template-columns: repeat(7, minmax(34px, 1fr));
+    max-width: 100%;
     overflow-x: auto;
+    overflow-y: hidden;
   }
 
   .history-calendar {
@@ -3367,7 +3434,9 @@ h2 {
   }
 
   .focus-screen {
+    max-width: 100%;
     min-height: calc(100dvh - 104px);
+    overflow: hidden;
     padding: 14px;
   }
 
