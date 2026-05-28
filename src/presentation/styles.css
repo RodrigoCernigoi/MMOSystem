@@ -2815,10 +2815,17 @@ h2 {
 }
 
 @media (max-width: 860px) {
+  body {
+    background:
+      linear-gradient(135deg, rgba(37, 99, 235, 0.16), transparent 28%),
+      linear-gradient(315deg, rgba(20, 184, 166, 0.12), transparent 26%),
+      #0d1117;
+  }
+
   .app-layout {
     grid-template-columns: 1fr;
     min-height: 100dvh;
-    padding-bottom: calc(78px + env(safe-area-inset-bottom));
+    padding-bottom: calc(74px + env(safe-area-inset-bottom));
   }
 
   .auth-shell {
@@ -2848,17 +2855,17 @@ h2 {
     display: grid;
     grid-template-columns: repeat(6, minmax(0, 1fr));
     gap: 3px;
-    min-height: calc(68px + env(safe-area-inset-bottom));
+    min-height: calc(64px + env(safe-area-inset-bottom));
     border-top: 1px solid rgba(148, 163, 184, 0.2);
     background: rgba(5, 10, 18, 0.94);
     backdrop-filter: blur(16px);
-    padding: 6px 6px calc(6px + env(safe-area-inset-bottom));
+    padding: 5px 6px calc(5px + env(safe-area-inset-bottom));
   }
 
   .mobile-tab {
     display: grid;
     min-width: 0;
-    min-height: 54px;
+    min-height: 50px;
     place-items: center;
     gap: 3px;
     border: 1px solid transparent;
@@ -2926,11 +2933,17 @@ h2 {
   }
 
   .view-frame {
-    padding: 12px;
+    padding: 10px;
   }
 
   .view-transition {
     min-width: 0;
+  }
+
+  .view-grid,
+  .view-grid-home,
+  .view-grid-wide {
+    gap: 12px;
   }
 
   .reward-toast {
@@ -2981,58 +2994,155 @@ h2 {
 
   .welcome-panel {
     min-height: auto;
-    padding: 18px;
+    gap: 14px;
+    padding: 14px;
+  }
+
+  .welcome-panel h1 {
+    font-size: clamp(2rem, 11vw, 2.8rem);
+  }
+
+  .welcome-copy {
+    margin-top: 6px;
+    font-size: 0.92rem;
+  }
+
+  .welcome-panel button {
+    min-height: 42px;
   }
 
   .content-panel,
   .status-panel,
   .quest-board {
-    padding: 16px;
+    padding: 14px;
   }
 
-  .section-heading {
+  .status-panel {
+    display: grid;
     gap: 12px;
   }
 
+  .system-tag {
+    width: fit-content;
+    padding: 6px 9px;
+  }
+
+  .hunter-header {
+    align-items: center;
+    flex-direction: row;
+    margin-top: 0;
+  }
+
+  .hunter-header h1 {
+    font-size: clamp(1.8rem, 9vw, 2.5rem);
+  }
+
+  .level-row {
+    margin-top: 0;
+  }
+
+  .xp-track {
+    margin-top: 0;
+  }
+
+  .stat-grid,
+  .attributes {
+    display: grid;
+    grid-auto-flow: column;
+    grid-auto-columns: minmax(138px, 54vw);
+    grid-template-columns: none;
+    gap: 10px;
+    overflow-x: auto;
+    overscroll-behavior-x: contain;
+    margin-top: 0;
+    padding-bottom: 4px;
+  }
+
+  .attribute-row {
+    align-items: center;
+    border: 1px solid rgba(148, 163, 184, 0.16);
+    background: rgba(15, 23, 42, 0.56);
+    padding: 10px;
+  }
+
+  .achievements {
+    display: none;
+  }
+
+  .section-heading {
+    gap: 8px;
+    margin-bottom: 12px;
+  }
+
   h1 {
-    font-size: clamp(2rem, 12vw, 3.2rem);
+    font-size: clamp(1.85rem, 10vw, 2.7rem);
     line-height: 1;
   }
 
   h2 {
-    font-size: 1.28rem;
+    font-size: 1.14rem;
+  }
+
+  .eyebrow {
+    font-size: 0.68rem;
+  }
+
+  .summary-strip,
+  .context-action-grid {
+    display: grid;
+    grid-auto-flow: column;
+    grid-auto-columns: minmax(150px, 68vw);
+    grid-template-columns: none;
+    gap: 10px;
+    overflow-x: auto;
+    overscroll-behavior-x: contain;
+    padding-bottom: 4px;
+    scroll-snap-type: x proximity;
+  }
+
+  .summary-strip > *,
+  .context-action-grid > * {
+    scroll-snap-align: start;
   }
 
   .metric {
-    min-height: 74px;
-    padding: 12px;
+    min-height: 66px;
+    padding: 10px;
   }
 
   .metric strong {
-    font-size: 1.2rem;
+    font-size: 1.08rem;
   }
 
   .daily-cockpit-grid {
     grid-template-columns: 1fr;
+    gap: 10px;
   }
 
   .daily-progress-card {
-    grid-template-columns: minmax(0, 1fr) 86px;
-    padding: 14px;
+    grid-template-columns: minmax(0, 1fr) 72px;
+    gap: 10px;
+    min-height: 118px;
+    padding: 12px;
   }
 
   .daily-progress-card strong {
-    font-size: 2.25rem;
+    font-size: 2rem;
   }
 
   .daily-progress-ring {
-    width: 82px;
-    height: 82px;
+    width: 72px;
+    height: 72px;
+  }
+
+  .daily-progress-ring span {
+    font-size: 0.92rem;
   }
 
   .next-action-card {
     grid-template-columns: 42px minmax(0, 1fr);
-    padding: 14px;
+    gap: 10px;
+    padding: 12px;
   }
 
   .next-action-icon {
@@ -3043,6 +3153,11 @@ h2 {
   .next-action-card button {
     grid-column: 1 / -1;
     width: 100%;
+    min-height: 40px;
+  }
+
+  .daily-review-summary-panel {
+    display: none;
   }
 
   .quest-form {
@@ -3054,29 +3169,50 @@ h2 {
   }
 
   .mission-toolbar {
-    grid-template-columns: 1fr;
+    display: grid;
+    grid-auto-flow: column;
+    grid-auto-columns: minmax(150px, 48vw);
+    grid-template-columns: none;
+    overflow-x: auto;
+    overscroll-behavior-x: contain;
+    padding-bottom: 3px;
+  }
+
+  .mission-search {
+    grid-column: auto;
+    min-width: 230px;
   }
 
   .quest-card {
     align-items: stretch;
     flex-direction: column;
-    gap: 12px;
+    gap: 10px;
+    padding: 12px;
   }
 
   .quest-card-compact {
     min-height: auto;
-    padding: 14px;
+    padding: 12px;
+  }
+
+  .quest-card h3 {
+    margin-top: 8px;
+    font-size: 1rem;
+  }
+
+  .quest-card p {
+    font-size: 0.9rem;
   }
 
   .quest-actions {
     display: grid;
-    grid-template-columns: repeat(4, minmax(44px, 1fr));
+    grid-template-columns: repeat(auto-fit, minmax(42px, 1fr));
     justify-content: stretch;
     width: 100%;
   }
 
   .quest-actions button {
-    min-height: 42px;
+    min-height: 40px;
   }
 
   .quest-form button,
@@ -3089,16 +3225,9 @@ h2 {
     grid-column: auto;
   }
 
-  .summary-strip {
-    grid-template-columns: 1fr;
-  }
-
-  .context-action-grid {
-    grid-template-columns: 1fr;
-  }
-
   .context-action-grid button {
-    min-height: 86px;
+    min-height: 76px;
+    align-content: center;
   }
 
   .tabs-list {
@@ -3109,6 +3238,20 @@ h2 {
 
   .tab-button {
     flex: 0 0 auto;
+    min-height: 38px;
+    padding: 0 12px;
+  }
+
+  .tabs-shell {
+    gap: 10px;
+  }
+
+  .tabs-content {
+    padding-top: 2px;
+  }
+
+  .quest-list {
+    gap: 10px;
   }
 
   .skill-constellation-toolbar,
@@ -3116,13 +3259,42 @@ h2 {
     grid-template-columns: 1fr;
   }
 
+  .skill-constellation-toolbar {
+    gap: 10px;
+  }
+
+  .skill-search {
+    min-height: 42px;
+  }
+
   .constellation-tabs {
     justify-content: flex-start;
+    flex-wrap: nowrap;
+    overflow-x: auto;
+    padding-bottom: 3px;
+  }
+
+  .constellation-tabs button {
+    flex: 0 0 auto;
+    min-height: 38px;
+  }
+
+  .constellation-summary {
+    display: grid;
+    grid-auto-flow: column;
+    grid-auto-columns: minmax(126px, 42vw);
+    grid-template-columns: none;
+    overflow-x: auto;
+    padding-bottom: 4px;
+  }
+
+  .constellation-card {
+    min-height: 66px;
   }
 
   .skill-flow-shell {
-    height: calc(100dvh - 260px);
-    min-height: 420px;
+    height: min(56dvh, 520px);
+    min-height: 340px;
   }
 
   .flow-skill-node {
@@ -3132,6 +3304,33 @@ h2 {
 
   .skill-flow-shell .react-flow__minimap {
     display: none;
+  }
+
+  .skill-detail-panel textarea {
+    min-height: 84px;
+  }
+
+  .settings-list {
+    gap: 10px;
+  }
+
+  .settings-row {
+    align-items: flex-start;
+    gap: 10px;
+    padding: 12px;
+  }
+
+  .settings-row-controls select,
+  .settings-row-controls input[type="range"] {
+    width: 100%;
+  }
+
+  .settings-data-actions {
+    justify-content: stretch;
+  }
+
+  .settings-data-actions button {
+    flex: 1 1 138px;
   }
 
   .daily-review-stage {

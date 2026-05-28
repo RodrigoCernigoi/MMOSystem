@@ -126,7 +126,7 @@ export const TodayView = ({ player, quests, onCompleteQuest, onEndDay, onOpenFoc
         </div>
       </section>
 
-      <section className="content-panel span-all">
+      <section className="content-panel span-all daily-review-summary-panel">
         <div className="section-heading">
           <div>
             <p className="eyebrow">Revisao diaria</p>
