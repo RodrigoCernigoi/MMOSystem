@@ -48,6 +48,7 @@ export const createLocalQuestRepository = (): QuestRepository => ({
       failedAt: quest.failedAt,
       projectId: quest.projectId,
       importance: quest.importance,
+      evidenceLog: quest.evidenceLog ?? [],
       habitLog: quest.habitLog ?? [],
       lastRenewedAt: quest.lastRenewedAt,
     }));

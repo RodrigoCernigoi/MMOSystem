@@ -22,8 +22,15 @@ export type Quest = {
   failedAt?: string;
   projectId?: string;
   importance?: string;
+  evidenceLog?: QuestEvidence[];
   habitLog?: string[];
   lastRenewedAt?: string;
+};
+
+export type QuestEvidence = {
+  id: string;
+  text: string;
+  createdAt: string;
 };
 
 export type CreateQuestInput = {
@@ -38,3 +45,7 @@ export type CreateQuestInput = {
 };
 
 export type UpdateQuestInput = Partial<CreateQuestInput>;
+
+export type CompleteQuestInput = {
+  evidence?: string;
+};

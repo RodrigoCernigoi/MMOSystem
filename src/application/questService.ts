@@ -1,7 +1,7 @@
 import { unlockAvailableAchievements } from "../domain/achievements";
 import { applyQuestFailure, applyQuestReward, getRewardForQuest } from "../domain/progression";
 import type { Player } from "../domain/player";
-import type { CreateQuestInput, Quest, UpdateQuestInput } from "../domain/task";
+import type { CompleteQuestInput, CreateQuestInput, Quest, UpdateQuestInput } from "../domain/task";
 import type { Clock, IdProvider, PlayerRepository, QuestRepository, QuestSuggestionGateway } from "./ports";
 
 export type QuestService = ReturnType<typeof createQuestService>;
@@ -87,6 +87,7 @@ export const createQuestService = ({
       dueAt: input.dueAt || undefined,
       projectId: input.projectId || undefined,
       importance: input.importance?.trim() || undefined,
+      evidenceLog: [],
       habitLog: [],
     };
 
@@ -169,7 +170,7 @@ export const createQuestService = ({
     await questRepository.saveAll(quests.filter((item) => item.id !== questId));
   },
 
-  async completeQuest(questId: string): Promise<{ player: Player; quest: Quest }> {
+  async completeQuest(questId: string, input: CompleteQuestInput = {}): Promise<{ player: Player; quest: Quest }> {
     const [player, quests] = await Promise.all([playerRepository.get(), questRepository.list()]);
     const quest = quests.find((item) => item.id === questId);
 
@@ -182,6 +183,18 @@ export const createQuestService = ({
     }
 
     const today = clock.now().toISOString().slice(0, 10);
+    const evidenceText = input.evidence?.trim();
+    const evidenceLog = evidenceText
+      ? [
+          {
+            id: idProvider.createId(),
+            text: evidenceText,
+            createdAt: clock.now().toISOString(),
+          },
+          ...(quest.evidenceLog ?? []),
+        ]
+      : (quest.evidenceLog ?? []);
+
     if (quest.kind === "habit") {
       if ((quest.habitLog ?? []).includes(today)) {
         return { player, quest };
@@ -189,6 +202,7 @@ export const createQuestService = ({
 
       const completedHabit: Quest = {
         ...quest,
+        evidenceLog,
         habitLog: [today, ...(quest.habitLog ?? [])],
         completedAt: clock.now().toISOString(),
       };
@@ -207,6 +221,7 @@ export const createQuestService = ({
     const completedQuest: Quest = {
       ...quest,
       status: "completed",
+      evidenceLog,
       completedAt: clock.now().toISOString(),
     };
     const reward = getRewardForQuest(completedQuest, player.streak);

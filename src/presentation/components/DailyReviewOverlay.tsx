@@ -28,6 +28,11 @@ export const DailyReviewOverlay = ({ isOpen, player, quests, date, onClose, onCo
   const completedTitles = [...completedQuestIds, ...completedHabitIds]
     .map((id) => quests.find((quest) => quest.id === id)?.title)
     .filter(Boolean);
+  const evidenceItems = [...completedQuestIds, ...completedHabitIds]
+    .map((id) => quests.find((quest) => quest.id === id))
+    .filter((quest): quest is Quest => Boolean(quest?.evidenceLog?.length))
+    .map((quest) => ({ title: quest.title, evidence: quest.evidenceLog?.[0]?.text ?? "" }))
+    .slice(0, 4);
   const dayRank = existingReview?.rank ?? getDailyReviewRank(completedTotal);
   const bonus = existingReview?.bonus ?? getDailyReviewBonus(dayRank);
 
@@ -64,6 +69,7 @@ export const DailyReviewOverlay = ({ isOpen, player, quests, date, onClose, onCo
     { label: "Moedas obtidas", value: coinsEarned, max: Math.max(50, coinsEarned), Icon: Coins },
     { label: "Missoes concluidas", value: completedQuestIds.length, max: Math.max(5, completedQuestIds.length), Icon: Target },
     { label: "Habitos registrados", value: completedHabitIds.length, max: Math.max(5, completedHabitIds.length), Icon: Trophy },
+    { label: "Evidencias reais", value: evidenceItems.length, max: Math.max(4, evidenceItems.length), Icon: BarChart3 },
     { label: "Bonus de fechamento", value: bonus.xp + bonus.coins + bonus.skillPoints, max: Math.max(100, bonus.xp + bonus.coins + bonus.skillPoints), Icon: Sparkles },
   ];
 
@@ -158,6 +164,26 @@ export const DailyReviewOverlay = ({ isOpen, player, quests, date, onClose, onCo
                 <span>Nenhuma conclusao registrada hoje.</span>
               ) : (
                 completedTitles.map((title) => <span key={title}>{title}</span>)
+              )}
+            </motion.div>
+            <motion.div
+              className="daily-review-log evidence-review-log"
+              initial={{ opacity: 0 }}
+              animate={{ opacity: phase >= 2 ? 1 : 0 }}
+              transition={{ delay: 2.35 }}
+            >
+              <div>
+                <Sparkles size={18} />
+                <strong>Provas reais do dia</strong>
+              </div>
+              {evidenceItems.length === 0 ? (
+                <span>Nenhuma evidencia textual registrada hoje.</span>
+              ) : (
+                evidenceItems.map((item) => (
+                  <span key={`${item.title}-${item.evidence}`}>
+                    {item.title}: {item.evidence}
+                  </span>
+                ))
               )}
             </motion.div>
             <motion.div

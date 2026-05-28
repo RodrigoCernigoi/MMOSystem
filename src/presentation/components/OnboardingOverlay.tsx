@@ -2,18 +2,22 @@ import { motion } from "motion/react";
 import { CheckCircle2, Gift, Sparkles, Target, UserRound } from "lucide-react";
 import { FormEvent, useState } from "react";
 import type { Attribute, CreateQuestInput } from "../../domain/task";
+import type { UpdatePlayerProfileInput } from "../../application/questService";
 import { useProgressionSystem } from "../useProgressionSystem";
 import { useRewards } from "../useRewards";
 import { attributeOptions } from "../viewModels";
 
 type OnboardingOverlayProps = {
   onCreateQuest: (input: CreateQuestInput) => Promise<void>;
+  onUpdateProfile: (input: UpdatePlayerProfileInput) => Promise<unknown>;
   onDone: () => void;
 };
 
-export const OnboardingOverlay = ({ onCreateQuest, onDone }: OnboardingOverlayProps) => {
+export const OnboardingOverlay = ({ onCreateQuest, onUpdateProfile, onDone }: OnboardingOverlayProps) => {
   const [step, setStep] = useState(0);
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [name, setName] = useState("");
+  const [focus, setFocus] = useState("Construir consistencia");
   const [lifeArea, setLifeArea] = useState<Attribute>("discipline");
   const [dailyQuestTitle, setDailyQuestTitle] = useState("Revisar prioridades do dia");
   const [skillTitle, setSkillTitle] = useState("Consistencia basica");
@@ -25,6 +29,13 @@ export const OnboardingOverlay = ({ onCreateQuest, onDone }: OnboardingOverlayPr
     event.preventDefault();
     setIsSubmitting(true);
 
+    await onUpdateProfile({
+      name: name || "Hunter",
+      title: "Em treinamento",
+      focus,
+      bio: "Primeira calibragem do sistema.",
+      avatarSymbol: "spark",
+    });
     await onCreateQuest({
       title: dailyQuestTitle,
       kind: "daily",
@@ -76,12 +87,24 @@ export const OnboardingOverlay = ({ onCreateQuest, onDone }: OnboardingOverlayPr
             <UserRound size={34} />
             <p className="eyebrow">Primeira sincronizacao</p>
             <h1>Vamos calibrar seu sistema</h1>
-            <p>Escolha uma area da vida para ser o ponto inicial do seu construtor de habitos.</p>
+            <p>Defina sua ficha inicial e uma area da vida para ser o ponto inicial do construtor de habitos.</p>
             <div className="onboarding-mini-flow">
               <span>1. Missao</span>
               <span>2. Foco</span>
               <span>3. Encerrar dia</span>
             </div>
+            <input
+              value={name}
+              onChange={(event) => setName(event.target.value)}
+              placeholder="Seu nome"
+              aria-label="Nome do usuario"
+            />
+            <input
+              value={focus}
+              onChange={(event) => setFocus(event.target.value)}
+              placeholder="Foco atual"
+              aria-label="Foco atual"
+            />
             <select value={lifeArea} onChange={(event) => setLifeArea(event.target.value as Attribute)}>
               {attributeOptions.map((option) => (
                 <option key={option.value} value={option.value}>

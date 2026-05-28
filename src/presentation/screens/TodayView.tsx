@@ -3,7 +3,7 @@ import { useEffect, useState } from "react";
 import { calculateHabitStreak } from "../../domain/habitStats";
 import { isHabitDoneToday, isQuestForToday, toDateKey } from "../../domain/schedule";
 import type { Player } from "../../domain/player";
-import type { Quest } from "../../domain/task";
+import type { CompleteQuestInput, Quest } from "../../domain/task";
 import { QuestCard } from "../components/QuestCard";
 import { DailyReviewOverlay } from "../components/DailyReviewOverlay";
 import { Metric } from "../components/Metric";
@@ -12,7 +12,7 @@ import { Tabs } from "../components/Tabs";
 type TodayViewProps = {
   player: Player;
   quests: Quest[];
-  onCompleteQuest: (id: string) => Promise<void>;
+  onCompleteQuest: (id: string, input?: CompleteQuestInput) => Promise<void>;
   onEndDay: (date: string) => Promise<unknown>;
   onOpenFocus: (id: string) => void;
   reviewRequestId?: number;

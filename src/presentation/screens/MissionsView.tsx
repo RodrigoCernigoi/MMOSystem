@@ -3,6 +3,7 @@ import { FormEvent, useMemo, useState } from "react";
 import type {
   Attribute,
   Quest,
+  CompleteQuestInput,
   QuestKind,
   Recurrence,
   TaskDifficulty,
@@ -10,6 +11,7 @@ import type {
   UpdateQuestInput,
 } from "../../domain/task";
 import { QuestCard } from "../components/QuestCard";
+import { QuestDetailModal } from "../components/QuestDetailModal";
 import { Tabs } from "../components/Tabs";
 import type { AppView } from "../navigation/appViews";
 import type { AppFocus } from "../navigation/navigationIntent";
@@ -26,7 +28,7 @@ type MissionFilter = TaskStatus | "all";
 type MissionsViewProps = {
   quests: Quest[];
   error: string | null;
-  onCompleteQuest: (id: string) => Promise<void>;
+  onCompleteQuest: (id: string, input?: CompleteQuestInput) => Promise<void>;
   onUpdateQuest: (id: string, input: UpdateQuestInput) => Promise<void>;
   onArchiveQuest: (id: string) => Promise<void>;
   onDeleteQuest: (id: string) => Promise<void>;
@@ -58,6 +60,7 @@ export const MissionsView = ({
   const [attributeFilter, setAttributeFilter] = useState<Attribute | "all">("all");
   const [projectFilter, setProjectFilter] = useState<string>("all");
   const [editingQuest, setEditingQuest] = useState<Quest | null>(null);
+  const [selectedQuest, setSelectedQuest] = useState<Quest | null>(null);
   const { progression } = useProgressionSystem();
   const activeProjects = progression.projects.filter((project) => project.status === "active");
   const projectById = useMemo(
@@ -134,8 +137,18 @@ export const MissionsView = ({
     setEditingQuest(null);
   };
 
+  const selectedQuestProjectTitle = selectedQuest?.projectId ? projectById.get(selectedQuest.projectId)?.title : undefined;
+
   return (
     <section className="content-panel">
+      <QuestDetailModal
+        quest={selectedQuest}
+        projectTitle={selectedQuestProjectTitle}
+        onClose={() => setSelectedQuest(null)}
+        onCompleteQuest={onCompleteQuest}
+        onOpenFocus={onOpenFocus}
+        onOpenProject={(projectId) => onFocusNavigate?.("projects", { type: "project", id: projectId })}
+      />
       <div className="section-heading">
         <div>
           <p className="eyebrow">Quest board</p>
@@ -248,6 +261,7 @@ export const MissionsView = ({
               onArchiveQuest={onArchiveQuest}
               onDeleteQuest={handleDelete}
               onOpenFocus={onOpenFocus}
+              onOpenDetails={setSelectedQuest}
               onOpenProject={
                 quest.projectId
                   ? (projectId) => onFocusNavigate?.("projects", { type: "project", id: projectId })

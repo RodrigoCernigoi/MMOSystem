@@ -57,6 +57,14 @@ export const StatusPanel = ({ player, quests, onUpdateProfile, onFocusNavigate }
       : null,
   ].filter(Boolean) as Array<{ title: string; detail: string }>;
   const evidenceItems = [
+    ...completedQuests
+      .filter((quest) => quest.evidenceLog?.length)
+      .map((quest) => ({
+        label: "Missao com evidencia",
+        title: quest.title,
+        detail: quest.evidenceLog?.[0]?.text ?? "",
+        focus: null,
+      })),
     ...unlockedSkills
       .filter((skill) => skill.evidence)
       .map((skill) => ({

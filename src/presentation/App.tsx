@@ -106,8 +106,8 @@ export const App = () => {
   }, []);
 
   const handleCompleteQuest = useCallback(
-    async (id: string) => {
-      const reward = await runSyncedAction(() => completeQuest(id));
+    async (id: string, input?: Parameters<typeof completeQuest>[1]) => {
+      const reward = await runSyncedAction(() => completeQuest(id, input));
       setRewardFeedback(reward);
       emitVisualEvent("quest-complete");
       if (reward.leveledUp) {
@@ -295,7 +295,13 @@ export const App = () => {
       <QuickActions onNavigate={handleNavigate} onOpenDailyReview={handleOpenDailyReview} />
       <SyncStatusBadge status={syncStatus} detail={syncDetail} />
       <AnimatePresence>
-        {showOnboarding && <OnboardingOverlay onCreateQuest={handleCreateQuest} onDone={handleFinishOnboarding} />}
+        {showOnboarding && (
+          <OnboardingOverlay
+            onCreateQuest={handleCreateQuest}
+            onUpdateProfile={handleUpdatePlayerProfile}
+            onDone={handleFinishOnboarding}
+          />
+        )}
       </AnimatePresence>
     </AppShell>
       )}

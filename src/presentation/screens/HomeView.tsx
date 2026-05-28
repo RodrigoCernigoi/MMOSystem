@@ -1,7 +1,7 @@
 import { ArrowRight, Award, Swords, Trophy } from "lucide-react";
 import { achievements } from "../../domain/achievements";
 import type { Player } from "../../domain/player";
-import type { Quest } from "../../domain/task";
+import type { CompleteQuestInput, Quest } from "../../domain/task";
 import type { AppView } from "../navigation/appViews";
 import type { AppFocus, CreateQuestIntent } from "../navigation/navigationIntent";
 import { useProgressionSystem } from "../useProgressionSystem";
@@ -12,7 +12,7 @@ import { Metric } from "../components/Metric";
 type HomeViewProps = {
   player: Player;
   quests: Quest[];
-  onCompleteQuest: (id: string) => Promise<void>;
+  onCompleteQuest: (id: string, input?: CompleteQuestInput) => Promise<void>;
   onNavigate: (view: AppView) => void;
   onCreateQuestIntent: (intent: CreateQuestIntent) => void;
   onFocusNavigate: (view: AppView, focus: AppFocus) => void;
@@ -38,11 +38,15 @@ export const HomeView = ({
 
   return (
     <div className="view-grid view-grid-home">
-      <section className="welcome-panel">
+      <section className="welcome-panel command-panel">
         <div>
-          <p className="eyebrow">Bem-vindo de volta</p>
+          <p className="eyebrow">Painel de comando</p>
           <h1>{player.name}</h1>
-          <p className="welcome-copy">Escolha uma missao, mantenha o streak e deixe o sistema cuidar do progresso.</p>
+          <p className="welcome-copy">
+            {player.focus
+              ? `Foco atual: ${player.focus}`
+              : "Escolha uma missao, registre evidencias reais e deixe o sistema cuidar do progresso."}
+          </p>
         </div>
         <button type="button" onClick={() => onNavigate("create")}>
           Criar missao
@@ -56,7 +60,7 @@ export const HomeView = ({
         <Metric icon={<Award size={18} />} label="Conquistas" value={unlockedCount} />
       </div>
 
-      <section className="content-panel span-all">
+      <section className="content-panel span-all command-center-panel">
         <div className="section-heading">
           <div>
             <p className="eyebrow">Continuar fluxo</p>
@@ -129,7 +133,7 @@ export const HomeView = ({
         </div>
       </section>
 
-      <StatusPanel player={player} quests={quests} />
+      <StatusPanel player={player} quests={quests} onFocusNavigate={onFocusNavigate} />
     </div>
   );
 };

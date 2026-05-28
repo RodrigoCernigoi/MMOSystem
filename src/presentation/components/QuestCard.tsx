@@ -1,17 +1,18 @@
 import { motion } from "motion/react";
-import { Archive, Check, Crosshair, ExternalLink, Pencil, Trash2 } from "lucide-react";
-import type { Quest } from "../../domain/task";
+import { Archive, Check, Crosshair, ExternalLink, FileText, Pencil, Trash2 } from "lucide-react";
+import type { CompleteQuestInput, Quest } from "../../domain/task";
 import { cardMotion } from "../motion/transitions";
 import { attributeLabels, difficultyLabels, questKindLabels, statusLabels } from "../viewModels";
 
 type QuestCardProps = {
   quest: Quest;
-  onCompleteQuest: (id: string) => Promise<void>;
+  onCompleteQuest: (id: string, input?: CompleteQuestInput) => Promise<void>;
   onEditQuest?: (quest: Quest) => void;
   onArchiveQuest?: (id: string) => Promise<void>;
   onDeleteQuest?: (id: string) => Promise<void>;
   onOpenProject?: (projectId: string) => void;
   onOpenFocus?: (id: string) => void;
+  onOpenDetails?: (quest: Quest) => void;
   projectTitle?: string;
   isUrgent?: boolean;
   isCompact?: boolean;
@@ -25,6 +26,7 @@ export const QuestCard = ({
   onDeleteQuest,
   onOpenProject,
   onOpenFocus,
+  onOpenDetails,
   projectTitle,
   isUrgent = false,
   isCompact = false,
@@ -53,8 +55,14 @@ export const QuestCard = ({
         {quest.dueAt ? ` · Prazo ${new Date(`${quest.dueAt}T00:00:00`).toLocaleDateString("pt-BR")}` : ""}
       </p>
       {quest.importance && <p>{quest.importance}</p>}
+      {quest.evidenceLog?.[0] && <p className="quest-evidence-preview">Evidencia: {quest.evidenceLog[0].text}</p>}
     </div>
     <div className="quest-actions">
+      {onOpenDetails && (
+        <button type="button" onClick={() => onOpenDetails(quest)} title="Abrir ficha da missao">
+          <FileText size={18} />
+        </button>
+      )}
       {quest.status === "open" && (
         <>
           <button type="button" onClick={() => onCompleteQuest(quest.id)} title="Concluir missao">

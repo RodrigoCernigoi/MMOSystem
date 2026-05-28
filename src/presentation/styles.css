@@ -1500,6 +1500,133 @@ h2 {
   margin-top: 5px;
 }
 
+.quest-evidence-preview {
+  border-left: 2px solid rgba(190, 242, 100, 0.55);
+  padding-left: 10px;
+  color: #d9f99d;
+}
+
+.quest-detail-backdrop {
+  position: fixed;
+  inset: 0;
+  z-index: 45;
+  display: grid;
+  place-items: center;
+  overflow: auto;
+  background: rgba(2, 6, 12, 0.72);
+  padding: 18px;
+  backdrop-filter: blur(10px);
+}
+
+.quest-detail-modal {
+  position: relative;
+  display: grid;
+  gap: 14px;
+  width: min(760px, 100%);
+  border: 1px solid rgba(125, 211, 252, 0.28);
+  background:
+    radial-gradient(circle at 18% 0%, rgba(34, 211, 238, 0.16), transparent 34%),
+    rgba(2, 6, 12, 0.94);
+  box-shadow: 0 28px 80px rgba(0, 0, 0, 0.52);
+  padding: 22px;
+}
+
+.quest-detail-header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 16px;
+}
+
+.quest-detail-header h1 {
+  margin: 4px 0 8px;
+  font-size: clamp(1.5rem, 4vw, 2.6rem);
+}
+
+.quest-detail-header span,
+.quest-detail-rank {
+  display: inline-flex;
+  border: 1px solid rgba(190, 242, 100, 0.25);
+  background: rgba(63, 98, 18, 0.16);
+  color: #d9f99d;
+  padding: 8px 10px;
+  font-weight: 900;
+}
+
+.quest-detail-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 10px;
+}
+
+.quest-detail-grid div,
+.quest-detail-block,
+.quest-project-link {
+  border: 1px solid rgba(148, 163, 184, 0.16);
+  background: rgba(15, 23, 42, 0.58);
+}
+
+.quest-detail-grid div {
+  display: grid;
+  gap: 7px;
+  padding: 12px;
+}
+
+.quest-detail-grid svg,
+.quest-project-link svg {
+  color: #22d3ee;
+}
+
+.quest-detail-grid span,
+.quest-detail-block span {
+  color: #7dd3fc;
+  font-size: 0.76rem;
+  font-weight: 900;
+  text-transform: uppercase;
+}
+
+.quest-detail-block {
+  display: grid;
+  gap: 8px;
+  padding: 13px;
+}
+
+.quest-project-link {
+  display: inline-flex;
+  width: fit-content;
+  align-items: center;
+  gap: 8px;
+  color: #e2e8f0;
+  padding: 10px 12px;
+  font-weight: 900;
+}
+
+.quest-evidence-log {
+  display: grid;
+  gap: 8px;
+}
+
+.quest-evidence-log article {
+  border-left: 2px solid rgba(190, 242, 100, 0.5);
+  padding-left: 10px;
+}
+
+.quest-evidence-form {
+  display: grid;
+  gap: 10px;
+}
+
+.quest-evidence-form textarea {
+  min-height: 112px;
+}
+
+.quest-detail-actions {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+  gap: 10px;
+}
+
 .empty-state {
   display: grid;
   min-height: 170px;
@@ -3894,6 +4021,31 @@ h2 {
 
   .quest-actions button {
     min-height: 40px;
+  }
+
+  .quest-detail-backdrop {
+    align-items: start;
+    padding: 10px;
+  }
+
+  .quest-detail-modal {
+    padding: 16px;
+  }
+
+  .quest-detail-header {
+    flex-direction: column;
+  }
+
+  .quest-detail-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .quest-detail-actions {
+    justify-content: stretch;
+  }
+
+  .quest-detail-actions button {
+    flex: 1;
   }
 
   .quest-forge button,

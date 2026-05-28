@@ -1,6 +1,6 @@
 import { Shield } from "lucide-react";
 import { useMemo } from "react";
-import type { CreateQuestInput, Quest } from "../../domain/task";
+import type { CompleteQuestInput, CreateQuestInput, Quest } from "../../domain/task";
 import { QuestCard } from "./QuestCard";
 import { QuestForm } from "./QuestForm";
 
@@ -8,7 +8,7 @@ type QuestBoardProps = {
   quests: Quest[];
   error: string | null;
   onCreateQuest: (input: CreateQuestInput) => Promise<void>;
-  onCompleteQuest: (id: string) => Promise<void>;
+  onCompleteQuest: (id: string, input?: CompleteQuestInput) => Promise<void>;
   onSuggestQuest: (goal: string) => Promise<CreateQuestInput>;
 };
 
