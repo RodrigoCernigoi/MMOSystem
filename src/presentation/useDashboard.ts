@@ -1,5 +1,6 @@
 import { useCallback, useEffect, useMemo, useState } from "react";
 import type { Player } from "../domain/player";
+import type { UpdatePlayerProfileInput } from "../application/questService";
 import type { CreateQuestInput, Quest, UpdateQuestInput } from "../domain/task";
 import { createAppContainer } from "../infrastructure/container";
 
@@ -48,6 +49,10 @@ export const useDashboard = () => {
     () => ({
       async createQuest(input: CreateQuestInput) {
         await container.questService.createQuest(input);
+        await refresh();
+      },
+      async updatePlayerProfile(input: UpdatePlayerProfileInput) {
+        await container.questService.updatePlayerProfile(input);
         await refresh();
       },
       async completeQuest(id: string) {

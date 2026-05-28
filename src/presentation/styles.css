@@ -768,6 +768,7 @@ button:active {
 }
 
 .hunter-header,
+.profile-card,
 .board-header,
 .level-row,
 .section-heading {
@@ -783,6 +784,116 @@ button:active {
 
 .hunter-header {
   margin-top: 28px;
+}
+
+.profile-card {
+  align-items: stretch;
+  margin-top: 18px;
+  border: 1px solid rgba(125, 211, 252, 0.2);
+  background:
+    radial-gradient(circle at 14% 18%, rgba(34, 211, 238, 0.14), transparent 30%),
+    rgba(15, 23, 42, 0.58);
+  padding: 16px;
+}
+
+.profile-card > div:nth-child(2) {
+  display: grid;
+  gap: 6px;
+  flex: 1;
+  min-width: 0;
+}
+
+.profile-card h1 {
+  overflow-wrap: anywhere;
+}
+
+.profile-card strong {
+  color: #dbeafe;
+}
+
+.profile-card p,
+.profile-card span {
+  color: #9fb5d0;
+}
+
+.profile-avatar {
+  display: grid;
+  width: 88px;
+  min-width: 88px;
+  place-items: center;
+  border: 1px solid rgba(125, 211, 252, 0.28);
+  background: rgba(8, 47, 73, 0.38);
+  color: #7dd3fc;
+  padding: 12px;
+  text-align: center;
+}
+
+.profile-avatar span {
+  color: inherit;
+  font-size: 0.7rem;
+  font-weight: 900;
+  text-transform: uppercase;
+}
+
+.profile-avatar-focus {
+  border-color: rgba(96, 165, 250, 0.34);
+  color: #93c5fd;
+}
+
+.profile-avatar-forge {
+  border-color: rgba(250, 204, 21, 0.34);
+  color: #fde68a;
+}
+
+.profile-avatar-vital {
+  border-color: rgba(132, 204, 22, 0.34);
+  color: #bef264;
+}
+
+.profile-edit-toggle {
+  min-height: 40px;
+  border: 1px solid rgba(148, 163, 184, 0.22);
+  background: rgba(15, 23, 42, 0.72);
+  color: #dbeafe;
+  font-weight: 900;
+}
+
+.profile-form {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 10px;
+  border: 1px solid rgba(148, 163, 184, 0.2);
+  background: rgba(2, 6, 23, 0.28);
+  padding: 12px;
+}
+
+.profile-form input,
+.profile-form select,
+.profile-form textarea {
+  min-height: 44px;
+  border: 1px solid rgba(148, 163, 184, 0.26);
+  background: rgba(15, 23, 42, 0.84);
+  color: #f8fafc;
+  padding: 0 12px;
+}
+
+.profile-form textarea {
+  grid-column: 1 / -1;
+  min-height: 86px;
+  padding-top: 12px;
+  resize: vertical;
+}
+
+.profile-form button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  min-height: 44px;
+  border: 0;
+  background: #14b8a6;
+  color: #052e2b;
+  font-weight: 900;
 }
 
 .eyebrow {
@@ -3191,6 +3302,32 @@ h2 {
     align-items: center;
     flex-direction: row;
     margin-top: 0;
+  }
+
+  .profile-card {
+    display: grid;
+    grid-template-columns: 72px minmax(0, 1fr);
+    gap: 12px;
+    padding: 12px;
+  }
+
+  .profile-card .rank-badge {
+    grid-column: 1 / -1;
+    justify-self: start;
+  }
+
+  .profile-avatar {
+    width: 72px;
+    min-width: 72px;
+    padding: 9px;
+  }
+
+  .profile-form {
+    grid-template-columns: 1fr;
+  }
+
+  .profile-form textarea {
+    grid-column: auto;
   }
 
   .hunter-header h1 {

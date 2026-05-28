@@ -7,6 +7,10 @@ export type AttributeMap = Record<Attribute, number>;
 export type Player = {
   id: string;
   name: string;
+  title?: string;
+  bio?: string;
+  avatarSymbol?: string;
+  focus?: string;
   level: number;
   xp: number;
   totalXp: number;
@@ -59,6 +63,10 @@ export type DailyReview = {
 export const createNewPlayer = (name = "Hunter"): Player => ({
   id: "local-player",
   name,
+  title: "Iniciante",
+  bio: "",
+  avatarSymbol: "spark",
+  focus: "",
   level: 1,
   xp: 0,
   totalXp: 0,

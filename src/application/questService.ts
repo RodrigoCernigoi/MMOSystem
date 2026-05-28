@@ -6,6 +6,14 @@ import type { Clock, IdProvider, PlayerRepository, QuestRepository, QuestSuggest
 
 export type QuestService = ReturnType<typeof createQuestService>;
 
+export type UpdatePlayerProfileInput = {
+  name?: string;
+  title?: string;
+  bio?: string;
+  avatarSymbol?: string;
+  focus?: string;
+};
+
 type QuestServiceDependencies = {
   questRepository: QuestRepository;
   playerRepository: PlayerRepository;
@@ -89,6 +97,21 @@ export const createQuestService = ({
     const quests = await questRepository.list();
     await questRepository.saveAll([quest, ...quests]);
     return quest;
+  },
+
+  async updatePlayerProfile(input: UpdatePlayerProfileInput): Promise<Player> {
+    const player = await playerRepository.get();
+    const updatedPlayer: Player = {
+      ...player,
+      name: input.name?.trim() || player.name,
+      title: input.title?.trim() || undefined,
+      bio: input.bio?.trim() || undefined,
+      avatarSymbol: input.avatarSymbol?.trim() || player.avatarSymbol,
+      focus: input.focus?.trim() || undefined,
+    };
+
+    await playerRepository.save(updatedPlayer);
+    return updatedPlayer;
   },
 
   async suggestQuest(goal: string): Promise<CreateQuestInput> {

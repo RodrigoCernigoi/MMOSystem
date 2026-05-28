@@ -41,6 +41,7 @@ export const App = () => {
     updateQuest,
     archiveQuest,
     deleteQuest,
+    updatePlayerProfile,
     suggestQuest,
     endDay,
   } = useDashboard();
@@ -139,6 +140,11 @@ export const App = () => {
   const handleEndDay = useCallback(
     (date: string) => runSyncedAction(() => endDay(date)),
     [endDay, runSyncedAction],
+  );
+
+  const handleUpdatePlayerProfile = useCallback(
+    (input: Parameters<typeof updatePlayerProfile>[0]) => runSyncedAction(() => updatePlayerProfile(input)),
+    [runSyncedAction, updatePlayerProfile],
   );
 
   const handleNavigate = useCallback((view: AppView) => {
@@ -247,7 +253,7 @@ export const App = () => {
     rewards: <RewardsView />,
     reports: <ReportsView player={player} />,
     achievements: <AchievementsView player={player} />,
-    status: <StatusView player={player} quests={quests} />,
+    status: <StatusView player={player} quests={quests} onUpdateProfile={handleUpdatePlayerProfile} />,
     settings: <SettingsView preferences={preferences} onChangePreferences={setPreferences} />,
   };
   const failedQuestCount = quests.filter((quest) => quest.status === "failed").length;
