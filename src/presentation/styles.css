@@ -452,7 +452,7 @@ button:active {
 
 .welcome-panel button:hover,
 .section-heading button:hover,
-.quest-form button:hover,
+.quest-forge button:hover,
 .quest-card button:hover,
 .edit-quest-form button:hover {
   box-shadow: 0 0 22px rgba(20, 184, 166, 0.26);
@@ -908,31 +908,100 @@ h2 {
   border-bottom: 1px solid rgba(148, 163, 184, 0.16);
 }
 
-.quest-form {
+.quest-forge {
   display: grid;
-  grid-template-columns: minmax(220px, 1.4fr) repeat(3, minmax(116px, 0.7fr));
-  gap: 10px;
+  grid-template-columns: minmax(0, 1fr) minmax(280px, 360px);
+  gap: 18px;
+  align-items: start;
   margin-top: 24px;
 }
 
+.quest-forge-main,
+.forge-block,
+.quest-forge-preview,
+.forge-ai-row {
+  display: grid;
+  gap: 14px;
+}
+
+.forge-block,
+.forge-ai-row,
+.quest-forge-preview {
+  border: 1px solid rgba(148, 163, 184, 0.2);
+  background: rgba(15, 23, 42, 0.58);
+  padding: 16px;
+}
+
+.forge-block-heading span,
+.forge-ai-row span,
+.forge-title-block label span,
+.forge-field-grid label span {
+  color: #9fb5d0;
+  font-size: 0.88rem;
+}
+
 .template-row {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 8px;
-  grid-column: 1 / -1;
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 10px;
 }
 
-.template-row button {
-  min-height: 34px;
-  border: 1px solid rgba(148, 163, 184, 0.26);
-  background: rgba(15, 23, 42, 0.84);
-  color: #cbd5e1;
-  padding: 0 10px;
-  font-weight: 800;
+.template-card {
+  display: grid;
+  min-height: 104px;
+  align-content: center;
+  justify-items: start;
+  gap: 7px;
+  border: 1px solid rgba(148, 163, 184, 0.18);
+  background:
+    radial-gradient(circle at 88% 14%, rgba(125, 211, 252, 0.12), transparent 28%),
+    rgba(15, 23, 42, 0.72);
+  color: #dbeafe;
+  padding: 12px;
+  text-align: left;
 }
 
-.quest-form input,
-.quest-form select,
+.template-card svg {
+  color: #7dd3fc;
+}
+
+.template-card span {
+  color: #9fb5d0;
+  font-size: 0.78rem;
+}
+
+.template-card-active {
+  border-color: rgba(132, 204, 22, 0.52);
+  background:
+    radial-gradient(circle at 88% 14%, rgba(132, 204, 22, 0.2), transparent 30%),
+    rgba(63, 98, 18, 0.22);
+  box-shadow: 0 0 28px rgba(132, 204, 22, 0.12);
+}
+
+.forge-title-block label,
+.forge-field-grid label {
+  display: grid;
+  gap: 7px;
+}
+
+.forge-field-grid {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(120px, 1fr));
+  gap: 10px;
+}
+
+.forge-field-wide {
+  grid-column: span 2;
+}
+
+.forge-ai-row {
+  grid-template-columns: minmax(180px, 0.8fr) minmax(240px, 1.2fr);
+  align-items: center;
+}
+
+.quest-forge input,
+.quest-forge select,
+.quest-forge textarea,
 .edit-quest-form input,
 .edit-quest-form select,
 .edit-quest-form textarea,
@@ -948,6 +1017,12 @@ h2 {
   outline: none;
 }
 
+.quest-forge textarea {
+  min-height: 92px;
+  padding-top: 12px;
+  resize: vertical;
+}
+
 .edit-quest-form textarea,
 .stacked-form textarea {
   min-height: 92px;
@@ -955,8 +1030,9 @@ h2 {
   resize: vertical;
 }
 
-.quest-form input:focus,
-.quest-form select:focus,
+.quest-forge input:focus,
+.quest-forge select:focus,
+.quest-forge textarea:focus,
 .edit-quest-form input:focus,
 .edit-quest-form select:focus,
 .edit-quest-form textarea:focus,
@@ -966,7 +1042,7 @@ h2 {
   border-color: #38bdf8;
 }
 
-.quest-form button,
+.quest-forge button,
 .quest-card button,
 .edit-quest-form button,
 .stacked-form button {
@@ -978,6 +1054,62 @@ h2 {
   background: #14b8a6;
   color: #052e2b;
   font-weight: 900;
+}
+
+.quest-forge-preview {
+  position: sticky;
+  top: 24px;
+  overflow: hidden;
+  min-height: 420px;
+  align-content: start;
+  background:
+    radial-gradient(circle at 50% 0%, rgba(34, 211, 238, 0.22), transparent 38%),
+    radial-gradient(circle at 100% 88%, rgba(132, 204, 22, 0.15), transparent 34%),
+    rgba(8, 13, 22, 0.82);
+}
+
+.preview-orbit {
+  position: absolute;
+  top: -80px;
+  right: -80px;
+  width: 220px;
+  height: 220px;
+  border: 1px solid rgba(125, 211, 252, 0.18);
+  border-radius: 999px;
+  pointer-events: none;
+}
+
+.preview-icon {
+  display: grid;
+  width: 58px;
+  height: 58px;
+  place-items: center;
+  border: 1px solid rgba(125, 211, 252, 0.26);
+  background: rgba(8, 47, 73, 0.38);
+  color: #7dd3fc;
+}
+
+.quest-forge-preview h2 {
+  overflow-wrap: anywhere;
+}
+
+.quest-forge-preview p {
+  color: #9fb5d0;
+}
+
+.preview-meta {
+  margin-top: 6px;
+}
+
+.forge-submit-button {
+  display: flex !important;
+  justify-content: center;
+  gap: 8px;
+  min-height: 52px;
+  margin-top: 8px;
+  background: linear-gradient(90deg, #22d3ee, #84cc16);
+  color: #052e2b;
+  box-shadow: 0 0 30px rgba(34, 211, 238, 0.18);
 }
 
 .stacked-form {
@@ -3198,8 +3330,38 @@ h2 {
     display: none;
   }
 
-  .quest-form {
+  .quest-forge {
     grid-template-columns: 1fr;
+  }
+
+  .quest-forge-preview {
+    position: relative;
+    top: 0;
+    min-height: auto;
+    order: -1;
+  }
+
+  .template-row,
+  .forge-field-grid,
+  .forge-ai-row {
+    grid-template-columns: 1fr;
+  }
+
+  .template-row {
+    grid-auto-flow: column;
+    grid-auto-columns: minmax(134px, 44vw);
+    overflow-x: auto;
+    overflow-y: hidden;
+    overscroll-behavior-x: contain;
+    -webkit-overflow-scrolling: touch;
+  }
+
+  .template-card {
+    min-height: 92px;
+  }
+
+  .forge-field-wide {
+    grid-column: auto;
   }
 
   .edit-quest-form {
@@ -3258,7 +3420,7 @@ h2 {
     min-height: 40px;
   }
 
-  .quest-form button,
+  .quest-forge button,
   .suggest-row {
     width: 100%;
   }
@@ -3519,7 +3681,14 @@ h2 {
 }
 
 @media (max-width: 1180px) and (min-width: 861px) {
-  .quest-form {
+  .quest-forge,
+  .forge-field-grid {
     grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .quest-forge-preview {
+    grid-column: 1 / -1;
+    position: relative;
+    top: 0;
   }
 }
