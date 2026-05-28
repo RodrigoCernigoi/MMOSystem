@@ -896,6 +896,91 @@ button:active {
   font-weight: 900;
 }
 
+.identity-summary-card,
+.training-distribution,
+.earned-title-grid,
+.evidence-list {
+  display: grid;
+  gap: 12px;
+  border: 1px solid rgba(148, 163, 184, 0.2);
+  background: rgba(15, 23, 42, 0.5);
+  padding: 14px;
+}
+
+.identity-summary-card {
+  grid-template-columns: 34px minmax(0, 1fr);
+  align-items: center;
+  color: #cbd5e1;
+}
+
+.identity-summary-card svg,
+.status-section-heading svg {
+  color: #7dd3fc;
+}
+
+.identity-summary-card p,
+.evidence-item p {
+  color: #9fb5d0;
+}
+
+.status-section-heading {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.training-row {
+  display: grid;
+  grid-template-columns: minmax(90px, 0.7fr) minmax(0, 1fr) 36px;
+  align-items: center;
+  gap: 10px;
+}
+
+.training-row span,
+.earned-title-card span,
+.evidence-item span {
+  color: #9fb5d0;
+}
+
+.training-track {
+  height: 10px;
+  overflow: hidden;
+  border: 1px solid rgba(125, 211, 252, 0.18);
+  background: rgba(2, 6, 23, 0.6);
+}
+
+.training-track div {
+  height: 100%;
+  background: linear-gradient(90deg, #22d3ee, #84cc16);
+  box-shadow: 0 0 16px rgba(34, 211, 238, 0.22);
+}
+
+.earned-title-grid,
+.evidence-list {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
+.earned-title-grid .status-section-heading,
+.earned-title-grid .muted-text,
+.evidence-list .status-section-heading,
+.evidence-list .muted-text {
+  grid-column: 1 / -1;
+}
+
+.earned-title-card,
+.evidence-item {
+  display: grid;
+  gap: 5px;
+  border: 1px solid rgba(125, 211, 252, 0.16);
+  background: rgba(2, 6, 23, 0.32);
+  padding: 12px;
+}
+
+.earned-title-card strong,
+.evidence-item strong {
+  color: #dbeafe;
+}
+
 .eyebrow {
   margin: 0 0 6px;
   color: #94a3b8;
@@ -3365,6 +3450,23 @@ h2 {
     border: 1px solid rgba(148, 163, 184, 0.16);
     background: rgba(15, 23, 42, 0.56);
     padding: 10px;
+  }
+
+  .identity-summary-card,
+  .training-distribution,
+  .earned-title-grid,
+  .evidence-list {
+    padding: 12px;
+  }
+
+  .training-row {
+    grid-template-columns: minmax(82px, 0.7fr) minmax(0, 1fr) 32px;
+    gap: 8px;
+  }
+
+  .earned-title-grid,
+  .evidence-list {
+    grid-template-columns: 1fr;
   }
 
   .achievements {
