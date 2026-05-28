@@ -1188,6 +1188,43 @@ h2 {
   gap: 4px;
 }
 
+.settings-row-account {
+  align-items: flex-start;
+}
+
+.settings-row-data {
+  align-items: flex-start;
+  flex-wrap: wrap;
+}
+
+.settings-row-account div {
+  flex: 1;
+}
+
+.settings-row-data > div:first-of-type {
+  flex: 1 1 280px;
+}
+
+.settings-data-actions {
+  display: flex !important;
+  flex: 2 1 420px;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+  gap: 8px;
+}
+
+.settings-data-actions button {
+  min-height: 40px;
+}
+
+.settings-row small {
+  color: #7dd3fc;
+}
+
+.settings-row .settings-warning {
+  color: #fca5a5;
+}
+
 .settings-row-controls select {
   min-height: 40px;
   border: 1px solid rgba(148, 163, 184, 0.26);

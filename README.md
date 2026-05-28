@@ -90,6 +90,8 @@ Sem chave, o projeto continua funcionando com um fallback local.
 
 Antes de usar, rode o SQL de `supabase/schema.sql` no SQL Editor do seu projeto Supabase.
 
+Com Supabase ativo, o app usa login e sincroniza player, missoes, projetos, skills, recompensas e sessoes de foco por usuario.
+
 Sem essas variaveis, o app usa `localStorage`.
 
 ## Sistemas Implementados
@@ -207,14 +209,13 @@ O build executa `tsc --noEmit` e `vite build`.
 Ideias futuras:
 
 - presets de sensacao visual/sonora;
-- onboarding inicial;
 - editor mais avancado da arvore de skills;
-- melhores relatorios semanais e mensais;
+- melhores relatorios mensais;
 - vincular recompensas a ciclos de habito;
 - modo mobile mais refinado;
 - exportacao/importacao dos dados;
 - deploy do backend em serverless;
-- suporte multiusuario completo via Supabase.
+- resolver conflitos de sync com timestamps por entidade.
 
 ## Observacoes de Seguranca
 

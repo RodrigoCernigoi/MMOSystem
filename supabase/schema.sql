@@ -1,16 +1,20 @@
 create table if not exists public.profiles (
   id uuid primary key references auth.users(id) on delete cascade,
   player jsonb not null,
-  progression jsonb not null default '{"projects":[],"masterQuests":[],"skills":[]}'::jsonb,
+  progression jsonb not null default '{"projects":[],"masterQuests":[],"skills":[],"bosses":[]}'::jsonb,
   rewards jsonb not null default '[]'::jsonb,
+  focus_sessions jsonb not null default '[]'::jsonb,
   updated_at timestamptz not null default now()
 );
 
 alter table public.profiles
-  add column if not exists progression jsonb not null default '{"projects":[],"masterQuests":[],"skills":[]}'::jsonb;
+  add column if not exists progression jsonb not null default '{"projects":[],"masterQuests":[],"skills":[],"bosses":[]}'::jsonb;
 
 alter table public.profiles
   add column if not exists rewards jsonb not null default '[]'::jsonb;
+
+alter table public.profiles
+  add column if not exists focus_sessions jsonb not null default '[]'::jsonb;
 
 create table if not exists public.quests (
   id uuid primary key,
