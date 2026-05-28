@@ -76,13 +76,22 @@ GROQ_MODEL=llama-3.1-8b-instant
 API_PORT=8787
 VITE_SUPABASE_URL=
 VITE_SUPABASE_ANON_KEY=
+VITE_API_BASE_URL=
 ```
 
 ### Groq
 
 `GROQ_API_KEY` e opcional. Quando configurada, o backend usa Groq para sugerir missoes a partir de um objetivo escrito pelo usuario.
 
-Sem chave, o projeto continua funcionando com um fallback local.
+Sem chave, o backend usa fallback local. Em deploy sem backend, o frontend tambem cai para uma sugestao local.
+
+`VITE_API_BASE_URL` e opcional. Use apenas quando a API estiver publicada separadamente, por exemplo:
+
+```env
+VITE_API_BASE_URL=https://sua-api.onrender.com
+```
+
+Se ficar vazio, o frontend chama `/api/quest-suggestions`. No desenvolvimento local, o Vite faz proxy para a API local.
 
 ### Supabase
 
@@ -204,6 +213,57 @@ npm run build
 
 O build executa `tsc --noEmit` e `vite build`.
 
+## Deploy
+
+### Frontend na Vercel
+
+1. Suba o repositorio no GitHub.
+2. Importe o projeto na Vercel.
+3. Configure:
+   - Framework: Vite
+   - Build command: `npm run build`
+   - Output directory: `dist`
+4. Adicione as variaveis:
+   - `VITE_SUPABASE_URL`
+   - `VITE_SUPABASE_ANON_KEY`
+   - `VITE_API_BASE_URL`, opcional
+5. Rode o SQL de `supabase/schema.sql` no Supabase.
+
+O arquivo `vercel.json` garante fallback para `index.html` em rotas SPA.
+
+### Frontend na Netlify
+
+1. Importe o repositorio na Netlify.
+2. Configure:
+   - Build command: `npm run build`
+   - Publish directory: `dist`
+3. Adicione as mesmas variaveis de ambiente.
+
+O arquivo `public/_redirects` garante fallback SPA no Netlify.
+
+### Backend Groq em producao
+
+O app funciona sem backend publicado, usando sugestoes locais. Para sugestoes com Groq em producao, publique a pasta `server` em um provedor Node como Render, Railway ou Fly e defina:
+
+```env
+GROQ_API_KEY=sua-chave
+GROQ_MODEL=llama-3.1-8b-instant
+API_PORT=8787
+```
+
+Depois coloque a URL publica dessa API em `VITE_API_BASE_URL` no deploy do frontend.
+
+### Checklist de Teste Externo
+
+- criar conta;
+- passar pelo onboarding;
+- criar uma missao;
+- abrir modo foco e salvar sessao;
+- encerrar o dia;
+- exportar backup;
+- abrir em outro dispositivo com a mesma conta;
+- confirmar que missoes, skills, recompensas e sessoes aparecem.
+
 ## Roadmap
 
 Ideias futuras:
@@ -213,7 +273,6 @@ Ideias futuras:
 - melhores relatorios mensais;
 - vincular recompensas a ciclos de habito;
 - modo mobile mais refinado;
-- exportacao/importacao dos dados;
 - deploy do backend em serverless;
 - resolver conflitos de sync com timestamps por entidade.
 
