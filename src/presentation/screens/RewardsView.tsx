@@ -1,20 +1,41 @@
 import { FormEvent } from "react";
-import { Coins, Gift, Trash2 } from "lucide-react";
+import { Coins, Gift, Scale, Trash2 } from "lucide-react";
+import { useState } from "react";
 import { useRewards } from "../useRewards";
 
 export const RewardsView = () => {
   const { rewards, player, isLoading, error, createReward, redeemReward, archiveReward } = useRewards();
+  const [rewardActionError, setRewardActionError] = useState<string | null>(null);
 
   const handleCreateReward = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
     const formData = new FormData(event.currentTarget);
+    const cost = Math.max(20, Number(formData.get("cost") ?? 20));
 
-    await createReward({
-      title: String(formData.get("title") ?? ""),
-      description: String(formData.get("description") ?? ""),
-      cost: Number(formData.get("cost") ?? 1),
-    });
-    event.currentTarget.reset();
+    try {
+      setRewardActionError(null);
+      await createReward({
+        title: String(formData.get("title") ?? ""),
+        description: String(formData.get("description") ?? ""),
+        cost,
+      });
+      event.currentTarget.reset();
+    } catch (actionError) {
+      setRewardActionError(
+        actionError instanceof Error ? actionError.message : "Nao consegui criar essa recompensa agora.",
+      );
+    }
+  };
+
+  const handleRedeemReward = async (rewardId: string) => {
+    try {
+      setRewardActionError(null);
+      await redeemReward(rewardId);
+    } catch (actionError) {
+      setRewardActionError(
+        actionError instanceof Error ? actionError.message : "Nao consegui resgatar essa recompensa agora.",
+      );
+    }
   };
 
   if (isLoading || !player) {
@@ -35,10 +56,18 @@ export const RewardsView = () => {
           </span>
         </div>
         {error && <div className="error-banner">{error}</div>}
+        {rewardActionError && <div className="error-banner">{rewardActionError}</div>}
+        <div className="economy-panel">
+          <Scale size={20} />
+          <div>
+            <strong>Escala economica</strong>
+            <span>30 moedas = pausa curta · 80 = lazer comum · 140+ = experiencia maior · 300+ = recompensa de ciclo.</span>
+          </div>
+        </div>
         <form className="stacked-form" onSubmit={handleCreateReward}>
           <input name="title" placeholder="Ex: noite de filme" aria-label="Titulo da recompensa" />
           <textarea name="description" placeholder="Recompensa real que voce pode usar" aria-label="Descricao" />
-          <input name="cost" type="number" min="1" defaultValue="50" aria-label="Custo" />
+          <input name="cost" type="number" min="20" defaultValue="80" aria-label="Custo" />
           <button type="submit">Criar recompensa</button>
         </form>
       </section>
@@ -78,7 +107,7 @@ export const RewardsView = () => {
                 <strong>{reward.title}</strong>
                 <p>{reward.description}</p>
                 <div className="inline-actions">
-                  <button type="button" onClick={() => redeemReward(reward.id)} disabled={player.coins < reward.cost}>
+                  <button type="button" onClick={() => handleRedeemReward(reward.id)} disabled={player.coins < reward.cost}>
                     Resgatar
                   </button>
                   <button type="button" className="danger-button" onClick={() => archiveReward(reward.id)}>

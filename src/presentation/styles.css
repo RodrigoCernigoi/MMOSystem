@@ -1728,6 +1728,34 @@ h2 {
   color: #9fb5d0;
 }
 
+.economy-panel {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  margin: 14px 0;
+  border: 1px solid rgba(190, 242, 100, 0.22);
+  background:
+    linear-gradient(135deg, rgba(190, 242, 100, 0.1), transparent 44%),
+    rgba(15, 23, 42, 0.58);
+  padding: 12px;
+}
+
+.economy-panel svg {
+  color: #bef264;
+  flex: 0 0 auto;
+}
+
+.economy-panel strong {
+  display: block;
+  color: #f8fafc;
+}
+
+.economy-panel span {
+  display: block;
+  margin-top: 4px;
+  color: #cbd5e1;
+}
+
 .achievement-card-unlocked {
   border-color: rgba(132, 204, 22, 0.35);
   background: rgba(63, 98, 18, 0.18);

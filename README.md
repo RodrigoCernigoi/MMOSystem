@@ -148,6 +148,24 @@ A tela de Skills usa React Flow para exibir uma arvore/constelacao com:
 
 A loja permite criar recompensas reais, como lazer, descanso, compras planejadas ou experiencias. O usuario resgata recompensas usando moedas ganhas nas missoes.
 
+A loja tambem inicia com recompensas padrao para dar uma escala de economia:
+
+- 30 moedas: pausa curta;
+- 80 moedas: lazer comum;
+- 140+ moedas: experiencia maior;
+- 300+ moedas: recompensa de ciclo.
+
+Recompensas criadas manualmente tem custo minimo de 20 moedas para evitar inflacao artificial.
+
+### Economia
+
+O sistema evita que progresso alto seja computado sem rastro real:
+
+- missoes de rank Hard e Elite exigem evidencia automaticamente;
+- missoes comuns continuam podendo ser concluidas rapidamente;
+- o encerramento diario so pode ser feito uma vez por dia;
+- recompensas padrao usam valores mais altos que tarefas pequenas para preservar o valor da moeda.
+
 ### Encerramento Diario
 
 O fluxo de "Encerrar dia" cria um relatorio com:

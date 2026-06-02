@@ -59,6 +59,8 @@ export const SkillsView = ({ focus, onFocusNavigate }: SkillsViewProps) => {
   const [activeFilter, setActiveFilter] = useState<SkillFilter>("all");
   const [searchTerm, setSearchTerm] = useState("");
   const [isCreatorOpen, setIsCreatorOpen] = useState(false);
+  const [skillActionError, setSkillActionError] = useState<string | null>(null);
+  const [skillActionMessage, setSkillActionMessage] = useState<string | null>(null);
   const selectedSkill =
     progression.skills.find((skill) => skill.id === selectedSkillId) ??
     progression.skills.find((skill) => skill.id === focus?.id) ??
@@ -159,15 +161,33 @@ export const SkillsView = ({ focus, onFocusNavigate }: SkillsViewProps) => {
     event.preventDefault();
     const formData = new FormData(event.currentTarget);
 
-    await createSkill({
-      title: String(formData.get("title") ?? ""),
-      description: String(formData.get("description") ?? ""),
-      attribute: String(formData.get("attribute")) as Attribute,
-      prerequisiteSkillIds: selectedPrerequisiteIds,
-    });
-    setSelectedPrerequisiteIds([]);
-    setIsCreatorOpen(false);
-    event.currentTarget.reset();
+    const title = String(formData.get("title") ?? "").trim();
+    const description = String(formData.get("description") ?? "").trim();
+
+    if (!title) {
+      setSkillActionError("Dê um nome para a habilidade antes de registrar.");
+      return;
+    }
+
+    setSkillActionError(null);
+    setSkillActionMessage(null);
+
+    try {
+      await createSkill({
+        title,
+        description: description || "Habilidade real registrada para acompanhamento.",
+        attribute: String(formData.get("attribute")) as Attribute,
+        prerequisiteSkillIds: selectedPrerequisiteIds,
+      });
+      setSelectedPrerequisiteIds([]);
+      setIsCreatorOpen(false);
+      setSkillActionMessage("Habilidade registrada na arvore.");
+      event.currentTarget.reset();
+    } catch (actionError) {
+      setSkillActionError(
+        actionError instanceof Error ? actionError.message : "Nao consegui registrar essa habilidade agora.",
+      );
+    }
   };
 
   const handleUnlockSkill = async () => {
@@ -175,9 +195,18 @@ export const SkillsView = ({ focus, onFocusNavigate }: SkillsViewProps) => {
       return;
     }
 
-    await unlockSkill(selectedSkill.id, { evidence });
-    emitVisualEvent("skill-unlock");
-    setEvidence("");
+    setSkillActionError(null);
+
+    try {
+      await unlockSkill(selectedSkill.id, { evidence });
+      emitVisualEvent("skill-unlock");
+      setEvidence("");
+      setSkillActionMessage("Habilidade marcada como adquirida.");
+    } catch (actionError) {
+      setSkillActionError(
+        actionError instanceof Error ? actionError.message : "Nao consegui atualizar essa habilidade agora.",
+      );
+    }
   };
 
   if (isLoading) {
@@ -198,6 +227,8 @@ export const SkillsView = ({ focus, onFocusNavigate }: SkillsViewProps) => {
           </button>
         </div>
         {error && <div className="error-banner">{error}</div>}
+        {skillActionError && <div className="error-banner">{skillActionError}</div>}
+        {skillActionMessage && <div className="success-banner">{skillActionMessage}</div>}
         <div className="skill-constellation-toolbar">
           <div className="skill-search">
             <Search size={17} />
@@ -287,7 +318,7 @@ export const SkillsView = ({ focus, onFocusNavigate }: SkillsViewProps) => {
             </div>
           </div>
           <form className="stacked-form" onSubmit={handleCreateSkill}>
-            <input name="title" placeholder="Ex: conversar com desconhecidos" aria-label="Titulo da habilidade" />
+            <input name="title" required placeholder="Ex: conversar com desconhecidos" aria-label="Titulo da habilidade" />
             <textarea name="description" placeholder="Como essa habilidade aparece na vida real" aria-label="Descricao" />
             <select name="attribute" defaultValue={activeFilter === "all" ? "social" : activeFilter}>
               {attributeOptions.map((option) => (

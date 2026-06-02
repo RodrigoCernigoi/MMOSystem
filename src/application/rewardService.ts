@@ -17,7 +17,13 @@ export const createRewardService = ({
   clock,
 }: RewardServiceDependencies) => ({
   async getRewards() {
-    const [rewards, player] = await Promise.all([rewardRepository.list(), playerRepository.get()]);
+    const [storedRewards, player] = await Promise.all([rewardRepository.list(), playerRepository.get()]);
+    const rewards = storedRewards.length === 0 ? createDefaultRewards(clock.now().toISOString()) : storedRewards;
+
+    if (storedRewards.length === 0) {
+      await rewardRepository.saveAll(rewards);
+    }
+
     return {
       rewards: rewards.filter((reward) => !reward.archivedAt),
       player,
@@ -29,7 +35,7 @@ export const createRewardService = ({
       id: idProvider.createId(),
       title: input.title.trim(),
       description: input.description.trim(),
-      cost: Math.max(1, Math.floor(input.cost)),
+      cost: Math.max(20, Math.floor(input.cost)),
       createdAt: clock.now().toISOString(),
     };
 
@@ -82,3 +88,41 @@ export const createRewardService = ({
     );
   },
 });
+
+const createDefaultRewards = (createdAt: string): Reward[] => [
+  {
+    id: "preset-reward-short-break",
+    title: "Pausa intencional",
+    description: "20 a 30 minutos de descanso, cafe, caminhada curta ou tempo longe da tela.",
+    cost: 30,
+    createdAt,
+  },
+  {
+    id: "preset-reward-entertainment",
+    title: "Sessao de lazer",
+    description: "Filme, episodio, jogo ou leitura leve sem culpa depois de um ciclo real de progresso.",
+    cost: 80,
+    createdAt,
+  },
+  {
+    id: "preset-reward-social",
+    title: "Role ou encontro simples",
+    description: "Uma saida planejada, convite social ou experiencia pequena fora da rotina.",
+    cost: 140,
+    createdAt,
+  },
+  {
+    id: "preset-reward-purchase",
+    title: "Compra planejada",
+    description: "Um item pessoal pequeno, comprado com intencao e dentro do seu orcamento real.",
+    cost: 220,
+    createdAt,
+  },
+  {
+    id: "preset-reward-recovery",
+    title: "Meio periodo de recuperacao",
+    description: "Bloco maior de descanso, hobby ou cuidado pessoal depois de uma semana consistente.",
+    cost: 360,
+    createdAt,
+  },
+];

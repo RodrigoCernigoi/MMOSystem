@@ -88,7 +88,7 @@ export const createQuestService = ({
       dueAt: input.dueAt || undefined,
       projectId: input.projectId || undefined,
       importance: input.importance?.trim() || undefined,
-      requiresEvidence: input.requiresEvidence ?? false,
+      requiresEvidence: input.requiresEvidence ?? (input.difficulty === "hard" || input.difficulty === "elite"),
       evidenceLog: [],
       habitLog: [],
     };
@@ -141,7 +141,10 @@ export const createQuestService = ({
       dueAt: input.dueAt || undefined,
       projectId: input.projectId || undefined,
       importance: input.importance === undefined ? quest.importance : input.importance.trim() || undefined,
-      requiresEvidence: input.requiresEvidence ?? quest.requiresEvidence,
+      requiresEvidence:
+        input.difficulty === "hard" || input.difficulty === "elite"
+          ? true
+          : input.requiresEvidence ?? quest.requiresEvidence,
     };
 
     if (!updatedQuest.title) {
