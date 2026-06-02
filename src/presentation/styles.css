@@ -804,7 +804,11 @@ button:active {
 }
 
 .profile-card h1 {
+  max-width: 100%;
+  font-size: clamp(1.25rem, 3vw, 1.8rem);
+  line-height: 1.08;
   overflow-wrap: anywhere;
+  word-break: break-word;
 }
 
 .profile-card strong {

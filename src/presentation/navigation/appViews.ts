@@ -35,7 +35,7 @@ export const navItems: NavItem[] = [
   { id: "reports", label: "Relatorios", Icon: BarChart3 },
   { id: "evidence", label: "Evidencias", Icon: FileText },
   { id: "achievements", label: "Conquistas", Icon: Award },
-  { id: "status", label: "Ficha", Icon: UserRound },
+  { id: "status", label: "Status", Icon: UserRound },
   { id: "settings", label: "Config", Icon: Settings },
 ];
 

@@ -52,6 +52,41 @@ const normalizePlayer = (player: Partial<Player>, userId: string): Player => {
   };
 };
 
+type ProfilePatch = {
+  player?: Player;
+  progression?: ProgressionSystem;
+  rewards?: Reward[];
+  focus_sessions?: unknown[];
+};
+
+export const upsertProfilePatch = async (patch: ProfilePatch) => {
+  const client = requireSupabase();
+  const userId = await getCurrentUserId();
+  const { data, error: readError } = await client
+    .from("profiles")
+    .select("player,progression,rewards,focus_sessions")
+    .eq("id", userId)
+    .maybeSingle();
+
+  if (readError) {
+    throw readError;
+  }
+
+  const payload = {
+    id: userId,
+    player: patch.player ? normalizePlayer(patch.player, userId) : normalizePlayer((data?.player ?? {}) as Partial<Player>, userId),
+    progression: patch.progression ?? ((data?.progression ?? createEmptyProgressionSystem()) as ProgressionSystem),
+    rewards: patch.rewards ?? ((data?.rewards ?? []) as Reward[]),
+    focus_sessions: patch.focus_sessions ?? ((data?.focus_sessions ?? []) as unknown[]),
+    updated_at: new Date().toISOString(),
+  };
+  const { error } = await client.from("profiles").upsert(payload);
+
+  if (error) {
+    throw error;
+  }
+};
+
 export const createSupabasePlayerRepository = (): PlayerRepository => ({
   async get() {
     const client = requireSupabase();
@@ -77,16 +112,7 @@ export const createSupabasePlayerRepository = (): PlayerRepository => ({
   },
 
   async save(player) {
-    const client = requireSupabase();
-    const userId = await getCurrentUserId();
-    const normalizedPlayer = normalizePlayer(player, userId);
-    const { error } = await client
-      .from("profiles")
-      .upsert({ id: userId, player: normalizedPlayer, updated_at: new Date().toISOString() });
-
-    if (error) {
-      throw error;
-    }
+    await upsertProfilePatch({ player });
   },
 });
 
@@ -104,15 +130,7 @@ export const createSupabaseRewardRepository = (): RewardRepository => ({
   },
 
   async saveAll(rewards) {
-    const client = requireSupabase();
-    const userId = await getCurrentUserId();
-    const { error } = await client
-      .from("profiles")
-      .upsert({ id: userId, rewards, updated_at: new Date().toISOString() });
-
-    if (error) {
-      throw error;
-    }
+    await upsertProfilePatch({ rewards });
   },
 });
 
@@ -140,15 +158,7 @@ export const createSupabaseProgressionRepository = (): ProgressionRepository => 
   },
 
   async save(progression) {
-    const client = requireSupabase();
-    const userId = await getCurrentUserId();
-    const { error } = await client
-      .from("profiles")
-      .upsert({ id: userId, progression, updated_at: new Date().toISOString() });
-
-    if (error) {
-      throw error;
-    }
+    await upsertProfilePatch({ progression });
   },
 });
 

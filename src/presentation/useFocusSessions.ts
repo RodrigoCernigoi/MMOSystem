@@ -1,5 +1,6 @@
 import { useCallback, useEffect, useState } from "react";
 import type { FocusSession } from "../domain/focusSession";
+import { upsertProfilePatch } from "../infrastructure/supabaseRepositories";
 import { isSupabaseConfigured, supabase } from "../infrastructure/supabaseClient";
 
 const focusSessionsKey = "mmo-system:focus-sessions";
@@ -41,19 +42,7 @@ const writeSupabaseSessions = async (sessions: FocusSession[]) => {
     return;
   }
 
-  const { data: userData, error: userError } = await supabase.auth.getUser();
-
-  if (userError || !userData.user) {
-    throw userError ?? new Error("Usuario nao autenticado.");
-  }
-
-  const { error } = await supabase
-    .from("profiles")
-    .upsert({ id: userData.user.id, focus_sessions: sessions.slice(0, 240), updated_at: new Date().toISOString() });
-
-  if (error) {
-    throw error;
-  }
+  await upsertProfilePatch({ focus_sessions: sessions.slice(0, 240) });
 };
 
 export const useFocusSessions = () => {
