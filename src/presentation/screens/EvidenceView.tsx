@@ -1,4 +1,4 @@
-import { FileText, Search, Sparkles, Target } from "lucide-react";
+import { BarChart3, FileText, FolderKanban, Search, Sparkles, Target } from "lucide-react";
 import { useMemo, useState } from "react";
 import type { Attribute, Quest } from "../../domain/task";
 import type { AppView } from "../navigation/appViews";
@@ -71,6 +71,37 @@ export const EvidenceView = ({ quests, onFocusNavigate }: EvidenceViewProps) => 
         projectTitle.toLowerCase().includes(normalizedSearch))
     );
   });
+  const evidenceStats = useMemo(() => {
+    const attributeCounts = visibleEvidence.reduce(
+      (counts, item) => ({ ...counts, [item.attribute]: (counts[item.attribute] ?? 0) + 1 }),
+      {} as Partial<Record<Attribute, number>>,
+    );
+    const strongestAttribute = (Object.entries(attributeCounts).sort(([, left], [, right]) => right - left)[0]?.[0] ??
+      null) as Attribute | null;
+    const projectCount = new Set(visibleEvidence.map((item) => item.projectId).filter(Boolean)).size;
+
+    return {
+      total: visibleEvidence.length,
+      questTotal: visibleEvidence.filter((item) => item.type === "quests").length,
+      skillTotal: visibleEvidence.filter((item) => item.type === "skills").length,
+      projectCount,
+      strongestAttribute,
+    };
+  }, [visibleEvidence]);
+  const groupedEvidence = useMemo(() => {
+    const groups = visibleEvidence.reduce(
+      (nextGroups, item) => {
+        const dateKey = new Date(item.date).toLocaleDateString("pt-BR");
+        return {
+          ...nextGroups,
+          [dateKey]: [...(nextGroups[dateKey] ?? []), item],
+        };
+      },
+      {} as Record<string, typeof visibleEvidence>,
+    );
+
+    return Object.entries(groups);
+  }, [visibleEvidence]);
 
   return (
     <section className="content-panel">
@@ -113,36 +144,71 @@ export const EvidenceView = ({ quests, onFocusNavigate }: EvidenceViewProps) => 
           ))}
         </select>
       </div>
+      <div className="evidence-stats-grid">
+        <div>
+          <FileText size={18} />
+          <span>Total filtrado</span>
+          <strong>{evidenceStats.total}</strong>
+        </div>
+        <div>
+          <Target size={18} />
+          <span>Missoes</span>
+          <strong>{evidenceStats.questTotal}</strong>
+        </div>
+        <div>
+          <Sparkles size={18} />
+          <span>Skills</span>
+          <strong>{evidenceStats.skillTotal}</strong>
+        </div>
+        <div>
+          <BarChart3 size={18} />
+          <span>Atributo destaque</span>
+          <strong>{evidenceStats.strongestAttribute ? attributeLabels[evidenceStats.strongestAttribute] : "-"}</strong>
+        </div>
+        <div>
+          <FolderKanban size={18} />
+          <span>Projetos com prova</span>
+          <strong>{evidenceStats.projectCount}</strong>
+        </div>
+      </div>
       <div className="evidence-archive-list">
         {visibleEvidence.length === 0 ? (
           <div className="empty-state visual-empty-state">Nenhuma evidencia encontrada.</div>
         ) : (
-          visibleEvidence.map((item) => (
-            <article className="evidence-archive-card" key={item.id}>
-              <div className="evidence-archive-icon">
-                {item.type === "skills" ? <Sparkles size={18} /> : <Target size={18} />}
+          groupedEvidence.map(([date, items]) => (
+            <section className="evidence-day-group" key={date}>
+              <div className="evidence-day-heading">
+                <strong>{date}</strong>
+                <span>{items.length} evidencia{items.length === 1 ? "" : "s"}</span>
               </div>
-              <div>
-                <span>{item.label} · {attributeLabels[item.attribute]}</span>
-                <strong>{item.title}</strong>
-                <p>{item.detail}</p>
-                {item.projectId && <small>{projectById.get(item.projectId)?.title}</small>}
-              </div>
-              <time>{new Date(item.date).toLocaleDateString("pt-BR")}</time>
-              {item.focus ? (
-                <button
-                  type="button"
-                  onClick={() => {
-                    const target = item.focus;
-                    if (target) {
-                      onFocusNavigate?.(target.view, target.focus);
-                    }
-                  }}
-                >
-                  Abrir
-                </button>
-              ) : null}
-            </article>
+              {items.map((item) => (
+                <article className="evidence-archive-card" key={item.id}>
+                  <div className="evidence-archive-icon">
+                    {item.type === "skills" ? <Sparkles size={18} /> : <Target size={18} />}
+                  </div>
+                  <div>
+                    <span>{item.label} · {attributeLabels[item.attribute]}</span>
+                    <strong>{item.title}</strong>
+                    <p>{item.detail}</p>
+                    {item.projectId && <small>{projectById.get(item.projectId)?.title}</small>}
+                  </div>
+                  <time>{new Date(item.date).toLocaleTimeString("pt-BR", { hour: "2-digit", minute: "2-digit" })}</time>
+                  {item.focus ? (
+                    <button
+                      type="button"
+                      onClick={() => {
+                        const target = item.focus;
+                        if (target) {
+                          onFocusNavigate?.(target.view, target.focus);
+                        }
+                      }}
+                    >
+                      Abrir
+                    </button>
+                  ) : null}
+                </article>
+              ))}
+            </section>
           ))
         )}
       </div>

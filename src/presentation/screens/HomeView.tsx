@@ -1,4 +1,4 @@
-import { ArrowRight, Award, Swords, Trophy } from "lucide-react";
+import { ArrowRight, Award, CheckCircle2, FileText, Flag, Swords, Trophy } from "lucide-react";
 import { useState } from "react";
 import { achievements } from "../../domain/achievements";
 import type { Player } from "../../domain/player";
@@ -38,6 +38,10 @@ export const HomeView = ({
   const activeProject = progression.projects.find((project) => project.status === "active");
   const developingSkill = progression.skills.find((skill) => !skill.isUnlocked);
   const latestReview = player.dailyReviews[0];
+  const hasEvidence = quests.some((quest) => quest.evidenceLog?.length) || progression.skills.some((skill) => skill.evidence);
+  const hasEvidenceQuest = quests.some((quest) => quest.requiresEvidence);
+  const firstOpenQuest = quests.find((quest) => quest.status === "open");
+  const shouldShowFirstDayGuide = !latestReview || !hasEvidence || !hasEvidenceQuest;
   const selectedQuestProjectTitle = selectedQuest?.projectId
     ? progression.projects.find((project) => project.id === selectedQuest.projectId)?.title
     : undefined;
@@ -72,6 +76,56 @@ export const HomeView = ({
         <Metric icon={<Trophy size={18} />} label="Concluidas" value={completedQuests.length} />
         <Metric icon={<Award size={18} />} label="Conquistas" value={unlockedCount} />
       </div>
+
+      {shouldShowFirstDayGuide && (
+        <section className="content-panel span-all first-day-guide">
+          <div className="section-heading">
+            <div>
+              <p className="eyebrow">Setup guiado</p>
+              <h2>Primeiro dia no sistema</h2>
+            </div>
+            <Flag size={24} />
+          </div>
+          <div className="first-day-steps">
+            <button
+              type="button"
+              className={quests.length > 0 ? "first-day-step first-day-step-done" : "first-day-step"}
+              onClick={() =>
+                onCreateQuestIntent({
+                  kind: "single",
+                  recurrence: "none",
+                  difficulty: "normal",
+                  attribute: "discipline",
+                  requiresEvidence: true,
+                  importance: "Primeira missao real para registrar uma evidencia concreta.",
+                })
+              }
+            >
+              <CheckCircle2 size={18} />
+              <strong>Criar uma missao real</strong>
+              <span>{quests.length > 0 ? "Missao criada" : "Comece com uma acao pequena e concreta"}</span>
+            </button>
+            <button
+              type="button"
+              className={hasEvidence ? "first-day-step first-day-step-done" : "first-day-step"}
+              onClick={() => (firstOpenQuest ? setSelectedQuest(firstOpenQuest) : onNavigate("create"))}
+            >
+              <FileText size={18} />
+              <strong>Registrar evidencia</strong>
+              <span>{hasEvidence ? "Prova registrada" : "Conclua uma missao com nota real"}</span>
+            </button>
+            <button
+              type="button"
+              className={latestReview ? "first-day-step first-day-step-done" : "first-day-step"}
+              onClick={() => onNavigate("today")}
+            >
+              <Trophy size={18} />
+              <strong>Encerrar o dia</strong>
+              <span>{latestReview ? `Ultimo rank ${latestReview.rank}` : "Compute XP, moedas e resumo"}</span>
+            </button>
+          </div>
+        </section>
+      )}
 
       <section className="content-panel span-all command-center-panel">
         <div className="section-heading">

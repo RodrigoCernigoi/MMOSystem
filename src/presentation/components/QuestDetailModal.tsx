@@ -24,6 +24,24 @@ export const QuestDetailModal = ({
   const [isCompleting, setIsCompleting] = useState(false);
   const [evidenceError, setEvidenceError] = useState<string | null>(null);
 
+  const formatCompletionError = (error: unknown) => {
+    const message = error instanceof Error ? error.message : "";
+
+    if (message.includes("exige evidencia")) {
+      return "Registre uma prova real antes de concluir esta missao.";
+    }
+
+    if (message.includes("not found")) {
+      return "Nao encontrei essa missao. Atualize a tela e tente novamente.";
+    }
+
+    if (message.includes("autenticado")) {
+      return "Sua sessao parece ter expirado. Entre novamente para salvar o progresso.";
+    }
+
+    return "Nao consegui computar essa conclusao agora. Tente novamente em alguns instantes.";
+  };
+
   const handleComplete = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
 
@@ -45,6 +63,8 @@ export const QuestDetailModal = ({
     try {
       await onCompleteQuest(quest.id, { evidence });
       onClose();
+    } catch (error) {
+      setEvidenceError(formatCompletionError(error));
     } finally {
       setIsCompleting(false);
     }
