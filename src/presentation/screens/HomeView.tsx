@@ -1,4 +1,5 @@
 import { ArrowRight, Award, Swords, Trophy } from "lucide-react";
+import { useState } from "react";
 import { achievements } from "../../domain/achievements";
 import type { Player } from "../../domain/player";
 import type { CompleteQuestInput, Quest } from "../../domain/task";
@@ -6,6 +7,7 @@ import type { AppView } from "../navigation/appViews";
 import type { AppFocus, CreateQuestIntent } from "../navigation/navigationIntent";
 import { useProgressionSystem } from "../useProgressionSystem";
 import { QuestCard } from "../components/QuestCard";
+import { QuestDetailModal } from "../components/QuestDetailModal";
 import { StatusPanel } from "../components/StatusPanel";
 import { Metric } from "../components/Metric";
 
@@ -27,6 +29,7 @@ export const HomeView = ({
   onFocusNavigate,
 }: HomeViewProps) => {
   const { progression } = useProgressionSystem();
+  const [selectedQuest, setSelectedQuest] = useState<Quest | null>(null);
   const openQuests = quests.filter((quest) => quest.status === "open").slice(0, 3);
   const completedQuests = quests.filter((quest) => quest.status === "completed");
   const unlockedCount = achievements.filter((achievement) =>
@@ -35,9 +38,19 @@ export const HomeView = ({
   const activeProject = progression.projects.find((project) => project.status === "active");
   const developingSkill = progression.skills.find((skill) => !skill.isUnlocked);
   const latestReview = player.dailyReviews[0];
+  const selectedQuestProjectTitle = selectedQuest?.projectId
+    ? progression.projects.find((project) => project.id === selectedQuest.projectId)?.title
+    : undefined;
 
   return (
     <div className="view-grid view-grid-home">
+      <QuestDetailModal
+        quest={selectedQuest}
+        projectTitle={selectedQuestProjectTitle}
+        onClose={() => setSelectedQuest(null)}
+        onCompleteQuest={onCompleteQuest}
+        onOpenProject={(projectId) => onFocusNavigate("projects", { type: "project", id: projectId })}
+      />
       <section className="welcome-panel command-panel">
         <div>
           <p className="eyebrow">Painel de comando</p>
@@ -127,7 +140,7 @@ export const HomeView = ({
             <div className="empty-state">Nenhuma missao ativa.</div>
           ) : (
             openQuests.map((quest) => (
-              <QuestCard key={quest.id} quest={quest} onCompleteQuest={onCompleteQuest} />
+              <QuestCard key={quest.id} quest={quest} onCompleteQuest={onCompleteQuest} onOpenDetails={setSelectedQuest} />
             ))
           )}
         </div>

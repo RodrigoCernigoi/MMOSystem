@@ -14,6 +14,7 @@ O MMO System combina organizacao pessoal com feedback de jogo:
 - conquistas, atributos, XP, moedas e ranks;
 - encerramento diario com relatorio animado;
 - historico de relatorios diarios;
+- arquivo de evidencias reais;
 - efeitos visuais com PixiJS;
 - transicoes com Motion;
 - audio feedback com Tone.js;
@@ -116,6 +117,8 @@ As missoes representam tarefas reais. Elas podem ser:
 
 Completar missoes gera XP, moedas, atributos e historico diario.
 
+Missoes importantes podem ser marcadas para exigir evidencia. Nesse caso, o check rapido abre a ficha da missao e a conclusao so acontece depois de registrar uma prova real, nota de aprendizado ou resultado concreto.
+
 ### Habitos
 
 Habitos nao sao encerrados como tarefas comuns. Eles recebem check-ins diarios e mantem log para streaks.
@@ -154,6 +157,7 @@ O fluxo de "Encerrar dia" cria um relatorio com:
 - missoes concluidas;
 - habitos registrados;
 - rank do dia;
+- evidencias reais registradas;
 - bonus de fechamento.
 
 O mesmo dia so pode ser encerrado uma vez, evitando bonus duplicado.
@@ -161,6 +165,10 @@ O mesmo dia so pode ser encerrado uma vez, evitando bonus duplicado.
 ### Relatorios
 
 A tela de relatorios mostra historico de fechamentos, graficos simples e estatisticas de progresso.
+
+### Evidencias
+
+A tela de Evidencias centraliza provas reais vindas de missoes e skills. E possivel filtrar por tipo, atributo, projeto e texto, ajudando o usuario a enxergar progresso concreto em vez de apenas pontos abstratos.
 
 ### Game Feel
 
@@ -258,11 +266,25 @@ Depois coloque a URL publica dessa API em `VITE_API_BASE_URL` no deploy do front
 - criar conta;
 - passar pelo onboarding;
 - criar uma missao;
+- criar uma missao marcada como "exigir evidencia";
+- confirmar que ela nao conclui sem registrar uma prova;
 - abrir modo foco e salvar sessao;
+- abrir a tela de Evidencias e conferir filtros;
 - encerrar o dia;
 - exportar backup;
 - abrir em outro dispositivo com a mesma conta;
 - confirmar que missoes, skills, recompensas e sessoes aparecem.
+
+### Checklist de Seguranca e Deploy
+
+- manter `GROQ_API_KEY` apenas no backend/provedor serverless;
+- expor no frontend somente `VITE_SUPABASE_URL` e `VITE_SUPABASE_ANON_KEY`;
+- confirmar que o SQL de `supabase/schema.sql` foi executado com RLS ativo;
+- conferir se as URLs do site estao permitidas no painel Auth do Supabase;
+- usar HTTPS no dominio publicado;
+- testar login, logout e recuperacao de sessao em navegador anonimo;
+- testar uma conta nova antes de enviar o link para terceiros;
+- evitar commitar `.env` real.
 
 ## Roadmap
 
@@ -281,3 +303,5 @@ Ideias futuras:
 Chaves privadas, como `GROQ_API_KEY`, devem ficar no backend ou em ambiente serverless. Nunca exponha chaves privadas no frontend.
 
 O arquivo `.env.example` nao deve conter chaves reais.
+
+`VITE_SUPABASE_ANON_KEY` e uma chave publicavel. A seguranca dos dados depende principalmente das politicas RLS do Supabase e do uso correto de `auth.uid()` nas tabelas.

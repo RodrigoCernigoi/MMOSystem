@@ -1490,6 +1490,12 @@ h2 {
   color: #fde68a;
 }
 
+.quest-meta .quest-evidence-chip {
+  border-color: rgba(190, 242, 100, 0.34);
+  background: rgba(63, 98, 18, 0.26);
+  color: #d9f99d;
+}
+
 .quest-card h3 {
   margin-top: 10px;
   font-size: 1.1rem;
@@ -1550,6 +1556,18 @@ h2 {
   background: rgba(63, 98, 18, 0.16);
   color: #d9f99d;
   padding: 8px 10px;
+  font-weight: 900;
+}
+
+.quest-required-evidence {
+  display: inline-flex;
+  width: fit-content;
+  align-items: center;
+  gap: 8px;
+  border: 1px solid rgba(190, 242, 100, 0.24);
+  background: rgba(63, 98, 18, 0.18);
+  color: #d9f99d;
+  padding: 9px 11px;
   font-weight: 900;
 }
 
@@ -2641,6 +2659,83 @@ h2 {
 
 .visual-check-list {
   max-height: 170px;
+}
+
+.forge-switch-field {
+  display: flex;
+  min-height: 44px;
+  align-items: center;
+  gap: 10px;
+  border: 1px solid rgba(190, 242, 100, 0.18);
+  background: rgba(63, 98, 18, 0.12);
+  color: #d9f99d;
+  padding: 10px 12px;
+  font-weight: 900;
+}
+
+.forge-switch-field input {
+  width: 18px;
+  height: 18px;
+  accent-color: #bef264;
+}
+
+.evidence-toolbar {
+  display: grid;
+  grid-template-columns: minmax(220px, 1fr) repeat(3, minmax(140px, 0.35fr));
+  gap: 10px;
+  margin-bottom: 14px;
+}
+
+.evidence-archive-list {
+  display: grid;
+  gap: 10px;
+}
+
+.evidence-archive-card {
+  display: grid;
+  grid-template-columns: 44px minmax(0, 1fr) auto auto;
+  align-items: center;
+  gap: 12px;
+  border: 1px solid rgba(148, 163, 184, 0.16);
+  background:
+    linear-gradient(135deg, rgba(34, 211, 238, 0.08), transparent 40%),
+    rgba(15, 23, 42, 0.58);
+  padding: 13px;
+}
+
+.evidence-archive-icon {
+  display: grid;
+  width: 44px;
+  height: 44px;
+  place-items: center;
+  background: rgba(34, 211, 238, 0.12);
+  color: #7dd3fc;
+}
+
+.evidence-archive-card span,
+.evidence-archive-card time,
+.evidence-archive-card small {
+  color: #9fb5d0;
+  font-size: 0.78rem;
+  font-weight: 800;
+}
+
+.evidence-archive-card strong {
+  display: block;
+  margin: 4px 0;
+  color: #f8fafc;
+}
+
+.evidence-archive-card p {
+  color: #cbd5e1;
+}
+
+.evidence-archive-card button {
+  border: 1px solid rgba(125, 211, 252, 0.22);
+  background: rgba(34, 211, 238, 0.1);
+  color: #bae6fd;
+  padding: 9px 11px;
+  font-weight: 900;
 }
 
 .progression-list,
@@ -3989,6 +4084,32 @@ h2 {
   .mission-search {
     grid-column: auto;
     min-width: 230px;
+  }
+
+  .evidence-toolbar {
+    display: grid;
+    grid-auto-flow: column;
+    grid-auto-columns: minmax(150px, 52vw);
+    grid-template-columns: none;
+    width: 100%;
+    max-width: 100%;
+    min-width: 0;
+    overflow-x: auto;
+    overflow-y: hidden;
+    overscroll-behavior-x: contain;
+    padding-bottom: 3px;
+    -webkit-overflow-scrolling: touch;
+  }
+
+  .evidence-archive-card {
+    grid-template-columns: 38px minmax(0, 1fr);
+    align-items: start;
+  }
+
+  .evidence-archive-card time,
+  .evidence-archive-card button {
+    grid-column: 2;
+    width: fit-content;
   }
 
   .quest-card {

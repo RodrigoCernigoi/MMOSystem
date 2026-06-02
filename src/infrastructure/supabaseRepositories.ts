@@ -37,6 +37,7 @@ const normalizePlayer = (player: Partial<Player>, userId: string): Player => {
     bio: player.bio ?? fallback.bio,
     avatarSymbol: player.avatarSymbol ?? fallback.avatarSymbol,
     focus: player.focus ?? fallback.focus,
+    appPreferences: player.appPreferences ?? fallback.appPreferences,
     totalXp: player.totalXp ?? player.xp ?? fallback.totalXp,
     skillPoints: player.skillPoints ?? 0,
     completedQuestCount: player.completedQuestCount ?? 0,

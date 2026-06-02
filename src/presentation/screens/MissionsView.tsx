@@ -133,6 +133,7 @@ export const MissionsView = ({
       dueAt: String(formData.get("dueAt") ?? ""),
       projectId: String(formData.get("projectId") ?? ""),
       importance: String(formData.get("importance") ?? ""),
+      requiresEvidence: formData.get("requiresEvidence") === "on",
     });
     setEditingQuest(null);
   };
@@ -242,6 +243,10 @@ export const MissionsView = ({
               ))}
           </select>
           <input name="importance" defaultValue={editingQuest.importance ?? ""} aria-label="Importancia da missao" />
+          <label className="forge-switch-field">
+            <input name="requiresEvidence" type="checkbox" defaultChecked={editingQuest.requiresEvidence ?? false} />
+            <span>Exigir evidencia</span>
+          </label>
           <button type="submit">Salvar</button>
           <button type="button" onClick={() => setEditingQuest(null)}>
             Cancelar

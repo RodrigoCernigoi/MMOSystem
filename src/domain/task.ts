@@ -22,6 +22,7 @@ export type Quest = {
   failedAt?: string;
   projectId?: string;
   importance?: string;
+  requiresEvidence?: boolean;
   evidenceLog?: QuestEvidence[];
   habitLog?: string[];
   lastRenewedAt?: string;
@@ -42,6 +43,7 @@ export type CreateQuestInput = {
   dueAt?: string;
   projectId?: string;
   importance?: string;
+  requiresEvidence?: boolean;
 };
 
 export type UpdateQuestInput = Partial<CreateQuestInput>;

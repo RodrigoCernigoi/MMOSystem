@@ -9,6 +9,7 @@ export type CreateQuestIntent = {
   dueAt?: string;
   projectId?: string;
   importance?: string;
+  requiresEvidence?: boolean;
 };
 
 export type AppFocus =

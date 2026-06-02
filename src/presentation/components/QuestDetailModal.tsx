@@ -22,6 +22,7 @@ export const QuestDetailModal = ({
   onOpenProject,
 }: QuestDetailModalProps) => {
   const [isCompleting, setIsCompleting] = useState(false);
+  const [evidenceError, setEvidenceError] = useState<string | null>(null);
 
   const handleComplete = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
@@ -31,10 +32,18 @@ export const QuestDetailModal = ({
     }
 
     const formData = new FormData(event.currentTarget);
+    const evidence = String(formData.get("evidence") ?? "").trim();
+
+    if (quest.requiresEvidence && !evidence) {
+      setEvidenceError("Esta missao esta marcada como importante e precisa de uma evidencia real.");
+      return;
+    }
+
+    setEvidenceError(null);
     setIsCompleting(true);
 
     try {
-      await onCompleteQuest(quest.id, { evidence: String(formData.get("evidence") ?? "") });
+      await onCompleteQuest(quest.id, { evidence });
       onClose();
     } finally {
       setIsCompleting(false);
@@ -67,6 +76,12 @@ export const QuestDetailModal = ({
               </div>
               <div className="quest-detail-rank">Rank {difficultyLabels[quest.difficulty]}</div>
             </div>
+            {quest.requiresEvidence && (
+              <div className="quest-required-evidence">
+                <Sparkles size={16} />
+                Evidencia obrigatoria para concluir esta missao.
+              </div>
+            )}
 
             <div className="quest-detail-grid">
               <div>
@@ -127,6 +142,7 @@ export const QuestDetailModal = ({
                   placeholder="O que foi feito? Qual prova real, aprendizado ou resultado essa missao gerou?"
                   aria-label="Evidencia da missao"
                 />
+                {evidenceError && <span className="settings-warning">{evidenceError}</span>}
                 <div className="quest-detail-actions">
                   {onOpenFocus && (
                     <button type="button" className="secondary-button" onClick={() => onOpenFocus(quest.id)}>

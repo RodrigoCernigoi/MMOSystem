@@ -1,5 +1,5 @@
 import { AnimatePresence, motion } from "motion/react";
-import { lazy, Suspense, useCallback, useEffect, useState } from "react";
+import { lazy, Suspense, useCallback, useEffect, useRef, useState } from "react";
 import type { ReactNode } from "react";
 import { useDashboard } from "./useDashboard";
 import type { RewardFeedback } from "./useDashboard";
@@ -21,6 +21,7 @@ import { emitVisualEvent, intensityMultiplier, useVisualPreferences } from "./vi
 const AchievementsView = lazy(() => import("./screens/AchievementsView").then((module) => ({ default: module.AchievementsView })));
 const CalendarView = lazy(() => import("./screens/CalendarView").then((module) => ({ default: module.CalendarView })));
 const CreateQuestView = lazy(() => import("./screens/CreateQuestView").then((module) => ({ default: module.CreateQuestView })));
+const EvidenceView = lazy(() => import("./screens/EvidenceView").then((module) => ({ default: module.EvidenceView })));
 const FocusView = lazy(() => import("./screens/FocusView").then((module) => ({ default: module.FocusView })));
 const MissionsView = lazy(() => import("./screens/MissionsView").then((module) => ({ default: module.MissionsView })));
 const ProjectsView = lazy(() => import("./screens/ProjectsView").then((module) => ({ default: module.ProjectsView })));
@@ -56,6 +57,7 @@ export const App = () => {
   const [syncStatus, setSyncStatus] = useState<SyncStatus>("idle");
   const [syncDetail, setSyncDetail] = useState<string | null>(null);
   const { preferences, setPreferences } = useVisualPreferences();
+  const didHydrateRemotePreferences = useRef(false);
   useToneGameFeel({ intensity: preferences.audioIntensity, volume: preferences.audioVolume });
 
   useEffect(() => {
@@ -68,9 +70,10 @@ export const App = () => {
       return;
     }
 
-    const hasCompletedOnboarding = localStorage.getItem("mmo-system:onboarding-complete") === "true";
+    const hasCompletedOnboarding =
+      player?.appPreferences?.onboardingComplete || localStorage.getItem("mmo-system:onboarding-complete") === "true";
     setShowOnboarding(!hasCompletedOnboarding && quests.length === 0);
-  }, [isLoading, quests.length, showSplash]);
+  }, [isLoading, player?.appPreferences?.onboardingComplete, quests.length, showSplash]);
 
   useEffect(() => {
     if (!rewardFeedback) {
@@ -89,6 +92,24 @@ export const App = () => {
     const timeoutId = window.setTimeout(() => setSyncStatus("idle"), 900);
     return () => window.clearTimeout(timeoutId);
   }, [syncStatus]);
+
+  useEffect(() => {
+    if (!player?.appPreferences || didHydrateRemotePreferences.current) {
+      return;
+    }
+
+    didHydrateRemotePreferences.current = true;
+    setPreferences({
+      theme: player.appPreferences.visualTheme ?? preferences.theme,
+      intensity: player.appPreferences.visualIntensity ?? preferences.intensity,
+      audioIntensity: player.appPreferences.audioIntensity ?? preferences.audioIntensity,
+      audioVolume: player.appPreferences.audioVolume ?? preferences.audioVolume,
+    });
+
+    if (player.appPreferences.lastView && player.appPreferences.lastView !== "focus") {
+      setActiveView(player.appPreferences.lastView);
+    }
+  }, [player?.appPreferences, preferences.audioIntensity, preferences.audioVolume, preferences.intensity, preferences.theme, setPreferences]);
 
   const runSyncedAction = useCallback(async <T,>(action: () => Promise<T>) => {
     setSyncStatus("saving");
@@ -147,10 +168,26 @@ export const App = () => {
     [runSyncedAction, updatePlayerProfile],
   );
 
+  const handleChangePreferences = useCallback(
+    (nextPreferences: typeof preferences) => {
+      setPreferences(nextPreferences);
+      void handleUpdatePlayerProfile({
+        appPreferences: {
+          visualTheme: nextPreferences.theme,
+          visualIntensity: nextPreferences.intensity,
+          audioIntensity: nextPreferences.audioIntensity,
+          audioVolume: nextPreferences.audioVolume,
+        },
+      });
+    },
+    [handleUpdatePlayerProfile, setPreferences],
+  );
+
   const handleNavigate = useCallback((view: AppView) => {
     setActiveView(view);
+    void handleUpdatePlayerProfile({ appPreferences: { lastView: view } });
     emitVisualEvent("ui-navigate");
-  }, []);
+  }, [handleUpdatePlayerProfile]);
 
   const handleOpenDailyReview = useCallback(() => {
     setActiveView("today");
@@ -172,9 +209,10 @@ export const App = () => {
 
   const handleFinishOnboarding = useCallback(() => {
     localStorage.setItem("mmo-system:onboarding-complete", "true");
+    void handleUpdatePlayerProfile({ appPreferences: { onboardingComplete: true } });
     setShowOnboarding(false);
     emitVisualEvent("ui-confirm");
-  }, []);
+  }, [handleUpdatePlayerProfile]);
 
   const handleOpenFocusMode = useCallback((questId: string) => {
     setFocusQuestId(questId);
@@ -252,6 +290,7 @@ export const App = () => {
     ),
     rewards: <RewardsView />,
     reports: <ReportsView player={player} />,
+    evidence: <EvidenceView quests={quests} onFocusNavigate={handleFocusNavigate} />,
     achievements: <AchievementsView player={player} />,
     status: (
       <StatusView
@@ -261,7 +300,7 @@ export const App = () => {
         onFocusNavigate={handleFocusNavigate}
       />
     ),
-    settings: <SettingsView preferences={preferences} onChangePreferences={setPreferences} />,
+    settings: <SettingsView preferences={preferences} onChangePreferences={handleChangePreferences} />,
   };
   const failedQuestCount = quests.filter((quest) => quest.status === "failed").length;
   const openQuestCount = quests.filter((quest) => quest.status === "open").length;

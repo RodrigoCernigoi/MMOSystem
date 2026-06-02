@@ -1,4 +1,4 @@
-import { Award, BarChart3, CalendarDays, Gift, GitBranch, Home, ListChecks, MoreHorizontal, PlusCircle, Settings, Sparkles, Sun, UserRound } from "lucide-react";
+import { Award, BarChart3, CalendarDays, FileText, Gift, GitBranch, Home, ListChecks, MoreHorizontal, PlusCircle, Settings, Sparkles, Sun, UserRound } from "lucide-react";
 import type { ComponentType } from "react";
 
 export type AppView =
@@ -12,6 +12,7 @@ export type AppView =
   | "skills"
   | "rewards"
   | "reports"
+  | "evidence"
   | "achievements"
   | "status"
   | "settings";
@@ -32,6 +33,7 @@ export const navItems: NavItem[] = [
   { id: "skills", label: "Skills", Icon: Sparkles },
   { id: "rewards", label: "Loja", Icon: Gift },
   { id: "reports", label: "Relatorios", Icon: BarChart3 },
+  { id: "evidence", label: "Evidencias", Icon: FileText },
   { id: "achievements", label: "Conquistas", Icon: Award },
   { id: "status", label: "Status", Icon: UserRound },
   { id: "settings", label: "Config", Icon: Settings },

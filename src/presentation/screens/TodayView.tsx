@@ -5,9 +5,11 @@ import { isHabitDoneToday, isQuestForToday, toDateKey } from "../../domain/sched
 import type { Player } from "../../domain/player";
 import type { CompleteQuestInput, Quest } from "../../domain/task";
 import { QuestCard } from "../components/QuestCard";
+import { QuestDetailModal } from "../components/QuestDetailModal";
 import { DailyReviewOverlay } from "../components/DailyReviewOverlay";
 import { Metric } from "../components/Metric";
 import { Tabs } from "../components/Tabs";
+import { useProgressionSystem } from "../useProgressionSystem";
 
 type TodayViewProps = {
   player: Player;
@@ -21,6 +23,8 @@ type TodayViewProps = {
 export const TodayView = ({ player, quests, onCompleteQuest, onEndDay, onOpenFocus, reviewRequestId = 0 }: TodayViewProps) => {
   const [isReviewOpen, setIsReviewOpen] = useState(false);
   const [activeTab, setActiveTab] = useState<"habits" | "missions" | "projects">("habits");
+  const [selectedQuest, setSelectedQuest] = useState<Quest | null>(null);
+  const { progression } = useProgressionSystem();
   const today = toDateKey(new Date());
   const todayQuests = quests.filter((quest) => isQuestForToday(quest, today));
   const todayHistory = player.dailyHistory.find((entry) => entry.date === today);
@@ -69,6 +73,9 @@ export const TodayView = ({ player, quests, onCompleteQuest, onEndDay, onOpenFoc
             onClick: () => setActiveTab("missions"),
           };
   const NextIcon = nextAction.Icon;
+  const selectedQuestProjectTitle = selectedQuest?.projectId
+    ? progression.projects.find((project) => project.id === selectedQuest.projectId)?.title
+    : undefined;
 
   useEffect(() => {
     if (reviewRequestId > 0) {
@@ -78,6 +85,13 @@ export const TodayView = ({ player, quests, onCompleteQuest, onEndDay, onOpenFoc
 
   return (
     <div className="view-grid view-grid-wide">
+      <QuestDetailModal
+        quest={selectedQuest}
+        projectTitle={selectedQuestProjectTitle}
+        onClose={() => setSelectedQuest(null)}
+        onCompleteQuest={onCompleteQuest}
+        onOpenFocus={onOpenFocus}
+      />
       <section className="content-panel span-all daily-cockpit">
         <div className="section-heading">
           <div>
@@ -169,13 +183,13 @@ export const TodayView = ({ player, quests, onCompleteQuest, onEndDay, onOpenFoc
                 <>
                   {pendingHabits.map((quest) => (
                     <div className="habit-card-wrap" key={quest.id}>
-                      <QuestCard quest={quest} onCompleteQuest={onCompleteQuest} onOpenFocus={onOpenFocus} />
+                      <QuestCard quest={quest} onCompleteQuest={onCompleteQuest} onOpenFocus={onOpenFocus} onOpenDetails={setSelectedQuest} />
                       <span>Streak: {calculateHabitStreak(quest)} dias</span>
                     </div>
                   ))}
                   {doneHabits.map((quest) => (
                     <div className="habit-card-wrap" key={quest.id}>
-                      <QuestCard quest={quest} onCompleteQuest={onCompleteQuest} onOpenFocus={onOpenFocus} />
+                      <QuestCard quest={quest} onCompleteQuest={onCompleteQuest} onOpenFocus={onOpenFocus} onOpenDetails={setSelectedQuest} />
                       <span>Concluido hoje · Streak: {calculateHabitStreak(quest)} dias</span>
                     </div>
                   ))}
@@ -189,7 +203,7 @@ export const TodayView = ({ player, quests, onCompleteQuest, onEndDay, onOpenFoc
                 <div className="empty-state visual-empty-state">Nenhuma missao para hoje.</div>
               ) : (
                 dueToday.map((quest) => (
-                  <QuestCard key={quest.id} quest={quest} onCompleteQuest={onCompleteQuest} onOpenFocus={onOpenFocus} />
+                  <QuestCard key={quest.id} quest={quest} onCompleteQuest={onCompleteQuest} onOpenFocus={onOpenFocus} onOpenDetails={setSelectedQuest} />
                 ))
               )}
             </div>
@@ -203,7 +217,7 @@ export const TodayView = ({ player, quests, onCompleteQuest, onEndDay, onOpenFoc
                   .filter((quest) => quest.status === "open" && quest.projectId)
                   .slice(0, 5)
                   .map((quest) => (
-                    <QuestCard key={quest.id} quest={quest} onCompleteQuest={onCompleteQuest} onOpenFocus={onOpenFocus} />
+                    <QuestCard key={quest.id} quest={quest} onCompleteQuest={onCompleteQuest} onOpenFocus={onOpenFocus} onOpenDetails={setSelectedQuest} />
                   ))
               )}
             </div>

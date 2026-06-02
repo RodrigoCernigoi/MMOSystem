@@ -47,6 +47,7 @@ export const QuestForm = ({ onCreateQuest, onSuggestQuest, projects = [], intent
   const [dueAt, setDueAt] = useState("");
   const [projectId, setProjectId] = useState("");
   const [importance, setImportance] = useState("");
+  const [requiresEvidence, setRequiresEvidence] = useState(false);
 
   useEffect(() => {
     if (!intent) {
@@ -61,13 +62,15 @@ export const QuestForm = ({ onCreateQuest, onSuggestQuest, projects = [], intent
     setDueAt(intent.dueAt ?? "");
     setProjectId(intent.projectId ?? "");
     setImportance(intent.importance ?? "");
+    setRequiresEvidence(intent.requiresEvidence ?? false);
   }, [intent]);
 
   const handleSubmit = async (event: FormEvent) => {
     event.preventDefault();
-    await onCreateQuest({ title, kind, attribute, difficulty, recurrence, dueAt, projectId, importance });
+    await onCreateQuest({ title, kind, attribute, difficulty, recurrence, dueAt, projectId, importance, requiresEvidence });
     setTitle("");
     setImportance("");
+    setRequiresEvidence(false);
   };
 
   const applyTemplate = (nextKind: QuestKind) => {
@@ -191,6 +194,14 @@ export const QuestForm = ({ onCreateQuest, onSuggestQuest, projects = [], intent
                 ))}
               </select>
             </label>
+            <label className="forge-switch-field forge-field-wide">
+              <input
+                type="checkbox"
+                checked={requiresEvidence}
+                onChange={(event) => setRequiresEvidence(event.target.checked)}
+              />
+              <span>Exigir evidencia antes de concluir</span>
+            </label>
           </div>
         </div>
 
@@ -225,6 +236,7 @@ export const QuestForm = ({ onCreateQuest, onSuggestQuest, projects = [], intent
           <span className="quest-rank">Rank {difficultyOptions.find((option) => option.value === difficulty)?.label}</span>
           <span>{questKindOptions.find((option) => option.value === kind)?.label}</span>
           <span>{attributeOptions.find((option) => option.value === attribute)?.label}</span>
+          {requiresEvidence && <span>Evidencia obrigatoria</span>}
           {dueAt && <span>{new Date(`${dueAt}T00:00:00`).toLocaleDateString("pt-BR")}</span>}
           {selectedProject && <span>{selectedProject.title}</span>}
         </div>

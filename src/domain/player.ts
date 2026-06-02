@@ -24,7 +24,33 @@ export type Player = {
   dailyHistory: DailyHistoryEntry[];
   dailyReviews: DailyReview[];
   attributes: AttributeMap;
+  appPreferences?: AppPreferences;
 };
+
+export type AppPreferences = {
+  visualTheme?: "auto" | "cyan" | "green" | "red";
+  visualIntensity?: "off" | "subtle" | "normal" | "high";
+  audioIntensity?: "off" | "subtle" | "normal" | "high";
+  audioVolume?: number;
+  onboardingComplete?: boolean;
+  lastView?: AppViewPreference;
+};
+
+export type AppViewPreference =
+  | "home"
+  | "today"
+  | "focus"
+  | "missions"
+  | "calendar"
+  | "create"
+  | "projects"
+  | "skills"
+  | "rewards"
+  | "reports"
+  | "achievements"
+  | "status"
+  | "settings"
+  | "evidence";
 
 export type RedeemedReward = {
   id: string;
@@ -86,4 +112,5 @@ export const createNewPlayer = (name = "Hunter"): Player => ({
     social: 1,
     vitality: 1,
   },
+  appPreferences: {},
 });

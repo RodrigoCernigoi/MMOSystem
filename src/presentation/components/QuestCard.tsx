@@ -47,6 +47,7 @@ export const QuestCard = ({
         <span>{questKindLabels[quest.kind]}</span>
         <span>{statusLabels[quest.status]}</span>
         {projectTitle && <span>{projectTitle}</span>}
+        {quest.requiresEvidence && <span className="quest-evidence-chip">Evidencia</span>}
         {isUrgent && <span className="quest-urgency-chip">Prioridade</span>}
       </div>
       <h3>{quest.title}</h3>
@@ -65,7 +66,13 @@ export const QuestCard = ({
       )}
       {quest.status === "open" && (
         <>
-          <button type="button" onClick={() => onCompleteQuest(quest.id)} title="Concluir missao">
+          <button
+            type="button"
+            onClick={() =>
+              quest.requiresEvidence && onOpenDetails ? onOpenDetails(quest) : onCompleteQuest(quest.id)
+            }
+            title={quest.requiresEvidence ? "Abrir ficha para registrar evidencia" : "Concluir missao"}
+          >
             <Check size={18} />
           </button>
           {onOpenFocus && (

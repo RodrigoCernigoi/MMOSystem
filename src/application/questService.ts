@@ -1,6 +1,6 @@
 import { unlockAvailableAchievements } from "../domain/achievements";
 import { applyQuestFailure, applyQuestReward, getRewardForQuest } from "../domain/progression";
-import type { Player } from "../domain/player";
+import type { AppPreferences, Player } from "../domain/player";
 import type { CompleteQuestInput, CreateQuestInput, Quest, UpdateQuestInput } from "../domain/task";
 import type { Clock, IdProvider, PlayerRepository, QuestRepository, QuestSuggestionGateway } from "./ports";
 
@@ -12,6 +12,7 @@ export type UpdatePlayerProfileInput = {
   bio?: string;
   avatarSymbol?: string;
   focus?: string;
+  appPreferences?: AppPreferences;
 };
 
 type QuestServiceDependencies = {
@@ -87,6 +88,7 @@ export const createQuestService = ({
       dueAt: input.dueAt || undefined,
       projectId: input.projectId || undefined,
       importance: input.importance?.trim() || undefined,
+      requiresEvidence: input.requiresEvidence ?? false,
       evidenceLog: [],
       habitLog: [],
     };
@@ -105,10 +107,11 @@ export const createQuestService = ({
     const updatedPlayer: Player = {
       ...player,
       name: input.name?.trim() || player.name,
-      title: input.title?.trim() || undefined,
-      bio: input.bio?.trim() || undefined,
+      title: input.title === undefined ? player.title : input.title.trim() || undefined,
+      bio: input.bio === undefined ? player.bio : input.bio.trim() || undefined,
       avatarSymbol: input.avatarSymbol?.trim() || player.avatarSymbol,
-      focus: input.focus?.trim() || undefined,
+      focus: input.focus === undefined ? player.focus : input.focus.trim() || undefined,
+      appPreferences: input.appPreferences ? { ...(player.appPreferences ?? {}), ...input.appPreferences } : player.appPreferences,
     };
 
     await playerRepository.save(updatedPlayer);
@@ -138,6 +141,7 @@ export const createQuestService = ({
       dueAt: input.dueAt || undefined,
       projectId: input.projectId || undefined,
       importance: input.importance === undefined ? quest.importance : input.importance.trim() || undefined,
+      requiresEvidence: input.requiresEvidence ?? quest.requiresEvidence,
     };
 
     if (!updatedQuest.title) {
@@ -184,6 +188,11 @@ export const createQuestService = ({
 
     const today = clock.now().toISOString().slice(0, 10);
     const evidenceText = input.evidence?.trim();
+
+    if (quest.requiresEvidence && !evidenceText) {
+      throw new Error("Esta missao exige evidencia para ser concluida.");
+    }
+
     const evidenceLog = evidenceText
       ? [
           {
