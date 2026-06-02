@@ -37,8 +37,8 @@ describe("dailyReviewService", () => {
     expect(firstClose.review.rank).toBe("A");
     expect(secondClose.alreadyClosed).toBe(true);
     expect(player.dailyReviews).toHaveLength(1);
-    expect(player.totalXp).toBe(70);
-    expect(player.coins).toBe(25);
+    expect(player.totalXp).toBe(60);
+    expect(player.coins).toBe(18);
     expect(player.skillPoints).toBe(1);
   });
 });

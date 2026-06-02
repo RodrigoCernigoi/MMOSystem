@@ -21,8 +21,8 @@ describe("progression", () => {
     const player = applyQuestReward(createNewPlayer(), makeQuest());
 
     expect(player.level).toBe(2);
-    expect(player.xp).toBe(50);
-    expect(player.coins).toBe(40);
+    expect(player.xp).toBe(40);
+    expect(player.coins).toBe(32);
     expect(player.attributes.strength).toBe(6);
   });
 

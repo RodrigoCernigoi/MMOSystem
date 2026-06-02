@@ -18,9 +18,11 @@ export const createRewardService = ({
 }: RewardServiceDependencies) => ({
   async getRewards() {
     const [storedRewards, player] = await Promise.all([rewardRepository.list(), playerRepository.get()]);
-    const rewards = storedRewards.length === 0 ? createDefaultRewards(clock.now().toISOString()) : storedRewards;
+    const rewards = storedRewards.length === 0
+      ? createDefaultRewards(clock.now().toISOString())
+      : storedRewards.map(normalizeReward);
 
-    if (storedRewards.length === 0) {
+    if (storedRewards.length === 0 || storedRewards.some((reward) => !reward.category)) {
       await rewardRepository.saveAll(rewards);
     }
 
@@ -36,6 +38,7 @@ export const createRewardService = ({
       title: input.title.trim(),
       description: input.description.trim(),
       cost: Math.max(20, Math.floor(input.cost)),
+      category: input.category ?? "leisure",
       createdAt: clock.now().toISOString(),
     };
 
@@ -69,6 +72,7 @@ export const createRewardService = ({
           rewardId: reward.id,
           title: reward.title,
           cost: reward.cost,
+          category: reward.category,
           redeemedAt: clock.now().toISOString(),
         },
         ...(player.redeemedRewards ?? []),
@@ -89,12 +93,18 @@ export const createRewardService = ({
   },
 });
 
+const normalizeReward = (reward: Reward): Reward => ({
+  ...reward,
+  category: reward.category ?? "leisure",
+});
+
 const createDefaultRewards = (createdAt: string): Reward[] => [
   {
     id: "preset-reward-short-break",
     title: "Pausa intencional",
     description: "20 a 30 minutos de descanso, cafe, caminhada curta ou tempo longe da tela.",
     cost: 30,
+    category: "rest",
     createdAt,
   },
   {
@@ -102,6 +112,7 @@ const createDefaultRewards = (createdAt: string): Reward[] => [
     title: "Sessao de lazer",
     description: "Filme, episodio, jogo ou leitura leve sem culpa depois de um ciclo real de progresso.",
     cost: 80,
+    category: "leisure",
     createdAt,
   },
   {
@@ -109,6 +120,7 @@ const createDefaultRewards = (createdAt: string): Reward[] => [
     title: "Role ou encontro simples",
     description: "Uma saida planejada, convite social ou experiencia pequena fora da rotina.",
     cost: 140,
+    category: "social",
     createdAt,
   },
   {
@@ -116,6 +128,7 @@ const createDefaultRewards = (createdAt: string): Reward[] => [
     title: "Compra planejada",
     description: "Um item pessoal pequeno, comprado com intencao e dentro do seu orcamento real.",
     cost: 220,
+    category: "purchase",
     createdAt,
   },
   {
@@ -123,6 +136,23 @@ const createDefaultRewards = (createdAt: string): Reward[] => [
     title: "Meio periodo de recuperacao",
     description: "Bloco maior de descanso, hobby ou cuidado pessoal depois de uma semana consistente.",
     cost: 360,
+    category: "rest",
+    createdAt,
+  },
+  {
+    id: "preset-reward-learning",
+    title: "Investimento em aprendizado",
+    description: "Livro, curso pequeno, aula ou material que aprofunda uma habilidade real.",
+    cost: 180,
+    category: "learning",
+    createdAt,
+  },
+  {
+    id: "preset-reward-health",
+    title: "Cuidado fisico planejado",
+    description: "Massagem, refeicao melhor, consulta, treino guiado ou cuidado de recuperacao.",
+    cost: 200,
+    category: "health",
     createdAt,
   },
 ];

@@ -57,6 +57,7 @@ export type RedeemedReward = {
   rewardId: string;
   title: string;
   cost: number;
+  category?: string;
   redeemedAt: string;
 };
 

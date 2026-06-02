@@ -1760,6 +1760,103 @@ h2 {
   color: #cbd5e1;
 }
 
+.economy-dashboard {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 10px;
+  margin-bottom: 12px;
+}
+
+.economy-dashboard div {
+  display: grid;
+  gap: 8px;
+  min-height: 92px;
+  align-content: center;
+  border: 1px solid rgba(148, 163, 184, 0.16);
+  background: rgba(2, 6, 12, 0.34);
+  padding: 12px;
+}
+
+.economy-dashboard svg {
+  color: #22d3ee;
+}
+
+.economy-dashboard span {
+  color: #9fb5d0;
+  font-size: 0.76rem;
+  font-weight: 900;
+  text-transform: uppercase;
+}
+
+.economy-dashboard strong {
+  color: #f8fafc;
+  font-size: 1.45rem;
+}
+
+.budget-panel {
+  display: grid;
+  gap: 9px;
+  margin-bottom: 12px;
+  border: 1px solid rgba(125, 211, 252, 0.16);
+  background: rgba(15, 23, 42, 0.44);
+  padding: 12px;
+}
+
+.budget-panel > div:first-child {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+}
+
+.budget-panel span {
+  color: #bef264;
+  font-weight: 900;
+}
+
+.budget-track {
+  height: 10px;
+  overflow: hidden;
+  background: rgba(15, 23, 42, 0.9);
+  border: 1px solid rgba(148, 163, 184, 0.16);
+}
+
+.budget-track div {
+  height: 100%;
+  background: linear-gradient(90deg, #22d3ee, #bef264);
+  transition: width var(--motion-slow) ease;
+}
+
+.economy-warning-list {
+  display: grid;
+  gap: 8px;
+  margin-bottom: 12px;
+}
+
+.economy-warning-list span {
+  display: flex;
+  align-items: flex-start;
+  gap: 8px;
+  border: 1px solid rgba(250, 204, 21, 0.26);
+  background: rgba(113, 63, 18, 0.2);
+  color: #fde68a;
+  padding: 10px;
+  font-weight: 800;
+}
+
+.reward-card {
+  position: relative;
+  overflow: hidden;
+}
+
+.reward-card::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background: linear-gradient(135deg, rgba(34, 211, 238, 0.08), transparent 42%);
+}
+
 .achievement-card-unlocked {
   border-color: rgba(132, 204, 22, 0.35);
   background: rgba(63, 98, 18, 0.18);
@@ -4451,6 +4548,10 @@ h2 {
 
   .settings-list {
     gap: 10px;
+  }
+
+  .economy-dashboard {
+    grid-template-columns: 1fr;
   }
 
   .settings-row {

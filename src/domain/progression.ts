@@ -8,17 +8,17 @@ export type QuestReward = {
 };
 
 const rewardByDifficulty: Record<TaskDifficulty, QuestReward> = {
-  easy: { xp: 25, coins: 5, attributePoints: 1 },
-  normal: { xp: 50, coins: 10, attributePoints: 2 },
-  hard: { xp: 90, coins: 20, attributePoints: 3 },
-  elite: { xp: 150, coins: 40, attributePoints: 5 },
+  easy: { xp: 22, coins: 4, attributePoints: 1 },
+  normal: { xp: 45, coins: 8, attributePoints: 2 },
+  hard: { xp: 82, coins: 16, attributePoints: 3 },
+  elite: { xp: 140, coins: 32, attributePoints: 5 },
 };
 
 const kindMultiplier: Record<QuestKind, number> = {
   single: 1,
-  daily: 1.15,
-  weekly: 1.35,
-  habit: 0.75,
+  daily: 1,
+  weekly: 1.25,
+  habit: 0.65,
 };
 
 const rankThresholds: Array<{ rank: Rank; minLevel: number }> = [

@@ -23,10 +23,10 @@ export const getDailyReviewRank = (completedTotal: number): Rank => {
 
 export const getDailyReviewBonus = (rank: Rank) => {
   const bonusByRank: Record<Rank, { xp: number; coins: number; skillPoints: number }> = {
-    S: { xp: 120, coins: 40, skillPoints: 2 },
-    A: { xp: 70, coins: 25, skillPoints: 1 },
-    B: { xp: 35, coins: 12, skillPoints: 0 },
-    C: { xp: 15, coins: 5, skillPoints: 0 },
+    S: { xp: 100, coins: 28, skillPoints: 2 },
+    A: { xp: 60, coins: 18, skillPoints: 1 },
+    B: { xp: 30, coins: 8, skillPoints: 0 },
+    C: { xp: 12, coins: 3, skillPoints: 0 },
     D: { xp: 0, coins: 0, skillPoints: 0 },
     E: { xp: 0, coins: 0, skillPoints: 0 },
   };
