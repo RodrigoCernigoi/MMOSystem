@@ -141,6 +141,7 @@ A tela de Skills usa React Flow para exibir uma arvore/constelacao com:
 - categorias por atributo;
 - busca;
 - filtros por constelacao;
+- seletor visual de icone por habilidade;
 - pre-requisitos entre habilidades;
 - evidencia real para marcar uma skill como adquirida;
 - conexoes visuais entre habilidades relacionadas.
@@ -219,6 +220,8 @@ Os efeitos sonoros customizados ficam em `public/sounds`. A camada de audio carr
 ### Creditos Visuais
 
 Alguns emblemas usam icones do [Game-icons.net](https://game-icons.net/) por meio do endpoint SVG do [Iconify](https://iconify.design/). Os icones do Game Icons sao distribuidos sob licenca CC BY 3.0.
+
+A tela de Creditos centraliza bibliotecas, assets visuais, sons e observacoes de licenca para facilitar publicacao e testes externos.
 
 ## Arquitetura
 

@@ -2008,6 +2008,80 @@ h2 {
   flex: 1 1 280px;
 }
 
+.credits-hero,
+.license-note {
+  display: flex;
+  align-items: flex-start;
+  gap: 14px;
+  border: 1px solid rgba(125, 211, 252, 0.18);
+  background:
+    linear-gradient(135deg, rgba(34, 211, 238, 0.1), transparent 42%),
+    rgba(15, 23, 42, 0.56);
+  padding: 16px;
+}
+
+.credits-hero > .game-icon,
+.license-note > .game-icon {
+  color: #bef264;
+}
+
+.credits-hero div,
+.license-note div {
+  display: grid;
+  gap: 6px;
+}
+
+.credits-hero strong,
+.license-note strong {
+  color: #f8fafc;
+}
+
+.credits-hero p,
+.license-note p {
+  color: #9fb5d0;
+}
+
+.credits-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 12px;
+}
+
+.credit-card {
+  display: grid;
+  gap: 12px;
+  min-height: 180px;
+  align-content: start;
+  border: 1px solid rgba(148, 163, 184, 0.18);
+  background: rgba(2, 6, 12, 0.34);
+  padding: 16px;
+}
+
+.credit-card svg {
+  color: #7dd3fc;
+}
+
+.credit-card div {
+  display: grid;
+  gap: 5px;
+}
+
+.credit-card strong {
+  color: #f8fafc;
+}
+
+.credit-card span,
+.credit-card small {
+  color: #9fb5d0;
+}
+
+.credit-card a {
+  width: fit-content;
+  color: #bef264;
+  font-weight: 900;
+  text-decoration: none;
+}
+
 .settings-data-actions {
   display: flex !important;
   flex: 2 1 420px;
@@ -3441,6 +3515,66 @@ h2 {
   margin-bottom: 14px;
 }
 
+.skill-constellation-legend {
+  display: grid;
+  grid-template-columns: repeat(5, minmax(120px, 1fr));
+  gap: 10px;
+  margin-bottom: 14px;
+}
+
+.skill-constellation-line {
+  display: flex;
+  min-height: 72px;
+  align-items: center;
+  gap: 10px;
+  border: 1px solid rgba(148, 163, 184, 0.16);
+  background: rgba(2, 6, 12, 0.34);
+  color: #dbeafe;
+  padding: 12px;
+  text-align: left;
+}
+
+.skill-constellation-line .game-icon {
+  color: #7dd3fc;
+}
+
+.skill-constellation-line div {
+  display: grid;
+  gap: 4px;
+  min-width: 0;
+}
+
+.skill-constellation-line strong {
+  font-size: 0.9rem;
+}
+
+.skill-constellation-line span {
+  color: #9fb5d0;
+  font-size: 0.75rem;
+  font-weight: 800;
+  text-transform: uppercase;
+}
+
+.skill-constellation-line-strength {
+  border-color: rgba(248, 113, 113, 0.22);
+}
+
+.skill-constellation-line-intelligence {
+  border-color: rgba(96, 165, 250, 0.22);
+}
+
+.skill-constellation-line-discipline {
+  border-color: rgba(250, 204, 21, 0.22);
+}
+
+.skill-constellation-line-social {
+  border-color: rgba(244, 114, 182, 0.22);
+}
+
+.skill-constellation-line-vitality {
+  border-color: rgba(132, 204, 22, 0.22);
+}
+
 .constellation-card {
   display: grid;
   min-height: 78px;
@@ -3670,6 +3804,41 @@ h2 {
 
 .skill-create-panel {
   align-self: start;
+}
+
+.skill-icon-picker {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(112px, 1fr));
+  gap: 8px;
+}
+
+.skill-icon-picker label {
+  cursor: pointer;
+}
+
+.skill-icon-picker input {
+  position: absolute;
+  opacity: 0;
+  pointer-events: none;
+}
+
+.skill-icon-picker span {
+  display: flex;
+  min-height: 48px;
+  align-items: center;
+  gap: 8px;
+  border: 1px solid rgba(148, 163, 184, 0.18);
+  background: rgba(15, 23, 42, 0.56);
+  color: #dbeafe;
+  padding: 10px;
+  font-size: 0.82rem;
+  font-weight: 900;
+}
+
+.skill-icon-picker input:checked + span {
+  border-color: rgba(34, 211, 238, 0.48);
+  background: linear-gradient(135deg, rgba(20, 184, 166, 0.28), rgba(125, 211, 252, 0.12));
+  color: #ecfeff;
 }
 
 .skill-detail-panel h3,
@@ -4647,6 +4816,7 @@ h2 {
   }
 
   .skill-constellation-toolbar,
+  .skill-constellation-legend,
   .constellation-summary {
     grid-template-columns: 1fr;
   }
@@ -4690,6 +4860,25 @@ h2 {
     overscroll-behavior-x: contain;
     padding-bottom: 4px;
     -webkit-overflow-scrolling: touch;
+  }
+
+  .skill-constellation-legend {
+    display: grid;
+    grid-auto-flow: column;
+    grid-auto-columns: minmax(160px, 56vw);
+    grid-template-columns: none;
+    width: 100%;
+    max-width: 100%;
+    min-width: 0;
+    overflow-x: auto;
+    overflow-y: hidden;
+    overscroll-behavior-x: contain;
+    padding-bottom: 4px;
+    -webkit-overflow-scrolling: touch;
+  }
+
+  .skill-constellation-legend::-webkit-scrollbar {
+    display: none;
   }
 
   .constellation-card {

@@ -30,6 +30,7 @@ export type SkillNode = {
   title: string;
   description: string;
   attribute: Attribute;
+  icon?: string;
   prerequisiteSkillIds: string[];
   evidence?: string;
   isUnlocked: boolean;
@@ -72,6 +73,7 @@ export type CreateMasterQuestInput = {
   skill: {
     title: string;
     description: string;
+    icon?: string;
     prerequisiteSkillIds?: string[];
   };
   boss?: {
@@ -85,6 +87,7 @@ export type CreateSkillInput = {
   title: string;
   description: string;
   attribute: Attribute;
+  icon?: string;
   prerequisiteSkillIds: string[];
 };
 

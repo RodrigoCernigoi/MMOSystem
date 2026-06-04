@@ -72,6 +72,7 @@ export const createProgressionService = ({
       title: input.skill.title.trim(),
       description: input.skill.description.trim(),
       attribute: input.attribute,
+      icon: input.skill.icon,
       prerequisiteSkillIds: input.skill.prerequisiteSkillIds ?? [],
       isUnlocked: false,
     };
@@ -119,6 +120,7 @@ export const createProgressionService = ({
       title: input.title.trim(),
       description: input.description.trim(),
       attribute: input.attribute,
+      icon: input.icon,
       prerequisiteSkillIds: input.prerequisiteSkillIds,
       isUnlocked: false,
     };

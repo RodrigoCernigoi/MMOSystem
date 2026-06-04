@@ -49,6 +49,7 @@ export type AppViewPreference =
   | "reports"
   | "achievements"
   | "status"
+  | "credits"
   | "settings"
   | "evidence";
 

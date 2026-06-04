@@ -21,6 +21,7 @@ import { emitVisualEvent, intensityMultiplier, useVisualPreferences } from "./vi
 const AchievementsView = lazy(() => import("./screens/AchievementsView").then((module) => ({ default: module.AchievementsView })));
 const CalendarView = lazy(() => import("./screens/CalendarView").then((module) => ({ default: module.CalendarView })));
 const CreateQuestView = lazy(() => import("./screens/CreateQuestView").then((module) => ({ default: module.CreateQuestView })));
+const CreditsView = lazy(() => import("./screens/CreditsView").then((module) => ({ default: module.CreditsView })));
 const EvidenceView = lazy(() => import("./screens/EvidenceView").then((module) => ({ default: module.EvidenceView })));
 const FocusView = lazy(() => import("./screens/FocusView").then((module) => ({ default: module.FocusView })));
 const MissionsView = lazy(() => import("./screens/MissionsView").then((module) => ({ default: module.MissionsView })));
@@ -292,6 +293,7 @@ export const App = () => {
     reports: <ReportsView player={player} />,
     evidence: <EvidenceView quests={quests} onFocusNavigate={handleFocusNavigate} />,
     achievements: <AchievementsView player={player} />,
+    credits: <CreditsView />,
     status: (
       <StatusView
         player={player}

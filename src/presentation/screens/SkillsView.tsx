@@ -7,7 +7,7 @@ import type { SkillNode } from "../../domain/progressionSystem";
 import type { AppView } from "../navigation/appViews";
 import type { AppFocus } from "../navigation/navigationIntent";
 import { GameIcon } from "../components/GameIcon";
-import { attributeGameIcons } from "../gameIconCatalog";
+import { attributeGameIcons, getSkillIcon, skillIconOptions } from "../gameIconCatalog";
 import { attributeLabels, attributeOptions } from "../viewModels";
 import { useProgressionSystem } from "../useProgressionSystem";
 import { emitVisualEvent } from "../visualPreferences";
@@ -33,7 +33,7 @@ const SkillTreeNode = memo(({ data }: { data: SkillTreeNodeData }) => (
     <Handle type="target" position={Position.Left} />
     <div className="flow-skill-node-header">
       <span>
-        <GameIcon name={attributeGameIcons[data.skill.attribute]} size={18} />
+        <GameIcon name={getSkillIcon(data.skill)} size={18} />
       </span>
       <strong>{data.skill.title}</strong>
     </div>
@@ -181,6 +181,7 @@ export const SkillsView = ({ focus, onFocusNavigate }: SkillsViewProps) => {
         title,
         description: description || "Habilidade real registrada para acompanhamento.",
         attribute: String(formData.get("attribute")) as Attribute,
+        icon: String(formData.get("icon") ?? "") || undefined,
         prerequisiteSkillIds: selectedPrerequisiteIds,
       });
       setSelectedPrerequisiteIds([]);
@@ -292,6 +293,29 @@ export const SkillsView = ({ focus, onFocusNavigate }: SkillsViewProps) => {
             );
           })}
         </div>
+        <div className="skill-constellation-legend">
+          {attributeOptions.map((option) => {
+            const skills = progression.skills.filter((skill) => skill.attribute === option.value);
+            const unlocked = skills.filter((skill) => skill.isUnlocked).length;
+
+            return (
+              <button
+                className={`skill-constellation-line skill-constellation-line-${option.value}`}
+                key={option.value}
+                type="button"
+                onClick={() => setActiveFilter(option.value)}
+              >
+                <GameIcon name={attributeGameIcons[option.value]} size={22} />
+                <div>
+                  <strong>{option.label}</strong>
+                  <span>
+                    {unlocked}/{skills.length} adquiridas
+                  </span>
+                </div>
+              </button>
+            );
+          })}
+        </div>
         <div className="skill-flow-shell">
           {progression.skills.length === 0 ? (
             <div className="empty-state">Registre a primeira habilidade real para iniciar sua arvore.</div>
@@ -334,6 +358,17 @@ export const SkillsView = ({ focus, onFocusNavigate }: SkillsViewProps) => {
                 </option>
               ))}
             </select>
+            <div className="skill-icon-picker" aria-label="Icone da habilidade">
+              {skillIconOptions.map((option) => (
+                <label key={option.value}>
+                  <input name="icon" type="radio" value={option.value} />
+                  <span>
+                    <GameIcon name={option.value} size={22} />
+                    {option.label}
+                  </span>
+                </label>
+              ))}
+            </div>
             <div className="check-list">
               {progression.skills.map((skill) => (
                 <label key={skill.id}>
@@ -367,7 +402,7 @@ export const SkillsView = ({ focus, onFocusNavigate }: SkillsViewProps) => {
               <strong>{selectedSkill.isUnlocked ? "Habilidade adquirida" : "Ainda em desenvolvimento"}</strong>
             </div>
             <div className={`skill-detail-emblem skill-detail-emblem-${selectedSkill.attribute}`}>
-              <GameIcon name={attributeGameIcons[selectedSkill.attribute]} size={42} />
+              <GameIcon name={getSkillIcon(selectedSkill)} size={42} />
             </div>
             <h3>{selectedSkill.title}</h3>
             <p>{selectedSkill.description}</p>
