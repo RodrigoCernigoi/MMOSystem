@@ -31,6 +31,7 @@ O MMO System combina organizacao pessoal com feedback de jogo:
 - Tone.js
 - React Flow (`@xyflow/react`)
 - Lucide React
+- Game Icons via Iconify
 - Supabase opcional
 - Groq opcional
 - Vitest
@@ -207,10 +208,15 @@ O projeto usa recursos sensoriais para tornar o progresso mais satisfatorio:
 - transicoes de tela;
 - particulas e efeitos com PixiJS;
 - feedback sonoro com Tone.js;
+- emblemas visuais com Game Icons;
 - toasts de recompensa;
 - efeitos ao completar missoes, subir de nivel e desbloquear skills.
 
 O som e os efeitos visuais podem ser ajustados na tela de configuracoes.
+
+### Creditos Visuais
+
+Alguns emblemas usam icones do [Game-icons.net](https://game-icons.net/) por meio do endpoint SVG do [Iconify](https://iconify.design/). Os icones do Game Icons sao distribuidos sob licenca CC BY 3.0.
 
 ## Arquitetura
 

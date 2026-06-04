@@ -180,6 +180,14 @@ button:active {
   padding: 12px;
 }
 
+.game-icon {
+  display: inline-block;
+  flex: 0 0 auto;
+  background: currentColor;
+  mask: var(--game-icon-url) center / contain no-repeat;
+  -webkit-mask: var(--game-icon-url) center / contain no-repeat;
+}
+
 .loading {
   display: grid;
   min-height: 100vh;
@@ -1849,12 +1857,59 @@ h2 {
   overflow: hidden;
 }
 
+.reward-card > * {
+  position: relative;
+  z-index: 1;
+}
+
 .reward-card::before {
   content: "";
   position: absolute;
   inset: 0;
   pointer-events: none;
   background: linear-gradient(135deg, rgba(34, 211, 238, 0.08), transparent 42%);
+}
+
+.reward-category-emblem {
+  display: grid;
+  width: 54px;
+  height: 54px;
+  place-items: center;
+  border: 1px solid rgba(34, 211, 238, 0.26);
+  background:
+    radial-gradient(circle at 30% 20%, rgba(190, 242, 100, 0.26), transparent 44%),
+    rgba(8, 13, 25, 0.82);
+  box-shadow: 0 0 24px rgba(34, 211, 238, 0.14);
+  color: #bef264;
+}
+
+.reward-category-filter {
+  display: flex;
+  gap: 8px;
+  overflow-x: auto;
+  padding: 2px 0 10px;
+  scrollbar-width: none;
+}
+
+.reward-category-filter::-webkit-scrollbar {
+  display: none;
+}
+
+.reward-category-filter button {
+  display: inline-flex;
+  min-width: max-content;
+  align-items: center;
+  gap: 8px;
+  border: 1px solid rgba(148, 163, 184, 0.18);
+  background: rgba(15, 23, 42, 0.58);
+  color: #dbeafe;
+}
+
+.reward-category-filter button.active {
+  border-color: rgba(34, 211, 238, 0.46);
+  background: linear-gradient(135deg, rgba(20, 184, 166, 0.28), rgba(132, 204, 22, 0.16));
+  box-shadow: 0 0 22px rgba(20, 184, 166, 0.14);
+  color: #ecfeff;
 }
 
 .achievement-card-unlocked {

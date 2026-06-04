@@ -1,4 +1,4 @@
-import { Award, BadgeCheck, Coins, IdCard, Medal, Save, Sparkles, Swords, Trophy } from "lucide-react";
+import { Award, BadgeCheck, IdCard, Medal, Save, Sparkles, Swords } from "lucide-react";
 import { FormEvent, useState } from "react";
 import { achievements } from "../../domain/achievements";
 import { xpRequiredForLevel } from "../../domain/progression";
@@ -10,6 +10,7 @@ import { useProgressionSystem } from "../useProgressionSystem";
 import type { AppView } from "../navigation/appViews";
 import type { AppFocus } from "../navigation/navigationIntent";
 import { attributeLabels } from "../viewModels";
+import { GameIcon } from "./GameIcon";
 import { Metric } from "./Metric";
 
 type StatusPanelProps = {
@@ -181,9 +182,9 @@ export const StatusPanel = ({ player, quests, onUpdateProfile, onFocusNavigate }
       </div>
 
       <div className="stat-grid">
-        <Metric icon={<Coins size={18} />} label="Moedas" value={player.coins} />
-        <Metric icon={<Sparkles size={18} />} label="Skill points" value={player.skillPoints} />
-        <Metric icon={<Trophy size={18} />} label="Streak" value={player.streak} />
+        <Metric icon={<GameIcon name="coins" size={19} />} label="Moedas" value={player.coins} />
+        <Metric icon={<GameIcon name="skills" size={19} />} label="Skill points" value={player.skillPoints} />
+        <Metric icon={<GameIcon name="trophy" size={19} />} label="Streak" value={player.streak} />
         <Metric icon={<Swords size={18} />} label="Ativas" value={openQuests.length} />
         <Metric icon={<Award size={18} />} label="Conquistas" value={unlockedAchievements.length} />
       </div>

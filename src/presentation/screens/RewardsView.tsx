@@ -1,13 +1,27 @@
 import { FormEvent } from "react";
-import { BarChart3, Coins, Gift, Scale, ShieldAlert, Trash2, WalletCards } from "lucide-react";
+import { Coins, Gift, ShieldAlert, Trash2 } from "lucide-react";
 import { useState } from "react";
 import type { RewardCategory } from "../../domain/reward";
 import { rewardCategoryLabels } from "../../domain/reward";
+import { GameIcon } from "../components/GameIcon";
 import { useRewards } from "../useRewards";
 
-const rewardCategories: Array<{ value: RewardCategory; label: string }> = Object.entries(rewardCategoryLabels).map(
-  ([value, label]) => ({ value: value as RewardCategory, label }),
-);
+const rewardCategoryIcons: Record<RewardCategory, string> = {
+  leisure: "card-play",
+  rest: "night-sleep",
+  social: "three-friends",
+  purchase: "shopping-bag",
+  health: "health-normal",
+  learning: "graduate-cap",
+};
+
+const rewardCategories: Array<{ value: RewardCategory; label: string; icon: string }> = Object.entries(
+  rewardCategoryLabels,
+).map(([value, label]) => ({
+  value: value as RewardCategory,
+  label,
+  icon: rewardCategoryIcons[value as RewardCategory],
+}));
 
 export const RewardsView = () => {
   const { rewards, player, isLoading, error, createReward, redeemReward, archiveReward } = useRewards();
@@ -90,7 +104,7 @@ export const RewardsView = () => {
         {error && <div className="error-banner">{error}</div>}
         {rewardActionError && <div className="error-banner">{rewardActionError}</div>}
         <div className="economy-panel">
-          <Scale size={20} />
+          <GameIcon name="coins" size={24} />
           <div>
             <strong>Escala economica</strong>
             <span>30 moedas = pausa curta · 80 = lazer comum · 140+ = experiencia maior · 300+ = recompensa de ciclo.</span>
@@ -98,17 +112,17 @@ export const RewardsView = () => {
         </div>
         <div className="economy-dashboard">
           <div>
-            <WalletCards size={18} />
+            <GameIcon name="receive-money" size={20} />
             <span>Ganho semanal</span>
             <strong>{weeklyIncome}</strong>
           </div>
           <div>
-            <Coins size={18} />
+            <GameIcon name="pay-money" size={20} />
             <span>Gasto semanal</span>
             <strong>{weeklySpent}</strong>
           </div>
           <div>
-            <BarChart3 size={18} />
+            <GameIcon name="bank" size={20} />
             <span>Orcamento sugerido</span>
             <strong>{weeklyBudget}</strong>
           </div>
@@ -179,14 +193,27 @@ export const RewardsView = () => {
             <p className="eyebrow">Catalogo</p>
             <h1>Recompensas</h1>
           </div>
-          <select value={categoryFilter} onChange={(event) => setCategoryFilter(event.target.value as RewardCategory | "all")}>
-            <option value="all">Todas categorias</option>
-            {rewardCategories.map((category) => (
-              <option key={category.value} value={category.value}>
-                {category.label}
-              </option>
-            ))}
-          </select>
+        </div>
+        <div className="reward-category-filter" aria-label="Filtrar recompensas por categoria">
+          <button
+            type="button"
+            className={categoryFilter === "all" ? "active" : ""}
+            onClick={() => setCategoryFilter("all")}
+          >
+            <GameIcon name="open-treasure-chest" size={20} />
+            Todas
+          </button>
+          {rewardCategories.map((category) => (
+            <button
+              type="button"
+              key={category.value}
+              className={categoryFilter === category.value ? "active" : ""}
+              onClick={() => setCategoryFilter(category.value)}
+            >
+              <GameIcon name={category.icon} size={20} />
+              {category.label}
+            </button>
+          ))}
         </div>
         <div className="reward-grid">
           {visibleRewards.length === 0 ? (
@@ -194,6 +221,9 @@ export const RewardsView = () => {
           ) : (
             visibleRewards.map((reward) => (
               <article className="reward-card" key={reward.id}>
+                <div className="reward-category-emblem">
+                  <GameIcon name={rewardCategoryIcons[reward.category]} size={30} />
+                </div>
                 <span>
                   {reward.cost} moedas · {rewardCategoryLabels[reward.category]}
                 </span>
