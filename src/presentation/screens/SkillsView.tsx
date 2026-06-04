@@ -1,11 +1,13 @@
 import "@xyflow/react/dist/style.css";
 import { Background, Controls, Handle, MiniMap, Position, ReactFlow, type Edge, type Node } from "@xyflow/react";
 import { FormEvent, memo, useMemo, useState } from "react";
-import { CheckCircle2, Lock, PlusCircle, Search, Sparkles, X } from "lucide-react";
+import { CheckCircle2, Lock, PlusCircle, Search, X } from "lucide-react";
 import type { Attribute } from "../../domain/task";
 import type { SkillNode } from "../../domain/progressionSystem";
 import type { AppView } from "../navigation/appViews";
 import type { AppFocus } from "../navigation/navigationIntent";
+import { GameIcon } from "../components/GameIcon";
+import { attributeGameIcons } from "../gameIconCatalog";
 import { attributeLabels, attributeOptions } from "../viewModels";
 import { useProgressionSystem } from "../useProgressionSystem";
 import { emitVisualEvent } from "../visualPreferences";
@@ -30,7 +32,9 @@ const SkillTreeNode = memo(({ data }: { data: SkillTreeNodeData }) => (
   >
     <Handle type="target" position={Position.Left} />
     <div className="flow-skill-node-header">
-      <span>{data.skill.isUnlocked ? <Sparkles size={16} /> : <Lock size={16} />}</span>
+      <span>
+        <GameIcon name={attributeGameIcons[data.skill.attribute]} size={18} />
+      </span>
       <strong>{data.skill.title}</strong>
     </div>
     <p>{data.skill.description}</p>
@@ -245,6 +249,7 @@ export const SkillsView = ({ focus, onFocusNavigate }: SkillsViewProps) => {
               type="button"
               onClick={() => setActiveFilter("all")}
             >
+              <GameIcon name="star-swirl" size={18} />
               Todas
               <span>{progression.skills.length}</span>
             </button>
@@ -255,6 +260,7 @@ export const SkillsView = ({ focus, onFocusNavigate }: SkillsViewProps) => {
                 type="button"
                 onClick={() => setActiveFilter(option.value)}
               >
+                <GameIcon name={attributeGameIcons[option.value]} size={18} />
                 {option.label}
                 <span>{progression.skills.filter((skill) => skill.attribute === option.value).length}</span>
               </button>
@@ -277,6 +283,7 @@ export const SkillsView = ({ focus, onFocusNavigate }: SkillsViewProps) => {
                 type="button"
                 onClick={() => setActiveFilter(option.value)}
               >
+                <GameIcon name={attributeGameIcons[option.value]} size={28} />
                 <span>{option.label}</span>
                 <strong>
                   {unlocked}/{skills.length}
@@ -358,6 +365,9 @@ export const SkillsView = ({ focus, onFocusNavigate }: SkillsViewProps) => {
             <div className="skill-detail-status">
               {selectedSkill.isUnlocked ? <CheckCircle2 size={18} /> : <Lock size={18} />}
               <strong>{selectedSkill.isUnlocked ? "Habilidade adquirida" : "Ainda em desenvolvimento"}</strong>
+            </div>
+            <div className={`skill-detail-emblem skill-detail-emblem-${selectedSkill.attribute}`}>
+              <GameIcon name={attributeGameIcons[selectedSkill.attribute]} size={42} />
             </div>
             <h3>{selectedSkill.title}</h3>
             <p>{selectedSkill.description}</p>

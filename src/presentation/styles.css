@@ -1070,7 +1070,8 @@ h2 {
   animation: list-enter var(--motion-medium) ease both;
 }
 
-.metric svg {
+.metric svg,
+.metric .game-icon {
   color: #2dd4bf;
 }
 
@@ -1093,11 +1094,22 @@ h2 {
 }
 
 .achievement-row {
-  display: grid;
-  gap: 4px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
   padding: 12px;
   border: 1px solid rgba(132, 204, 22, 0.22);
   background: rgba(63, 98, 18, 0.18);
+}
+
+.achievement-row > .game-icon {
+  color: #bef264;
+}
+
+.achievement-row div {
+  display: grid;
+  gap: 4px;
+  min-width: 0;
 }
 
 .achievement-row,
@@ -1111,9 +1123,19 @@ h2 {
 
 .attribute-row {
   display: flex;
+  align-items: center;
   justify-content: space-between;
+  gap: 10px;
   padding: 12px 0;
   border-bottom: 1px solid rgba(148, 163, 184, 0.16);
+}
+
+.attribute-row span,
+.training-row span {
+  display: inline-flex;
+  min-width: 0;
+  align-items: center;
+  gap: 8px;
 }
 
 .quest-forge {
@@ -1715,10 +1737,40 @@ h2 {
 }
 
 .achievement-card {
+  position: relative;
+  overflow: hidden;
   transition:
     transform var(--motion-medium) ease,
     border-color var(--motion-medium) ease,
     box-shadow var(--motion-medium) ease;
+}
+
+.achievement-card::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background:
+    radial-gradient(circle at 18% 16%, rgba(125, 211, 252, 0.12), transparent 26%),
+    linear-gradient(135deg, rgba(148, 163, 184, 0.08), transparent 42%);
+}
+
+.achievement-card > * {
+  position: relative;
+  z-index: 1;
+}
+
+.achievement-emblem {
+  display: grid;
+  width: 58px;
+  height: 58px;
+  place-items: center;
+  border: 1px solid rgba(125, 211, 252, 0.24);
+  background:
+    radial-gradient(circle at 30% 22%, rgba(125, 211, 252, 0.28), transparent 44%),
+    rgba(8, 13, 25, 0.86);
+  box-shadow: 0 0 24px rgba(125, 211, 252, 0.12);
+  color: #7dd3fc;
 }
 
 .achievement-card:hover {
@@ -1752,7 +1804,8 @@ h2 {
   padding: 12px;
 }
 
-.economy-panel svg {
+.economy-panel svg,
+.economy-panel .game-icon {
   color: #bef264;
   flex: 0 0 auto;
 }
@@ -1785,7 +1838,8 @@ h2 {
   padding: 12px;
 }
 
-.economy-dashboard svg {
+.economy-dashboard svg,
+.economy-dashboard .game-icon {
   color: #22d3ee;
 }
 
@@ -1915,6 +1969,15 @@ h2 {
 .achievement-card-unlocked {
   border-color: rgba(132, 204, 22, 0.35);
   background: rgba(63, 98, 18, 0.18);
+}
+
+.achievement-card-unlocked .achievement-emblem {
+  border-color: rgba(190, 242, 100, 0.38);
+  background:
+    radial-gradient(circle at 32% 20%, rgba(190, 242, 100, 0.34), transparent 44%),
+    rgba(20, 37, 10, 0.84);
+  box-shadow: 0 0 30px rgba(132, 204, 22, 0.18);
+  color: #bef264;
 }
 
 .settings-row {
@@ -3361,7 +3424,7 @@ h2 {
   color: #e0f2fe;
 }
 
-.constellation-tabs span {
+.constellation-tabs button > span:not(.game-icon) {
   display: grid;
   min-width: 24px;
   height: 24px;
@@ -3403,10 +3466,14 @@ h2 {
   box-shadow: 0 0 34px rgba(34, 211, 238, 0.12);
 }
 
-.constellation-card span {
+.constellation-card > span:not(.game-icon) {
   font-size: 0.76rem;
   font-weight: 900;
   text-transform: uppercase;
+}
+
+.constellation-card > .game-icon {
+  color: #7dd3fc;
 }
 
 .constellation-card strong {
@@ -3505,13 +3572,24 @@ h2 {
   gap: 9px;
 }
 
-.flow-skill-node-header span {
+.flow-skill-node-header > span {
   display: grid;
   width: 30px;
   height: 30px;
   place-items: center;
-  background: rgba(51, 65, 85, 0.88);
+  border: 1px solid rgba(125, 211, 252, 0.18);
+  background:
+    radial-gradient(circle at 34% 24%, rgba(125, 211, 252, 0.22), transparent 45%),
+    rgba(51, 65, 85, 0.88);
   color: #bae6fd;
+}
+
+.flow-skill-node-unlocked .flow-skill-node-header > span {
+  border-color: rgba(190, 242, 100, 0.34);
+  background:
+    radial-gradient(circle at 34% 24%, rgba(190, 242, 100, 0.28), transparent 45%),
+    rgba(26, 46, 5, 0.82);
+  color: #bef264;
 }
 
 .flow-skill-node-header strong {
@@ -3551,6 +3629,43 @@ h2 {
 .skill-detail-panel {
   display: grid;
   gap: 12px;
+}
+
+.skill-detail-emblem {
+  display: grid;
+  width: 76px;
+  height: 76px;
+  place-items: center;
+  border: 1px solid rgba(125, 211, 252, 0.22);
+  background:
+    radial-gradient(circle at 32% 22%, rgba(125, 211, 252, 0.26), transparent 45%),
+    rgba(8, 13, 25, 0.82);
+  box-shadow: 0 0 30px rgba(34, 211, 238, 0.12);
+  color: #7dd3fc;
+}
+
+.skill-detail-emblem-strength {
+  color: #fca5a5;
+}
+
+.skill-detail-emblem-intelligence {
+  color: #93c5fd;
+}
+
+.skill-detail-emblem-discipline {
+  color: #fde68a;
+}
+
+.skill-detail-emblem-social {
+  color: #f9a8d4;
+}
+
+.skill-detail-emblem-vitality {
+  color: #bef264;
+}
+
+.skill-detail-emblem .game-icon {
+  color: inherit;
 }
 
 .skill-create-panel {

@@ -1,6 +1,8 @@
 import { motion } from "motion/react";
 import { achievements } from "../../domain/achievements";
 import type { Player } from "../../domain/player";
+import { GameIcon } from "../components/GameIcon";
+import { achievementGameIcons, fallbackAchievementIcon } from "../gameIconCatalog";
 import { cardMotion } from "../motion/transitions";
 
 type AchievementsViewProps = {
@@ -29,6 +31,9 @@ export const AchievementsView = ({ player }: AchievementsViewProps) => (
             layout
             {...cardMotion}
           >
+            <div className="achievement-emblem">
+              <GameIcon name={achievementGameIcons[achievement.id] ?? fallbackAchievementIcon} size={32} />
+            </div>
             <span>{unlocked ? "Liberada" : "Bloqueada"}</span>
             <strong>{achievement.title}</strong>
             <p>{achievement.description}</p>

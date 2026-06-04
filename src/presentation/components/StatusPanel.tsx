@@ -9,6 +9,7 @@ import { useFocusSessions } from "../useFocusSessions";
 import { useProgressionSystem } from "../useProgressionSystem";
 import type { AppView } from "../navigation/appViews";
 import type { AppFocus } from "../navigation/navigationIntent";
+import { achievementGameIcons, attributeGameIcons, fallbackAchievementIcon } from "../gameIconCatalog";
 import { attributeLabels } from "../viewModels";
 import { GameIcon } from "./GameIcon";
 import { Metric } from "./Metric";
@@ -197,7 +198,10 @@ export const StatusPanel = ({ player, quests, onUpdateProfile, onFocusNavigate }
       <div className="attributes">
         {Object.entries(player.attributes).map(([key, value]) => (
           <div className="attribute-row" key={key}>
-            <span>{attributeLabels[key as Attribute]}</span>
+            <span>
+              <GameIcon name={attributeGameIcons[key as Attribute]} size={17} />
+              {attributeLabels[key as Attribute]}
+            </span>
             <strong>{value}</strong>
           </div>
         ))}
@@ -214,7 +218,10 @@ export const StatusPanel = ({ player, quests, onUpdateProfile, onFocusNavigate }
 
           return (
             <div className="training-row" key={attribute}>
-              <span>{attributeLabels[attribute]}</span>
+              <span>
+                <GameIcon name={attributeGameIcons[attribute]} size={16} />
+                {attributeLabels[attribute]}
+              </span>
               <div className="training-track">
                 <div style={{ width: `${percent}%` }} />
               </div>
@@ -277,8 +284,11 @@ export const StatusPanel = ({ player, quests, onUpdateProfile, onFocusNavigate }
         ) : (
           unlockedAchievements.map((achievement) => (
             <div className="achievement-row" key={achievement.id}>
-              <strong>{achievement.title}</strong>
-              <span>{achievement.description}</span>
+              <GameIcon name={achievementGameIcons[achievement.id] ?? fallbackAchievementIcon} size={24} />
+              <div>
+                <strong>{achievement.title}</strong>
+                <span>{achievement.description}</span>
+              </div>
             </div>
           ))
         )}
