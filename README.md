@@ -214,6 +214,8 @@ O projeto usa recursos sensoriais para tornar o progresso mais satisfatorio:
 
 O som e os efeitos visuais podem ser ajustados na tela de configuracoes.
 
+Os efeitos sonoros customizados ficam em `public/sounds`. A camada de audio carrega esses arquivos por evento e usa Tone.js como fallback quando um asset nao estiver disponivel.
+
 ### Creditos Visuais
 
 Alguns emblemas usam icones do [Game-icons.net](https://game-icons.net/) por meio do endpoint SVG do [Iconify](https://iconify.design/). Os icones do Game Icons sao distribuidos sob licenca CC BY 3.0.

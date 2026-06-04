@@ -42,6 +42,8 @@ export const DailyReviewOverlay = ({ isOpen, player, quests, date, onClose, onCo
       return;
     }
 
+    emitVisualEvent("ui-popup");
+
     const timers = [
       window.setTimeout(() => setPhase(1), 650),
       window.setTimeout(() => setPhase(2), 1450),
@@ -57,7 +59,6 @@ export const DailyReviewOverlay = ({ isOpen, player, quests, date, onClose, onCo
     try {
       await onConfirm();
       emitVisualEvent("ui-confirm");
-      emitVisualEvent(dayRank === "S" || dayRank === "A" ? "level-up" : "quest-complete");
       onClose();
     } finally {
       setIsConfirming(false);
@@ -75,7 +76,7 @@ export const DailyReviewOverlay = ({ isOpen, player, quests, date, onClose, onCo
 
   const handleAnimationComplete = () => {
     if (isOpen) {
-      emitVisualEvent(dayRank === "S" || dayRank === "A" ? "level-up" : "quest-complete");
+      emitVisualEvent("daily-review");
     }
   };
 

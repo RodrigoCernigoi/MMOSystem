@@ -9,6 +9,12 @@ type ToneGameFeelOptions = {
   volume: number;
 };
 
+type AudioAssetCue = {
+  src: string;
+  delayMs?: number;
+  gain?: number;
+};
+
 type ToneState = {
   tone: ToneModule;
   gain: import("tone").Gain;
@@ -18,6 +24,70 @@ type ToneState = {
 };
 
 const clamp = (value: number, min: number, max: number) => Math.min(max, Math.max(min, value));
+
+const audioAssetsByEvent: Partial<Record<GameFeelEventType, AudioAssetCue[]>> = {
+  "ui-navigate": [{ src: "/sounds/select.mp3", gain: 0.48 }],
+  "ui-confirm": [
+    { src: "/sounds/button01.mp3", gain: 0.72 },
+    { src: "/sounds/item-select-2.mp3", delayMs: 45, gain: 0.28 },
+  ],
+  "ui-popup": [{ src: "/sounds/popup-show.mp3", gain: 0.62 }],
+  "quest-complete": [
+    { src: "/sounds/clear-combo.mp3", gain: 0.72 },
+    { src: "/sounds/drop-coin01.mp3", delayMs: 120, gain: 0.42 },
+  ],
+  "level-up": [{ src: "/sounds/level-win.mp3", gain: 0.78 }],
+  "skill-unlock": [{ src: "/sounds/get-item.mp3", gain: 0.74 }],
+  "daily-review": [
+    { src: "/sounds/material-level-complete.mp3", gain: 0.72 },
+    { src: "/sounds/drop-coin01.mp3", delayMs: 420, gain: 0.36 },
+  ],
+};
+
+const createAudioCache = () => {
+  const urls = new Set(Object.values(audioAssetsByEvent).flatMap((cues) => cues?.map((cue) => cue.src) ?? []));
+
+  return new Map(
+    Array.from(urls).map((src) => {
+      const audio = new Audio(src);
+      audio.preload = "auto";
+      return [src, audio] as const;
+    }),
+  );
+};
+
+const playAudioAsset = async (audio: HTMLAudioElement, volume: number) => {
+  const instance = audio.cloneNode(true) as HTMLAudioElement;
+  instance.volume = clamp(volume, 0, 1);
+  await instance.play();
+};
+
+const playAssetEvent = (
+  cache: Map<string, HTMLAudioElement>,
+  type: GameFeelEventType,
+  multiplier: number,
+  volume: number,
+) => {
+  const cues = audioAssetsByEvent[type];
+
+  if (!cues?.length) {
+    return false;
+  }
+
+  cues.forEach((cue) => {
+    const audio = cache.get(cue.src);
+
+    if (!audio) {
+      return;
+    }
+
+    window.setTimeout(() => {
+      void playAudioAsset(audio, volume * multiplier * (cue.gain ?? 1)).catch(() => undefined);
+    }, cue.delayMs ?? 0);
+  });
+
+  return true;
+};
 
 const playEvent = (state: ToneState, type: GameFeelEventType, multiplier: number) => {
   const now = state.tone.now();
@@ -39,6 +109,18 @@ const playEvent = (state: ToneState, type: GameFeelEventType, multiplier: number
   if (type === "skill-unlock") {
     state.synth.triggerAttackRelease(["A4", "C5", "E5"], "8n", now, velocity);
     state.pluck.triggerAttack("A5", now + 0.18);
+    return;
+  }
+
+  if (type === "daily-review") {
+    state.synth.triggerAttackRelease(["D4", "A4", "D5"], "8n", now, velocity);
+    state.synth.triggerAttackRelease(["F4", "A4", "C5"], "8n", now + 0.16, velocity * 0.92);
+    state.noise.triggerAttackRelease("16n", now + 0.08);
+    return;
+  }
+
+  if (type === "ui-popup") {
+    state.pluck.triggerAttack("C5", now);
     return;
   }
 
@@ -74,6 +156,7 @@ const createToneState = async (): Promise<ToneState> => {
 
 export const useToneGameFeel = ({ intensity, volume }: ToneGameFeelOptions) => {
   const stateRef = useRef<ToneState | null>(null);
+  const audioCacheRef = useRef<Map<string, HTMLAudioElement> | null>(null);
   const preferencesRef = useRef({ intensity, volume });
 
   useEffect(() => {
@@ -93,6 +176,10 @@ export const useToneGameFeel = ({ intensity, volume }: ToneGameFeelOptions) => {
     const ensureAudio = async () => {
       if (preferencesRef.current.intensity === "off") {
         return null;
+      }
+
+      if (!audioCacheRef.current) {
+        audioCacheRef.current = createAudioCache();
       }
 
       if (!stateRef.current) {
@@ -121,6 +208,21 @@ export const useToneGameFeel = ({ intensity, volume }: ToneGameFeelOptions) => {
       const type = (event as CustomEvent<{ type: GameFeelEventType }>).detail?.type;
 
       if (!type || preferencesRef.current.intensity === "off") {
+        return;
+      }
+
+      if (!audioCacheRef.current) {
+        audioCacheRef.current = createAudioCache();
+      }
+
+      const didPlayAsset = playAssetEvent(
+        audioCacheRef.current,
+        type,
+        audioIntensityMultiplier[preferencesRef.current.intensity],
+        preferencesRef.current.volume,
+      );
+
+      if (didPlayAsset) {
         return;
       }
 

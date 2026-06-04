@@ -87,14 +87,19 @@ export const PixiGameFeelLayer = ({ intensity, accent }: PixiGameFeelLayerProps)
         return;
       }
 
-      const color = type === "level-up" ? 0xbef264 : type === "skill-unlock" ? 0x7dd3fc : accentColors[stateRef.current.accent];
-      const count = type === "level-up" ? 44 : type === "skill-unlock" ? 34 : 24;
+      const color =
+        type === "level-up" || type === "daily-review"
+          ? 0xbef264
+          : type === "skill-unlock"
+            ? 0x7dd3fc
+            : accentColors[stateRef.current.accent];
+      const count = type === "daily-review" ? 58 : type === "level-up" ? 44 : type === "skill-unlock" ? 34 : type === "ui-popup" ? 14 : 24;
       const originX = app.renderer.width * 0.5;
       const originY = app.renderer.height * 0.46;
 
       for (let index = 0; index < count; index += 1) {
         const angle = Math.random() * Math.PI * 2;
-        const speed = 2.2 + Math.random() * (type === "level-up" ? 5.2 : 3.4);
+        const speed = 2.2 + Math.random() * (type === "level-up" || type === "daily-review" ? 5.2 : 3.4);
         const graphic = new Graphics();
         const burst: Burst = {
           graphic,

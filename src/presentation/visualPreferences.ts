@@ -61,7 +61,14 @@ export const useVisualPreferences = () => {
   };
 };
 
-export type GameFeelEventType = "quest-complete" | "level-up" | "skill-unlock" | "ui-confirm" | "ui-navigate";
+export type GameFeelEventType =
+  | "quest-complete"
+  | "level-up"
+  | "skill-unlock"
+  | "daily-review"
+  | "ui-popup"
+  | "ui-confirm"
+  | "ui-navigate";
 
 export const emitVisualEvent = (type: GameFeelEventType) => {
   window.dispatchEvent(new CustomEvent("mmo-system:visual-event", { detail: { type } }));
