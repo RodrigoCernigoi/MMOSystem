@@ -1,4 +1,4 @@
-import { CheckCircle2, Coins, Compass, PlusCircle, Target, Trophy } from "lucide-react";
+import { AlertTriangle, CalendarCheck2, CheckCircle2, Coins, Compass, Flame, PlusCircle, Target, Trophy } from "lucide-react";
 import { useEffect, useState } from "react";
 import { calculateHabitStreak } from "../../domain/habitStats";
 import { isHabitDoneToday, isQuestForToday, toDateKey } from "../../domain/schedule";
@@ -36,7 +36,13 @@ export const TodayView = ({ player, quests, onCompleteQuest, onEndDay, onOpenFoc
   const completedToday = (todayHistory?.completedQuestIds.length ?? 0) + (todayHistory?.completedHabitIds.length ?? 0);
   const totalToday = pendingHabits.length + doneHabits.length + dueToday.length;
   const progressPercent = totalToday === 0 ? (todayReview ? 100 : 0) : Math.round((completedToday / totalToday) * 100);
+  const habitTotal = pendingHabits.length + doneHabits.length;
+  const habitPercent = habitTotal === 0 ? 0 : Math.round((doneHabits.length / habitTotal) * 100);
+  const criticalQuests = dueToday
+    .filter((quest) => quest.status === "open" && (quest.difficulty === "hard" || quest.difficulty === "elite" || quest.requiresEvidence))
+    .slice(0, 3);
   const nextQuest = pendingHabits[0] ?? dueToday[0] ?? projectQuests[0];
+  const dayFocus = player.focus || nextQuest?.importance || nextQuest?.title || "Escolha uma acao pequena para mover o dia.";
   const nextAction = nextQuest
     ? {
         eyebrow: nextQuest.kind === "habit" ? "Proximo check-in" : "Proxima missao",
@@ -137,6 +143,69 @@ export const TodayView = ({ player, quests, onCompleteQuest, onEndDay, onOpenFoc
           <Metric icon={<Target size={18} />} label="Pendentes" value={Math.max(0, totalToday - completedToday)} />
           <Metric icon={<Trophy size={18} />} label="Habitos" value={pendingHabits.length} />
           <Metric icon={<Coins size={18} />} label="Moedas hoje" value={todayHistory?.coinsEarned ?? 0} />
+        </div>
+      </section>
+
+      <section className="content-panel span-all daily-command-panel">
+        <div className="daily-command-grid">
+          <article className="daily-focus-card">
+            <div className="daily-command-icon">
+              <Compass size={22} />
+            </div>
+            <div>
+              <p className="eyebrow">Foco atual</p>
+              <h2>{dayFocus}</h2>
+              <span>Use a tela de foco para executar uma missao por vez e reduzir atrito.</span>
+            </div>
+            {nextQuest && (
+              <button type="button" onClick={() => onOpenFocus(nextQuest.id)}>
+                Abrir foco
+              </button>
+            )}
+          </article>
+
+          <article className="daily-habit-card">
+            <div className="daily-command-icon">
+              <Flame size={22} />
+            </div>
+            <div>
+              <p className="eyebrow">Habitos</p>
+              <h2>{habitPercent}% do ritual</h2>
+              <span>
+                {doneHabits.length}/{habitTotal || 0} check-ins registrados
+              </span>
+            </div>
+            <div className="daily-mini-track">
+              <div style={{ width: `${habitPercent}%` }} />
+            </div>
+          </article>
+
+          <article className={criticalQuests.length > 0 ? "daily-critical-card has-critical" : "daily-critical-card"}>
+            <div className="daily-command-icon">
+              <AlertTriangle size={22} />
+            </div>
+            <div>
+              <p className="eyebrow">Criticas</p>
+              <h2>{criticalQuests.length > 0 ? `${criticalQuests.length} em atencao` : "Nada urgente"}</h2>
+              <span>
+                {criticalQuests[0]?.title ?? "Missoes de evidencia, Hard e Elite aparecem aqui."}
+              </span>
+            </div>
+          </article>
+
+          <article className={todayReview ? "daily-close-card closed" : "daily-close-card"}>
+            <div className="daily-command-icon">
+              <CalendarCheck2 size={22} />
+            </div>
+            <div>
+              <p className="eyebrow">Fechamento</p>
+              <h2>{todayReview ? `Rank ${todayReview.rank}` : completedToday > 0 ? "Pronto para computar" : "Aguardando progresso"}</h2>
+              <span>{todayReview ? "Dia ja registrado no sistema." : "Compute XP, moedas, evidencias e bonus."}</span>
+            </div>
+            <button type="button" onClick={() => setIsReviewOpen(true)}>
+              {todayReview ? "Ver" : "Encerrar"}
+            </button>
+          </article>
         </div>
       </section>
 
