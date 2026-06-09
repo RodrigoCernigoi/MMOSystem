@@ -1262,11 +1262,26 @@ h2 {
 }
 
 .real-template-row button {
-  display: grid !important;
-  min-width: 160px;
-  place-items: start !important;
-  gap: 5px;
+  display: flex !important;
+  min-width: 240px;
+  max-width: 280px;
+  min-height: 76px;
+  place-items: initial !important;
+  align-items: flex-start;
+  gap: 10px;
   text-align: left;
+  white-space: normal;
+}
+
+.real-template-row button svg {
+  flex: 0 0 auto;
+  color: #7dd3fc;
+}
+
+.real-template-row button div {
+  display: grid;
+  gap: 4px;
+  min-width: 0;
 }
 
 .real-template-row span,
@@ -1276,6 +1291,8 @@ h2 {
   color: #dbeafe;
   font-size: 0.78rem;
   font-weight: 800;
+  line-height: 1.25;
+  overflow-wrap: anywhere;
 }
 
 .skill-template-strip,

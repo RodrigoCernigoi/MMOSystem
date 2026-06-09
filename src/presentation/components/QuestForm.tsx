@@ -39,6 +39,7 @@ const realQuestTemplates: Array<{
   attribute: Attribute;
   difficulty: TaskDifficulty;
   recurrence: Recurrence;
+  Icon: typeof Target;
   requiresEvidence?: boolean;
 }> = [
   {
@@ -49,6 +50,7 @@ const realQuestTemplates: Array<{
     attribute: "vitality",
     difficulty: "easy",
     recurrence: "daily",
+    Icon: HeartPulse,
   },
   {
     label: "Estudo",
@@ -58,6 +60,7 @@ const realQuestTemplates: Array<{
     attribute: "intelligence",
     difficulty: "normal",
     recurrence: "daily",
+    Icon: Brain,
     requiresEvidence: true,
   },
   {
@@ -68,6 +71,7 @@ const realQuestTemplates: Array<{
     attribute: "social",
     difficulty: "normal",
     recurrence: "none",
+    Icon: MessageCircle,
   },
   {
     label: "Projeto",
@@ -77,6 +81,7 @@ const realQuestTemplates: Array<{
     attribute: "discipline",
     difficulty: "hard",
     recurrence: "none",
+    Icon: Target,
     requiresEvidence: true,
   },
   {
@@ -87,6 +92,7 @@ const realQuestTemplates: Array<{
     attribute: "discipline",
     difficulty: "easy",
     recurrence: "daily",
+    Icon: ShieldCheck,
   },
 ];
 
@@ -234,12 +240,15 @@ export const QuestForm = ({ onCreateQuest, onSuggestQuest, projects = [], intent
                 <span>Atalhos conscientes para rotinas comuns</span>
               </div>
               <div className="real-template-row">
-                {realQuestTemplates.map((template) => (
-                  <button type="button" key={template.label} onClick={() => applyRealTemplate(template)}>
-                    <strong>{template.label}</strong>
-                    <span>{template.title}</span>
-                  </button>
-                ))}
+            {realQuestTemplates.map((template) => (
+              <button type="button" key={template.label} onClick={() => applyRealTemplate(template)}>
+                <template.Icon size={22} />
+                <div>
+                  <strong>{template.label}</strong>
+                  <span>{template.title}</span>
+                </div>
+              </button>
+            ))}
               </div>
               <label>
                 <span>Nome da missao</span>
