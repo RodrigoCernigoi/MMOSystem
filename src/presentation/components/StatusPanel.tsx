@@ -13,6 +13,7 @@ import { achievementGameIcons, attributeGameIcons, fallbackAchievementIcon } fro
 import { attributeLabels } from "../viewModels";
 import { GameIcon } from "./GameIcon";
 import { Metric } from "./Metric";
+import { RecalibrationOverlay } from "./RecalibrationOverlay";
 
 type StatusPanelProps = {
   player: Player;
@@ -45,6 +46,7 @@ const rewardStyleLabels = {
 
 export const StatusPanel = ({ player, quests, onUpdateProfile, onFocusNavigate }: StatusPanelProps) => {
   const [isEditingProfile, setIsEditingProfile] = useState(false);
+  const [isRecalibrating, setIsRecalibrating] = useState(false);
   const { progression } = useProgressionSystem();
   const { sessions } = useFocusSessions();
   const openQuests = quests.filter((quest) => quest.status === "open");
@@ -215,12 +217,17 @@ export const StatusPanel = ({ player, quests, onUpdateProfile, onFocusNavigate }
       </div>
 
       <div className="status-calibration-card">
-        <div className="status-section-heading">
+        <div className="status-section-heading status-section-heading-action">
           <Compass size={18} />
           <div>
             <p className="eyebrow">Calibragem pessoal</p>
             <h2>Bussola do sistema</h2>
           </div>
+          {onUpdateProfile && (
+            <button type="button" onClick={() => setIsRecalibrating(true)}>
+              Recalibrar
+            </button>
+          )}
         </div>
         <div className="calibration-grid">
           <article>
@@ -254,6 +261,14 @@ export const StatusPanel = ({ player, quests, onUpdateProfile, onFocusNavigate }
           )}
         </div>
       </div>
+
+      {isRecalibrating && onUpdateProfile && (
+        <RecalibrationOverlay
+          player={player}
+          onUpdateProfile={onUpdateProfile}
+          onClose={() => setIsRecalibrating(false)}
+        />
+      )}
 
       <div className="attributes">
         {Object.entries(player.attributes).map(([key, value]) => (
