@@ -7,6 +7,7 @@ import type {
   UnlockSkillInput,
   UpdateMasterQuestInput,
   UpdateProjectInput,
+  UpdateSkillInput,
 } from "../domain/progressionSystem";
 import type { Quest } from "../domain/task";
 import { createAppContainer } from "../infrastructure/container";
@@ -57,6 +58,10 @@ export const useProgressionSystem = () => {
       },
       async createSkill(input: CreateSkillInput) {
         await container.progressionService.createSkill(input);
+        await refresh();
+      },
+      async updateSkill(id: string, input: UpdateSkillInput) {
+        await container.progressionService.updateSkill(id, input);
         await refresh();
       },
       async updateProject(id: string, input: UpdateProjectInput) {

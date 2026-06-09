@@ -91,6 +91,8 @@ export type CreateSkillInput = {
   prerequisiteSkillIds: string[];
 };
 
+export type UpdateSkillInput = Partial<CreateSkillInput>;
+
 export type UnlockSkillInput = {
   evidence: string;
 };

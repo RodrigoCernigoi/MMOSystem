@@ -29,6 +29,65 @@ const questTemplates: Array<{
   { kind: "single", label: "Unica", detail: "acao pontual", Icon: Target },
 ];
 
+const realQuestTemplates: Array<{
+  label: string;
+  title: string;
+  importance: string;
+  kind: QuestKind;
+  attribute: Attribute;
+  difficulty: TaskDifficulty;
+  recurrence: Recurrence;
+  requiresEvidence?: boolean;
+}> = [
+  {
+    label: "Saude",
+    title: "Caminhar por 20 minutos",
+    importance: "Cuidar do corpo para sustentar energia real ao longo da semana.",
+    kind: "habit",
+    attribute: "vitality",
+    difficulty: "easy",
+    recurrence: "daily",
+  },
+  {
+    label: "Estudo",
+    title: "Estudar com foco por 45 minutos",
+    importance: "Avancar uma habilidade concreta com pratica deliberada.",
+    kind: "daily",
+    attribute: "intelligence",
+    difficulty: "normal",
+    recurrence: "daily",
+    requiresEvidence: true,
+  },
+  {
+    label: "Social",
+    title: "Iniciar uma conversa intencional",
+    importance: "Treinar presenca social em uma situacao pequena e real.",
+    kind: "single",
+    attribute: "social",
+    difficulty: "normal",
+    recurrence: "none",
+  },
+  {
+    label: "Projeto",
+    title: "Finalizar o proximo bloco do projeto",
+    importance: "Transformar uma meta grande em um avanco objetivo e verificavel.",
+    kind: "single",
+    attribute: "discipline",
+    difficulty: "hard",
+    recurrence: "none",
+    requiresEvidence: true,
+  },
+  {
+    label: "Disciplina",
+    title: "Planejar as 3 prioridades de amanha",
+    importance: "Reduzir atrito e deixar a proxima acao clara antes do dia comecar.",
+    kind: "daily",
+    attribute: "discipline",
+    difficulty: "easy",
+    recurrence: "daily",
+  },
+];
+
 const attributeIcons: Record<Attribute, typeof Target> = {
   strength: Dumbbell,
   intelligence: Brain,
@@ -81,6 +140,16 @@ export const QuestForm = ({ onCreateQuest, onSuggestQuest, projects = [], intent
     }
   };
 
+  const applyRealTemplate = (template: (typeof realQuestTemplates)[number]) => {
+    setTitle(template.title);
+    setImportance(template.importance);
+    setKind(template.kind);
+    setAttribute(template.attribute);
+    setDifficulty(template.difficulty);
+    setRecurrence(template.recurrence);
+    setRequiresEvidence(Boolean(template.requiresEvidence));
+  };
+
   const handleSuggest = async () => {
     const suggestion = await onSuggestQuest(goal || title);
     setTitle(suggestion.title);
@@ -118,6 +187,18 @@ export const QuestForm = ({ onCreateQuest, onSuggestQuest, projects = [], intent
         </div>
 
         <div className="forge-block forge-title-block">
+          <div className="forge-block-heading">
+            <p className="eyebrow">Templates reais</p>
+            <span>Atalhos conscientes para rotinas comuns</span>
+          </div>
+          <div className="real-template-row">
+            {realQuestTemplates.map((template) => (
+              <button type="button" key={template.label} onClick={() => applyRealTemplate(template)}>
+                <strong>{template.label}</strong>
+                <span>{template.title}</span>
+              </button>
+            ))}
+          </div>
           <label>
             <span>Nome da missao</span>
             <input

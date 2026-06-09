@@ -23,6 +23,43 @@ const rewardCategories: Array<{ value: RewardCategory; label: string; icon: stri
   icon: rewardCategoryIcons[value as RewardCategory],
 }));
 
+const rewardTemplates: Array<{
+  title: string;
+  description: string;
+  cost: number;
+  category: RewardCategory;
+  icon: string;
+}> = [
+  {
+    title: "Cafe sem pressa",
+    description: "Uma pausa curta e consciente longe da tela.",
+    cost: 30,
+    category: "rest",
+    icon: "coffee-cup",
+  },
+  {
+    title: "Sessao de lazer",
+    description: "Filme, jogo ou leitura leve depois de progresso real.",
+    cost: 80,
+    category: "leisure",
+    icon: "card-play",
+  },
+  {
+    title: "Role social",
+    description: "Uma saida simples ou convite para se conectar com alguem.",
+    cost: 140,
+    category: "social",
+    icon: "three-friends",
+  },
+  {
+    title: "Livro ou curso pequeno",
+    description: "Investimento em algo que aprofunda uma habilidade real.",
+    cost: 180,
+    category: "learning",
+    icon: "graduate-cap",
+  },
+];
+
 export const RewardsView = () => {
   const { rewards, player, isLoading, error, createReward, redeemReward, archiveReward } = useRewards();
   const [rewardActionError, setRewardActionError] = useState<string | null>(null);
@@ -42,6 +79,17 @@ export const RewardsView = () => {
         category: String(formData.get("category") ?? "leisure") as RewardCategory,
       });
       event.currentTarget.reset();
+    } catch (actionError) {
+      setRewardActionError(
+        actionError instanceof Error ? actionError.message : "Nao consegui criar essa recompensa agora.",
+      );
+    }
+  };
+
+  const handleCreateRewardTemplate = async (template: (typeof rewardTemplates)[number]) => {
+    try {
+      setRewardActionError(null);
+      await createReward(template);
     } catch (actionError) {
       setRewardActionError(
         actionError instanceof Error ? actionError.message : "Nao consegui criar essa recompensa agora.",
@@ -146,6 +194,14 @@ export const RewardsView = () => {
             ))}
           </div>
         )}
+        <div className="reward-template-strip">
+          {rewardTemplates.map((template) => (
+            <button type="button" key={template.title} onClick={() => handleCreateRewardTemplate(template)}>
+              <GameIcon name={template.icon} size={22} />
+              <span>{template.title}</span>
+            </button>
+          ))}
+        </div>
         <form className="stacked-form" onSubmit={handleCreateReward}>
           <input name="title" placeholder="Ex: noite de filme" aria-label="Titulo da recompensa" />
           <textarea name="description" placeholder="Recompensa real que voce pode usar" aria-label="Descricao" />

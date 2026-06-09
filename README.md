@@ -120,6 +120,8 @@ Completar missoes gera XP, moedas, atributos e historico diario.
 
 Missoes importantes podem ser marcadas para exigir evidencia. Nesse caso, o check rapido abre a ficha da missao e a conclusao so acontece depois de registrar uma prova real, nota de aprendizado ou resultado concreto.
 
+A criacao de missoes tambem oferece templates reais para saude, estudo, social, projetos e disciplina, funcionando como atalhos editaveis em vez de missoes aleatorias.
+
 ### Habitos
 
 Habitos nao sao encerrados como tarefas comuns. Eles recebem check-ins diarios e mantem log para streaks.
@@ -142,6 +144,8 @@ A tela de Skills usa React Flow para exibir uma arvore/constelacao com:
 - busca;
 - filtros por constelacao;
 - seletor visual de icone por habilidade;
+- templates reais para registrar habilidades comuns;
+- edicao posterior de titulo, descricao, atributo, icone e pre-requisitos;
 - pre-requisitos entre habilidades;
 - evidencia real para marcar uma skill como adquirida;
 - conexoes visuais entre habilidades relacionadas.
@@ -149,6 +153,8 @@ A tela de Skills usa React Flow para exibir uma arvore/constelacao com:
 ### Recompensas
 
 A loja permite criar recompensas reais, como lazer, descanso, compras planejadas ou experiencias. O usuario resgata recompensas usando moedas ganhas nas missoes.
+
+A tela tambem oferece templates de recompensas reais para acelerar a criacao sem quebrar a escala economica.
 
 As recompensas possuem categorias:
 
@@ -192,6 +198,8 @@ O fluxo de "Encerrar dia" cria um relatorio com:
 - bonus de fechamento.
 
 O mesmo dia so pode ser encerrado uma vez, evitando bonus duplicado.
+
+O onboarding inicial cria uma ficha, uma missao diaria, uma skill real e uma recompensa base, apresentando o ciclo principal do sistema antes da primeira tela cheia.
 
 ### Relatorios
 

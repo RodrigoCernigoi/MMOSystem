@@ -10,6 +10,7 @@ import {
   type UnlockSkillInput,
   type UpdateMasterQuestInput,
   type UpdateProjectInput,
+  type UpdateSkillInput,
 } from "../domain/progressionSystem";
 import { calculateProjectProgress } from "../domain/progressionProgress";
 import type { Quest } from "../domain/task";
@@ -135,6 +136,35 @@ export const createProgressionService = ({
     });
 
     return skill;
+  },
+
+  async updateSkill(skillId: string, input: UpdateSkillInput): Promise<SkillNode> {
+    const progression = await progressionRepository.get();
+    const skill = progression.skills.find((item) => item.id === skillId);
+
+    if (!skill) {
+      throw new Error("Skill not found.");
+    }
+
+    const updatedSkill: SkillNode = {
+      ...skill,
+      ...input,
+      title: input.title === undefined ? skill.title : input.title.trim(),
+      description: input.description === undefined ? skill.description : input.description.trim(),
+      prerequisiteSkillIds: (input.prerequisiteSkillIds ?? skill.prerequisiteSkillIds).filter((id) => id !== skillId),
+      icon: input.icon === undefined ? skill.icon : input.icon || undefined,
+    };
+
+    if (!updatedSkill.title) {
+      throw new Error("Skill title is required.");
+    }
+
+    await progressionRepository.save({
+      ...progression,
+      skills: progression.skills.map((item) => (item.id === skillId ? updatedSkill : item)),
+    });
+
+    return updatedSkill;
   },
 
   async updateProject(projectId: string, input: UpdateProjectInput): Promise<Project> {

@@ -1,8 +1,10 @@
 import { motion } from "motion/react";
-import { CheckCircle2, Gift, Sparkles, Target, UserRound } from "lucide-react";
+import { CheckCircle2, Gift, Sparkles, Target, Trophy, UserRound } from "lucide-react";
 import { FormEvent, useState } from "react";
 import type { Attribute, CreateQuestInput } from "../../domain/task";
+import type { RewardCategory } from "../../domain/reward";
 import type { UpdatePlayerProfileInput } from "../../application/questService";
+import { GameIcon } from "./GameIcon";
 import { useProgressionSystem } from "../useProgressionSystem";
 import { useRewards } from "../useRewards";
 import { attributeOptions } from "../viewModels";
@@ -13,6 +15,48 @@ type OnboardingOverlayProps = {
   onDone: () => void;
 };
 
+const onboardingPresets: Array<{
+  label: string;
+  focus: string;
+  area: Attribute;
+  quest: string;
+  skill: string;
+  skillIcon: string;
+  reward: string;
+  rewardCategory: RewardCategory;
+}> = [
+  {
+    label: "Disciplina",
+    focus: "Construir consistencia",
+    area: "discipline",
+    quest: "Planejar as 3 prioridades do dia",
+    skill: "Consistencia basica",
+    skillIcon: "check-mark",
+    reward: "Lazer sem culpa",
+    rewardCategory: "leisure",
+  },
+  {
+    label: "Saude",
+    focus: "Recuperar energia",
+    area: "vitality",
+    quest: "Caminhar por 20 minutos",
+    skill: "Energia fisica basica",
+    skillIcon: "health-normal",
+    reward: "Descanso planejado",
+    rewardCategory: "rest",
+  },
+  {
+    label: "Estudo",
+    focus: "Evoluir uma habilidade",
+    area: "intelligence",
+    quest: "Estudar com foco por 45 minutos",
+    skill: "Estudo profundo",
+    skillIcon: "brain",
+    reward: "Material de aprendizado",
+    rewardCategory: "learning",
+  },
+];
+
 export const OnboardingOverlay = ({ onCreateQuest, onUpdateProfile, onDone }: OnboardingOverlayProps) => {
   const [step, setStep] = useState(0);
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -21,7 +65,9 @@ export const OnboardingOverlay = ({ onCreateQuest, onUpdateProfile, onDone }: On
   const [lifeArea, setLifeArea] = useState<Attribute>("discipline");
   const [dailyQuestTitle, setDailyQuestTitle] = useState("Revisar prioridades do dia");
   const [skillTitle, setSkillTitle] = useState("Consistencia basica");
+  const [skillIcon, setSkillIcon] = useState("check-mark");
   const [rewardTitle, setRewardTitle] = useState("Lazer sem culpa");
+  const [rewardCategory, setRewardCategory] = useState<RewardCategory>("leisure");
   const { createSkill } = useProgressionSystem();
   const { createReward } = useRewards();
 
@@ -49,12 +95,14 @@ export const OnboardingOverlay = ({ onCreateQuest, onUpdateProfile, onDone }: On
       title: skillTitle,
       description: "Habilidade real que voce quer desenvolver e rastrear.",
       attribute: lifeArea,
+      icon: skillIcon,
       prerequisiteSkillIds: [],
     });
     await createReward({
       title: rewardTitle,
       description: "Recompensa pessoal para trocar por moedas.",
       cost: 20,
+      category: rewardCategory,
     });
 
     localStorage.setItem("mmo-system:onboarding-complete", "true");
@@ -77,7 +125,7 @@ export const OnboardingOverlay = ({ onCreateQuest, onUpdateProfile, onDone }: On
         exit={{ opacity: 0, y: 18, scale: 0.98 }}
       >
         <div className="onboarding-steps">
-          {[0, 1, 2].map((item) => (
+          {[0, 1, 2, 3].map((item) => (
             <span className={step >= item ? "onboarding-step onboarding-step-active" : "onboarding-step"} key={item} />
           ))}
         </div>
@@ -90,8 +138,29 @@ export const OnboardingOverlay = ({ onCreateQuest, onUpdateProfile, onDone }: On
             <p>Defina sua ficha inicial e uma area da vida para ser o ponto inicial do construtor de habitos.</p>
             <div className="onboarding-mini-flow">
               <span>1. Missao</span>
-              <span>2. Foco</span>
-              <span>3. Encerrar dia</span>
+              <span>2. Skill real</span>
+              <span>3. Recompensa</span>
+              <span>4. Encerrar dia</span>
+            </div>
+            <div className="onboarding-preset-row">
+              {onboardingPresets.map((preset) => (
+                <button
+                  type="button"
+                  key={preset.label}
+                  onClick={() => {
+                    setFocus(preset.focus);
+                    setLifeArea(preset.area);
+                    setDailyQuestTitle(preset.quest);
+                    setSkillTitle(preset.skill);
+                    setSkillIcon(preset.skillIcon);
+                    setRewardTitle(preset.reward);
+                    setRewardCategory(preset.rewardCategory);
+                  }}
+                >
+                  <GameIcon name={preset.skillIcon} size={22} />
+                  <span>{preset.label}</span>
+                </button>
+              ))}
             </div>
             <input
               value={name}
@@ -131,13 +200,25 @@ export const OnboardingOverlay = ({ onCreateQuest, onUpdateProfile, onDone }: On
         {step === 2 && (
           <section className="onboarding-page">
             <Sparkles size={34} />
-            <p className="eyebrow">Skill e recompensa</p>
+            <p className="eyebrow">Skill real</p>
             <h1>Defina o primeiro sinal de progresso</h1>
             <input
               value={skillTitle}
               onChange={(event) => setSkillTitle(event.target.value)}
               aria-label="Primeira skill real"
             />
+            <div className="onboarding-icon-preview">
+              <GameIcon name={skillIcon} size={28} />
+              <span>A skill entra na sua arvore como uma habilidade real a ser comprovada.</span>
+            </div>
+          </section>
+        )}
+
+        {step === 3 && (
+          <section className="onboarding-page">
+            <Trophy size={34} />
+            <p className="eyebrow">Recompensa e ciclo diario</p>
+            <h1>Feche o ciclo com intencao</h1>
             <div className="onboarding-reward-input">
               <Gift size={18} />
               <input
@@ -146,6 +227,9 @@ export const OnboardingOverlay = ({ onCreateQuest, onUpdateProfile, onDone }: On
                 aria-label="Primeira recompensa"
               />
             </div>
+            <p>
+              Ao final do dia, use "Encerrar dia" para computar missoes, XP, moedas, evidencias e bonus de fechamento.
+            </p>
           </section>
         )}
 
@@ -158,7 +242,7 @@ export const OnboardingOverlay = ({ onCreateQuest, onUpdateProfile, onDone }: On
               Voltar
             </button>
           )}
-          {step < 2 ? (
+          {step < 3 ? (
             <button type="button" onClick={() => setStep((current) => current + 1)}>
               Continuar
             </button>
