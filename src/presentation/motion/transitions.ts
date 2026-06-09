@@ -1,6 +1,6 @@
 export const viewMotion = {
   initial: { opacity: 0.92, y: 10, scale: 0.992, filter: "blur(4px)" },
-  animate: { opacity: 1, y: 0, scale: 1 },
+  animate: { opacity: 1, y: 0, scale: 1, filter: "blur(0px)" },
   exit: { opacity: 0.72, y: -6, scale: 0.996, filter: "blur(3px)" },
   transition: { duration: 0.18, ease: "easeOut" },
 } as const;
