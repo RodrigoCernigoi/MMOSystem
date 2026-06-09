@@ -64,6 +64,7 @@ type SkillTreeNodeData = {
   attributeLabel: string;
   masterQuestTitle?: string;
   hasLockedPrerequisites: boolean;
+  isSelected: boolean;
 };
 
 const SkillTreeNode = memo(({ data }: { data: SkillTreeNodeData }) => (
@@ -73,6 +74,7 @@ const SkillTreeNode = memo(({ data }: { data: SkillTreeNodeData }) => (
       `flow-skill-node-${data.skill.attribute}`,
       data.skill.isUnlocked ? "flow-skill-node-unlocked" : "",
       data.hasLockedPrerequisites ? "flow-skill-node-locked" : "",
+      data.isSelected ? "flow-skill-node-selected" : "",
     ].join(" ")}
   >
     <Handle type="target" position={Position.Left} />
@@ -85,8 +87,14 @@ const SkillTreeNode = memo(({ data }: { data: SkillTreeNodeData }) => (
     <p>{data.skill.description}</p>
     <div className="flow-skill-node-meta">
       <span>{data.attributeLabel}</span>
+      <span>{data.skill.isUnlocked ? "Adquirida" : data.hasLockedPrerequisites ? "Bloqueada" : "Em desenvolvimento"}</span>
       {data.masterQuestTitle && <span>{data.masterQuestTitle}</span>}
     </div>
+    {data.skill.prerequisiteSkillIds.length > 0 && (
+      <div className="flow-skill-prereq-count">
+        {data.skill.prerequisiteSkillIds.length} pre-requisito{data.skill.prerequisiteSkillIds.length > 1 ? "s" : ""}
+      </div>
+    )}
     <Handle type="source" position={Position.Right} />
   </article>
 ));
@@ -203,6 +211,7 @@ export const SkillsView = ({ focus, onFocusNavigate }: SkillsViewProps) => {
           hasLockedPrerequisites: skill.prerequisiteSkillIds.some(
             (id) => !progression.skills.find((item) => item.id === id)?.isUnlocked,
           ),
+          isSelected: selectedSkillId === skill.id || focus?.id === skill.id,
         },
       };
     });
@@ -217,7 +226,7 @@ export const SkillsView = ({ focus, onFocusNavigate }: SkillsViewProps) => {
     );
 
     return { nodes: treeNodes, edges: treeEdges, visibleSkillCount: visibleSkills.length };
-  }, [activeFilter, focus?.id, progression.masterQuests, progression.skills, searchTerm]);
+  }, [activeFilter, focus?.id, progression.masterQuests, progression.skills, searchTerm, selectedSkillId]);
 
   const togglePrerequisite = (skillId: string) => {
     setSelectedPrerequisiteIds((current) =>
@@ -424,6 +433,11 @@ export const SkillsView = ({ focus, onFocusNavigate }: SkillsViewProps) => {
           })}
         </div>
         <div className="skill-flow-shell">
+          <div className="skill-flow-legend">
+            <span className="done">Adquirida</span>
+            <span className="open">Em desenvolvimento</span>
+            <span className="locked">Bloqueada</span>
+          </div>
           {progression.skills.length === 0 ? (
             <div className="empty-state">Registre a primeira habilidade real para iniciar sua arvore.</div>
           ) : visibleSkillCount === 0 ? (
@@ -448,80 +462,86 @@ export const SkillsView = ({ focus, onFocusNavigate }: SkillsViewProps) => {
       </section>
 
       {isCreatorOpen && (
-        <section className="content-panel skill-create-panel">
-          <div className="section-heading">
-            <div>
-              <p className="eyebrow">Registro</p>
-              <h2>Nova habilidade real</h2>
+        <div className="skill-create-backdrop" role="presentation">
+          <section className="content-panel skill-create-panel" aria-label="Criar habilidade">
+            <div className="section-heading">
+              <div>
+                <p className="eyebrow">Registro</p>
+                <h2>Nova habilidade real</h2>
+              </div>
+              <button type="button" className="secondary-button" onClick={() => setIsCreatorOpen(false)}>
+                <X size={16} />
+                Fechar
+              </button>
             </div>
-          </div>
-          <form className="stacked-form" onSubmit={handleCreateSkill}>
-            <div className="skill-template-strip">
-              {skillTemplates.map((template) => (
-                <button type="button" key={template.title} onClick={() => applySkillTemplate(template)}>
-                  <GameIcon name={template.icon} size={22} />
-                  <span>{template.title}</span>
-                </button>
-              ))}
-            </div>
-            <input
-              name="title"
-              required
-              value={skillDraft.title}
-              onChange={(event) => setSkillDraft((current) => ({ ...current, title: event.target.value }))}
-              placeholder="Ex: conversar com desconhecidos"
-              aria-label="Titulo da habilidade"
-            />
-            <textarea
-              name="description"
-              value={skillDraft.description}
-              onChange={(event) => setSkillDraft((current) => ({ ...current, description: event.target.value }))}
-              placeholder="Como essa habilidade aparece na vida real"
-              aria-label="Descricao"
-            />
-            <select
-              name="attribute"
-              value={skillDraft.attribute}
-              onChange={(event) => setSkillDraft((current) => ({ ...current, attribute: event.target.value as Attribute }))}
-            >
-              {attributeOptions.map((option) => (
-                <option key={option.value} value={option.value}>
-                  {option.label}
-                </option>
-              ))}
-            </select>
-            <div className="skill-icon-picker" aria-label="Icone da habilidade">
-              {skillIconOptions.map((option) => (
-                <label key={option.value}>
-                  <input
-                    name="icon"
-                    type="radio"
-                    value={option.value}
-                    checked={skillDraft.icon === option.value}
-                    onChange={() => setSkillDraft((current) => ({ ...current, icon: option.value }))}
-                  />
-                  <span>
-                    <GameIcon name={option.value} size={22} />
+            <form className="stacked-form" onSubmit={handleCreateSkill}>
+              <div className="skill-template-strip">
+                {skillTemplates.map((template) => (
+                  <button type="button" key={template.title} onClick={() => applySkillTemplate(template)}>
+                    <GameIcon name={template.icon} size={22} />
+                    <span>{template.title}</span>
+                  </button>
+                ))}
+              </div>
+              <input
+                name="title"
+                required
+                value={skillDraft.title}
+                onChange={(event) => setSkillDraft((current) => ({ ...current, title: event.target.value }))}
+                placeholder="Ex: conversar com desconhecidos"
+                aria-label="Titulo da habilidade"
+              />
+              <textarea
+                name="description"
+                value={skillDraft.description}
+                onChange={(event) => setSkillDraft((current) => ({ ...current, description: event.target.value }))}
+                placeholder="Como essa habilidade aparece na vida real"
+                aria-label="Descricao"
+              />
+              <select
+                name="attribute"
+                value={skillDraft.attribute}
+                onChange={(event) => setSkillDraft((current) => ({ ...current, attribute: event.target.value as Attribute }))}
+              >
+                {attributeOptions.map((option) => (
+                  <option key={option.value} value={option.value}>
                     {option.label}
-                  </span>
-                </label>
-              ))}
-            </div>
-            <div className="check-list">
-              {progression.skills.map((skill) => (
-                <label key={skill.id}>
-                  <input
-                    type="checkbox"
-                    checked={selectedPrerequisiteIds.includes(skill.id)}
-                    onChange={() => togglePrerequisite(skill.id)}
-                  />
-                  <span>{skill.title}</span>
-                </label>
-              ))}
-            </div>
-            <button type="submit">Registrar habilidade</button>
-          </form>
-        </section>
+                  </option>
+                ))}
+              </select>
+              <div className="skill-icon-picker" aria-label="Icone da habilidade">
+                {skillIconOptions.map((option) => (
+                  <label key={option.value}>
+                    <input
+                      name="icon"
+                      type="radio"
+                      value={option.value}
+                      checked={skillDraft.icon === option.value}
+                      onChange={() => setSkillDraft((current) => ({ ...current, icon: option.value }))}
+                    />
+                    <span>
+                      <GameIcon name={option.value} size={22} />
+                      {option.label}
+                    </span>
+                  </label>
+                ))}
+              </div>
+              <div className="check-list">
+                {progression.skills.map((skill) => (
+                  <label key={skill.id}>
+                    <input
+                      type="checkbox"
+                      checked={selectedPrerequisiteIds.includes(skill.id)}
+                      onChange={() => togglePrerequisite(skill.id)}
+                    />
+                    <span>{skill.title}</span>
+                  </label>
+                ))}
+              </div>
+              <button type="submit">Registrar habilidade</button>
+            </form>
+          </section>
+        </div>
       )}
 
       <section className="content-panel">
@@ -622,9 +642,16 @@ export const SkillsView = ({ focus, onFocusNavigate }: SkillsViewProps) => {
                     {selectedSkill.prerequisiteSkillIds.map((id) => {
                       const prerequisite = progression.skills.find((skill) => skill.id === id);
                       return (
-                        <span key={id}>
-                          {prerequisite?.isUnlocked ? "OK" : "Pendente"} - {prerequisite?.title ?? "Habilidade removida"}
-                        </span>
+                        <button
+                          className={prerequisite?.isUnlocked ? "skill-prereq-chip done" : "skill-prereq-chip pending"}
+                          key={id}
+                          type="button"
+                          onClick={() => prerequisite && setSelectedSkillId(prerequisite.id)}
+                        >
+                          {prerequisite ? <GameIcon name={getSkillIcon(prerequisite)} size={18} /> : <Lock size={16} />}
+                          <span>{prerequisite?.isUnlocked ? "OK" : "Pendente"}</span>
+                          <strong>{prerequisite?.title ?? "Habilidade removida"}</strong>
+                        </button>
                       );
                     })}
                   </div>
@@ -639,7 +666,7 @@ export const SkillsView = ({ focus, onFocusNavigate }: SkillsViewProps) => {
                       aria-label="Evidencia da habilidade"
                     />
                     <button type="button" onClick={handleUnlockSkill} disabled={hasLockedPrerequisites}>
-                      {hasLockedPrerequisites ? "Pre-requisitos pendentes" : "Marcar como adquirida"}
+                      {hasLockedPrerequisites ? "Pre-requisitos pendentes" : "Registrar evidencia e adquirir"}
                     </button>
                   </>
                 )}
