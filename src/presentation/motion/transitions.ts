@@ -1,8 +1,8 @@
 export const viewMotion = {
-  initial: { opacity: 0, y: 14, scale: 0.985 },
+  initial: { opacity: 0.92, y: 10, scale: 0.992, filter: "blur(4px)" },
   animate: { opacity: 1, y: 0, scale: 1 },
-  exit: { opacity: 0, y: -10, scale: 0.985 },
-  transition: { duration: 0.22, ease: "easeOut" },
+  exit: { opacity: 0.72, y: -6, scale: 0.996, filter: "blur(3px)" },
+  transition: { duration: 0.18, ease: "easeOut" },
 } as const;
 
 export const cardMotion = {

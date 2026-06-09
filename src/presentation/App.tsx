@@ -18,19 +18,48 @@ import { HomeView } from "./screens/HomeView";
 import { TodayView } from "./screens/TodayView";
 import { emitVisualEvent, intensityMultiplier, useVisualPreferences } from "./visualPreferences";
 
-const AchievementsView = lazy(() => import("./screens/AchievementsView").then((module) => ({ default: module.AchievementsView })));
-const CalendarView = lazy(() => import("./screens/CalendarView").then((module) => ({ default: module.CalendarView })));
-const CreateQuestView = lazy(() => import("./screens/CreateQuestView").then((module) => ({ default: module.CreateQuestView })));
-const CreditsView = lazy(() => import("./screens/CreditsView").then((module) => ({ default: module.CreditsView })));
-const EvidenceView = lazy(() => import("./screens/EvidenceView").then((module) => ({ default: module.EvidenceView })));
-const FocusView = lazy(() => import("./screens/FocusView").then((module) => ({ default: module.FocusView })));
-const MissionsView = lazy(() => import("./screens/MissionsView").then((module) => ({ default: module.MissionsView })));
-const ProjectsView = lazy(() => import("./screens/ProjectsView").then((module) => ({ default: module.ProjectsView })));
-const RewardsView = lazy(() => import("./screens/RewardsView").then((module) => ({ default: module.RewardsView })));
-const ReportsView = lazy(() => import("./screens/ReportsView").then((module) => ({ default: module.ReportsView })));
-const SettingsView = lazy(() => import("./screens/SettingsView").then((module) => ({ default: module.SettingsView })));
-const SkillsView = lazy(() => import("./screens/SkillsView").then((module) => ({ default: module.SkillsView })));
-const StatusView = lazy(() => import("./screens/StatusView").then((module) => ({ default: module.StatusView })));
+const loadAchievementsView = () => import("./screens/AchievementsView");
+const loadCalendarView = () => import("./screens/CalendarView");
+const loadCreateQuestView = () => import("./screens/CreateQuestView");
+const loadCreditsView = () => import("./screens/CreditsView");
+const loadEvidenceView = () => import("./screens/EvidenceView");
+const loadFocusView = () => import("./screens/FocusView");
+const loadMissionsView = () => import("./screens/MissionsView");
+const loadProjectsView = () => import("./screens/ProjectsView");
+const loadRewardsView = () => import("./screens/RewardsView");
+const loadReportsView = () => import("./screens/ReportsView");
+const loadSettingsView = () => import("./screens/SettingsView");
+const loadSkillsView = () => import("./screens/SkillsView");
+const loadStatusView = () => import("./screens/StatusView");
+const lazyScreenLoaders = [
+  loadAchievementsView,
+  loadCalendarView,
+  loadCreateQuestView,
+  loadCreditsView,
+  loadEvidenceView,
+  loadFocusView,
+  loadMissionsView,
+  loadProjectsView,
+  loadRewardsView,
+  loadReportsView,
+  loadSettingsView,
+  loadSkillsView,
+  loadStatusView,
+];
+
+const AchievementsView = lazy(() => loadAchievementsView().then((module) => ({ default: module.AchievementsView })));
+const CalendarView = lazy(() => loadCalendarView().then((module) => ({ default: module.CalendarView })));
+const CreateQuestView = lazy(() => loadCreateQuestView().then((module) => ({ default: module.CreateQuestView })));
+const CreditsView = lazy(() => loadCreditsView().then((module) => ({ default: module.CreditsView })));
+const EvidenceView = lazy(() => loadEvidenceView().then((module) => ({ default: module.EvidenceView })));
+const FocusView = lazy(() => loadFocusView().then((module) => ({ default: module.FocusView })));
+const MissionsView = lazy(() => loadMissionsView().then((module) => ({ default: module.MissionsView })));
+const ProjectsView = lazy(() => loadProjectsView().then((module) => ({ default: module.ProjectsView })));
+const RewardsView = lazy(() => loadRewardsView().then((module) => ({ default: module.RewardsView })));
+const ReportsView = lazy(() => loadReportsView().then((module) => ({ default: module.ReportsView })));
+const SettingsView = lazy(() => loadSettingsView().then((module) => ({ default: module.SettingsView })));
+const SkillsView = lazy(() => loadSkillsView().then((module) => ({ default: module.SkillsView })));
+const StatusView = lazy(() => loadStatusView().then((module) => ({ default: module.StatusView })));
 
 export const App = () => {
   const {
@@ -60,6 +89,22 @@ export const App = () => {
   const { preferences, setPreferences } = useVisualPreferences();
   const didHydrateRemotePreferences = useRef(false);
   useToneGameFeel({ intensity: preferences.audioIntensity, volume: preferences.audioVolume });
+
+  useEffect(() => {
+    const preloadScreens = () => {
+      lazyScreenLoaders.forEach((loadScreen) => {
+        void loadScreen();
+      });
+    };
+
+    if ("requestIdleCallback" in window) {
+      const idleId = window.requestIdleCallback(preloadScreens, { timeout: 1800 });
+      return () => window.cancelIdleCallback(idleId);
+    }
+
+    const timeoutId = globalThis.setTimeout(preloadScreens, 600);
+    return () => globalThis.clearTimeout(timeoutId);
+  }, []);
 
   useEffect(() => {
     const timeoutId = window.setTimeout(() => setShowSplash(false), 3000);
@@ -323,7 +368,7 @@ export const App = () => {
       pixiAccent={pixiAccent}
       pixiEnabled={preferences.intensity !== "off"}
     >
-      <AnimatePresence mode="wait">
+      <AnimatePresence initial={false}>
         <motion.div className="view-transition" key={activeView} {...viewMotion}>
           <Suspense fallback={<main className="loading">Carregando tela...</main>}>
             {views[activeView]}

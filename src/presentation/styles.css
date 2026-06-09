@@ -362,6 +362,9 @@ button:active {
   max-width: 100%;
   overflow-x: hidden;
   padding: 24px;
+  background:
+    radial-gradient(circle at 18% 0%, rgba(34, 211, 238, 0.05), transparent 32%),
+    rgba(2, 6, 12, 0.18);
 }
 
 .view-transition,
@@ -381,7 +384,8 @@ button:active {
 }
 
 .view-transition {
-  animation: view-enter var(--motion-medium) ease both;
+  transform-origin: center top;
+  will-change: opacity, transform, filter;
 }
 
 .view-grid {
