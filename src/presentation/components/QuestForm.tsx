@@ -1,4 +1,4 @@
-import { Brain, CalendarClock, Dumbbell, Flame, HeartPulse, MessageCircle, Plus, ShieldCheck, Sparkles, Target, WandSparkles } from "lucide-react";
+import { Brain, CalendarClock, Dumbbell, Flame, HeartPulse, MessageCircle, Plus, Settings2, ShieldCheck, Sparkles, Target, WandSparkles } from "lucide-react";
 import { FormEvent, useEffect, useState } from "react";
 import type { Project } from "../../domain/progressionSystem";
 import type { Attribute, CreateQuestInput, QuestKind, Recurrence, TaskDifficulty } from "../../domain/task";
@@ -16,6 +16,8 @@ type QuestFormProps = {
   projects?: Project[];
   intent?: CreateQuestIntent | null;
 };
+
+type ForgeTab = "base" | "settings" | "assistant";
 
 const questTemplates: Array<{
   kind: QuestKind;
@@ -97,6 +99,7 @@ const attributeIcons: Record<Attribute, typeof Target> = {
 };
 
 export const QuestForm = ({ onCreateQuest, onSuggestQuest, projects = [], intent }: QuestFormProps) => {
+  const [activeTab, setActiveTab] = useState<ForgeTab>("base");
   const [title, setTitle] = useState("");
   const [goal, setGoal] = useState("");
   const [kind, setKind] = useState<QuestKind>("single");
@@ -161,148 +164,204 @@ export const QuestForm = ({ onCreateQuest, onSuggestQuest, projects = [], intent
   };
   const AttributeIcon = attributeIcons[attribute];
   const selectedProject = projects.find((project) => project.id === projectId);
+  const activeTabIndex = activeTab === "base" ? 1 : activeTab === "settings" ? 2 : 3;
 
   return (
     <form className="quest-forge" onSubmit={handleSubmit}>
       <section className="quest-forge-main">
-        <div className="forge-block">
-          <div className="forge-block-heading">
-            <p className="eyebrow">Tipo de missao</p>
-            <span>Escolha o formato da acao</span>
-          </div>
-          <div className="template-row">
-            {questTemplates.map(({ kind: templateKind, label, detail, Icon }) => (
-              <button
-                className={kind === templateKind ? "template-card template-card-active" : "template-card"}
-                key={templateKind}
-                type="button"
-                onClick={() => applyTemplate(templateKind)}
-              >
-                <Icon size={20} />
-                <strong>{label}</strong>
-                <span>{detail}</span>
-              </button>
-            ))}
-          </div>
+        <div className="forge-progress-card">
+          <span>Etapa {activeTabIndex}/3</span>
+          <strong>
+            {activeTab === "base" && "Escolha o formato e a intencao"}
+            {activeTab === "settings" && "Ajuste como o sistema vai rastrear"}
+            {activeTab === "assistant" && "Use apoio opcional para lapidar"}
+          </strong>
         </div>
 
-        <div className="forge-block forge-title-block">
-          <div className="forge-block-heading">
-            <p className="eyebrow">Templates reais</p>
-            <span>Atalhos conscientes para rotinas comuns</span>
-          </div>
-          <div className="real-template-row">
-            {realQuestTemplates.map((template) => (
-              <button type="button" key={template.label} onClick={() => applyRealTemplate(template)}>
-                <strong>{template.label}</strong>
-                <span>{template.title}</span>
-              </button>
-            ))}
-          </div>
-          <label>
-            <span>Nome da missao</span>
-            <input
-              value={title}
-              onChange={(event) => setTitle(event.target.value)}
-              placeholder="Ex: estudar TypeScript por 45 min"
-              aria-label="Titulo da missao"
-            />
-          </label>
-          <label>
-            <span>Por que isso importa?</span>
-            <textarea
-              value={importance}
-              onChange={(event) => setImportance(event.target.value)}
-              placeholder="Conecte essa acao a uma meta real"
-              aria-label="Importancia da missao"
-            />
-          </label>
+        <div className="forge-tabbar" role="tablist" aria-label="Etapas de criacao da missao">
+          <button
+            className={activeTab === "base" ? "active" : ""}
+            type="button"
+            onClick={() => setActiveTab("base")}
+          >
+            <Target size={18} />
+            Base
+          </button>
+          <button
+            className={activeTab === "settings" ? "active" : ""}
+            type="button"
+            onClick={() => setActiveTab("settings")}
+          >
+            <Settings2 size={18} />
+            Ajustes
+          </button>
+          <button
+            className={activeTab === "assistant" ? "active" : ""}
+            type="button"
+            onClick={() => setActiveTab("assistant")}
+          >
+            <WandSparkles size={18} />
+            Assistente
+          </button>
         </div>
 
-        <div className="forge-block">
-          <div className="forge-block-heading">
-            <p className="eyebrow">Parametros</p>
-            <span>Ajuste dificuldade, atributo e prazo</span>
-          </div>
-          <div className="forge-field-grid">
-            <label>
-              <span>Atributo</span>
-              <select value={attribute} onChange={(event) => setAttribute(event.target.value as Attribute)}>
-                {attributeOptions.map((option) => (
-                  <option key={option.value} value={option.value}>
-                    {option.label}
-                  </option>
+        {activeTab === "base" && (
+          <div className="forge-tab-panel">
+            <div className="forge-block">
+              <div className="forge-block-heading">
+                <p className="eyebrow">Tipo de missao</p>
+                <span>Escolha o formato da acao</span>
+              </div>
+              <div className="template-row">
+                {questTemplates.map(({ kind: templateKind, label, detail, Icon }) => (
+                  <button
+                    className={kind === templateKind ? "template-card template-card-active" : "template-card"}
+                    key={templateKind}
+                    type="button"
+                    onClick={() => applyTemplate(templateKind)}
+                  >
+                    <Icon size={20} />
+                    <strong>{label}</strong>
+                    <span>{detail}</span>
+                  </button>
                 ))}
-              </select>
-            </label>
-            <label>
-              <span>Rank</span>
-              <select value={difficulty} onChange={(event) => setDifficulty(event.target.value as TaskDifficulty)}>
-                {difficultyOptions.map((option) => (
-                  <option key={option.value} value={option.value}>
-                    Rank {option.label}
-                  </option>
-                ))}
-              </select>
-            </label>
-            <label>
-              <span>Recorrencia</span>
-              <select value={recurrence} onChange={(event) => setRecurrence(event.target.value as Recurrence)}>
-                {recurrenceOptions.map((option) => (
-                  <option key={option.value} value={option.value}>
-                    {option.label}
-                  </option>
-                ))}
-              </select>
-            </label>
-            <label>
-              <span>Prazo</span>
-              <input
-                type="date"
-                value={dueAt}
-                onChange={(event) => setDueAt(event.target.value)}
-                aria-label="Prazo da missao"
-              />
-            </label>
-            <label className="forge-field-wide">
-              <span>Projeto vinculado</span>
-              <select value={projectId} onChange={(event) => setProjectId(event.target.value)}>
-                <option value="">Sem projeto</option>
-                {projects.map((project) => (
-                  <option key={project.id} value={project.id}>
-                    {project.title}
-                  </option>
-                ))}
-              </select>
-            </label>
-            <label className="forge-switch-field forge-field-wide">
-              <input
-                type="checkbox"
-                checked={requiresEvidence}
-                onChange={(event) => setRequiresEvidence(event.target.checked)}
-              />
-              <span>Exigir evidencia antes de concluir</span>
-            </label>
-          </div>
-        </div>
+              </div>
+            </div>
 
-        <div className="forge-ai-row">
-          <div>
-            <p className="eyebrow">Assistente</p>
-            <span>Descreva uma meta e gere uma missao base</span>
+            <div className="forge-block forge-title-block">
+              <div className="forge-block-heading">
+                <p className="eyebrow">Templates reais</p>
+                <span>Atalhos conscientes para rotinas comuns</span>
+              </div>
+              <div className="real-template-row">
+                {realQuestTemplates.map((template) => (
+                  <button type="button" key={template.label} onClick={() => applyRealTemplate(template)}>
+                    <strong>{template.label}</strong>
+                    <span>{template.title}</span>
+                  </button>
+                ))}
+              </div>
+              <label>
+                <span>Nome da missao</span>
+                <input
+                  value={title}
+                  onChange={(event) => setTitle(event.target.value)}
+                  placeholder="Ex: estudar TypeScript por 45 min"
+                  aria-label="Titulo da missao"
+                />
+              </label>
+              <label>
+                <span>Por que isso importa?</span>
+                <textarea
+                  value={importance}
+                  onChange={(event) => setImportance(event.target.value)}
+                  placeholder="Conecte essa acao a uma meta real"
+                  aria-label="Importancia da missao"
+                />
+              </label>
+            </div>
           </div>
-          <div className="suggest-row">
-            <input
-              value={goal}
-              onChange={(event) => setGoal(event.target.value)}
-              placeholder="Objetivo para sugerir quest"
-              aria-label="Objetivo para sugestao"
-            />
-            <button type="button" onClick={handleSuggest} title="Sugerir missao">
-              <WandSparkles size={18} />
-            </button>
+        )}
+
+        {activeTab === "settings" && (
+          <div className="forge-tab-panel">
+            <div className="forge-block">
+              <div className="forge-block-heading">
+                <p className="eyebrow">Parametros</p>
+                <span>Ajuste dificuldade, atributo e prazo</span>
+              </div>
+              <div className="forge-field-grid">
+                <label>
+                  <span>Atributo</span>
+                  <select value={attribute} onChange={(event) => setAttribute(event.target.value as Attribute)}>
+                    {attributeOptions.map((option) => (
+                      <option key={option.value} value={option.value}>
+                        {option.label}
+                      </option>
+                    ))}
+                  </select>
+                </label>
+                <label>
+                  <span>Rank</span>
+                  <select value={difficulty} onChange={(event) => setDifficulty(event.target.value as TaskDifficulty)}>
+                    {difficultyOptions.map((option) => (
+                      <option key={option.value} value={option.value}>
+                        Rank {option.label}
+                      </option>
+                    ))}
+                  </select>
+                </label>
+                <label>
+                  <span>Recorrencia</span>
+                  <select value={recurrence} onChange={(event) => setRecurrence(event.target.value as Recurrence)}>
+                    {recurrenceOptions.map((option) => (
+                      <option key={option.value} value={option.value}>
+                        {option.label}
+                      </option>
+                    ))}
+                  </select>
+                </label>
+                <label>
+                  <span>Prazo</span>
+                  <input
+                    type="date"
+                    value={dueAt}
+                    onChange={(event) => setDueAt(event.target.value)}
+                    aria-label="Prazo da missao"
+                  />
+                </label>
+                <label className="forge-field-wide">
+                  <span>Projeto vinculado</span>
+                  <select value={projectId} onChange={(event) => setProjectId(event.target.value)}>
+                    <option value="">Sem projeto</option>
+                    {projects.map((project) => (
+                      <option key={project.id} value={project.id}>
+                        {project.title}
+                      </option>
+                    ))}
+                  </select>
+                </label>
+                <label className="forge-switch-field forge-field-wide">
+                  <input
+                    type="checkbox"
+                    checked={requiresEvidence}
+                    onChange={(event) => setRequiresEvidence(event.target.checked)}
+                  />
+                  <span>Exigir evidencia antes de concluir</span>
+                </label>
+              </div>
+            </div>
           </div>
-        </div>
+        )}
+
+        {activeTab === "assistant" && (
+          <div className="forge-tab-panel">
+            <div className="forge-ai-row">
+              <div>
+                <p className="eyebrow">Assistente</p>
+                <span>Descreva uma meta e gere uma missao base</span>
+              </div>
+              <div className="suggest-row">
+                <input
+                  value={goal}
+                  onChange={(event) => setGoal(event.target.value)}
+                  placeholder="Objetivo para sugerir quest"
+                  aria-label="Objetivo para sugestao"
+                />
+                <button type="button" onClick={handleSuggest} title="Sugerir missao">
+                  <WandSparkles size={18} />
+                </button>
+              </div>
+            </div>
+            <div className="forge-helper-card">
+              <Sparkles size={20} />
+              <div>
+                <strong>Use como rascunho, nao como piloto automatico</strong>
+                <span>Depois da sugestao, volte para Base e Ajustes para garantir que a missao faz sentido na sua rotina.</span>
+              </div>
+            </div>
+          </div>
+        )}
       </section>
 
       <aside className="quest-forge-preview">

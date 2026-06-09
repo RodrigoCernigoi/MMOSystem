@@ -1153,9 +1153,59 @@ h2 {
 .quest-forge-main,
 .forge-block,
 .quest-forge-preview,
-.forge-ai-row {
+.forge-ai-row,
+.forge-tab-panel {
   display: grid;
   gap: 14px;
+}
+
+.forge-progress-card {
+  display: grid;
+  gap: 4px;
+  border: 1px solid rgba(125, 211, 252, 0.18);
+  background:
+    linear-gradient(135deg, rgba(34, 211, 238, 0.1), transparent 44%),
+    rgba(2, 6, 12, 0.42);
+  padding: 14px;
+}
+
+.forge-progress-card span {
+  color: #bef264;
+  font-size: 0.78rem;
+  font-weight: 900;
+  text-transform: uppercase;
+}
+
+.forge-progress-card strong {
+  color: #f8fafc;
+}
+
+.forge-tabbar {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 8px;
+}
+
+.forge-tabbar button {
+  display: inline-flex !important;
+  justify-content: center;
+  align-items: center;
+  gap: 8px;
+  border: 1px solid rgba(148, 163, 184, 0.18);
+  background: rgba(15, 23, 42, 0.62);
+  color: #dbeafe;
+  font-weight: 900;
+}
+
+.forge-tabbar button.active {
+  border-color: rgba(34, 211, 238, 0.48);
+  background: linear-gradient(135deg, rgba(20, 184, 166, 0.3), rgba(132, 204, 22, 0.12));
+  box-shadow: 0 0 24px rgba(34, 211, 238, 0.14);
+  color: #ecfeff;
+}
+
+.forge-tab-panel {
+  animation: list-enter var(--motion-medium) ease both;
 }
 
 .forge-block,
@@ -1170,7 +1220,7 @@ h2 {
 .forge-ai-row span,
 .forge-title-block label span,
 .forge-field-grid label span {
-  color: #9fb5d0;
+  color: #cbd5e1;
   font-size: 0.88rem;
 }
 
@@ -1208,12 +1258,13 @@ h2 {
   gap: 8px;
   border: 1px solid rgba(125, 211, 252, 0.18);
   background: rgba(2, 6, 12, 0.42);
-  color: #dbeafe;
+  color: #f8fafc;
 }
 
 .real-template-row button {
-  display: grid;
+  display: grid !important;
   min-width: 160px;
+  place-items: start !important;
   gap: 5px;
   text-align: left;
 }
@@ -1222,7 +1273,7 @@ h2 {
 .skill-template-strip span,
 .reward-template-strip span,
 .onboarding-preset-row span {
-  color: #9fb5d0;
+  color: #dbeafe;
   font-size: 0.78rem;
   font-weight: 800;
 }
@@ -1252,8 +1303,13 @@ h2 {
 }
 
 .template-card span {
-  color: #9fb5d0;
+  color: #dbeafe;
   font-size: 0.78rem;
+}
+
+.template-card strong,
+.real-template-row strong {
+  color: #f8fafc;
 }
 
 .template-card-active {
@@ -1262,6 +1318,11 @@ h2 {
     radial-gradient(circle at 88% 14%, rgba(132, 204, 22, 0.2), transparent 30%),
     rgba(63, 98, 18, 0.22);
   box-shadow: 0 0 28px rgba(132, 204, 22, 0.12);
+}
+
+.template-card-active span,
+.template-card-active strong {
+  color: #ecfccb;
 }
 
 .forge-title-block label,
@@ -1283,6 +1344,31 @@ h2 {
 .forge-ai-row {
   grid-template-columns: minmax(180px, 0.8fr) minmax(240px, 1.2fr);
   align-items: center;
+}
+
+.forge-helper-card {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  border: 1px solid rgba(190, 242, 100, 0.18);
+  background: rgba(63, 98, 18, 0.12);
+  color: #dbeafe;
+  padding: 12px;
+}
+
+.forge-helper-card svg {
+  flex: 0 0 auto;
+  color: #bef264;
+}
+
+.forge-helper-card div {
+  display: grid;
+  gap: 4px;
+}
+
+.forge-helper-card span {
+  color: #cbd5e1;
+  font-size: 0.88rem;
 }
 
 .quest-forge input,
@@ -4679,7 +4765,6 @@ h2 {
     position: relative;
     top: 0;
     min-height: auto;
-    order: -1;
   }
 
   .template-row,
@@ -4699,6 +4784,14 @@ h2 {
 
   .template-card {
     min-height: 92px;
+  }
+
+  .forge-tabbar {
+    grid-template-columns: 1fr;
+  }
+
+  .forge-tabbar button {
+    width: 100%;
   }
 
   .forge-field-wide {
