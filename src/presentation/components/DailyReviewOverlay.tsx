@@ -1,9 +1,23 @@
 import { AnimatePresence, motion } from "motion/react";
-import { BarChart3, Coins, Sparkles, Target, Trophy, X } from "lucide-react";
+import {
+  Activity,
+  BarChart3,
+  Brain,
+  Coins,
+  Dumbbell,
+  HeartPulse,
+  MessageCircle,
+  ShieldCheck,
+  Sparkles,
+  Target,
+  Trophy,
+  X,
+} from "lucide-react";
 import { useEffect, useState } from "react";
 import { getDailyReviewBonus, getDailyReviewRank } from "../../domain/dailyReview";
 import type { Player } from "../../domain/player";
-import type { Quest } from "../../domain/task";
+import type { Attribute, Quest } from "../../domain/task";
+import { attributeLabels } from "../viewModels";
 import { emitVisualEvent } from "../visualPreferences";
 
 type DailyReviewOverlayProps = {
@@ -13,6 +27,59 @@ type DailyReviewOverlayProps = {
   date: string;
   onClose: () => void;
   onConfirm: () => Promise<unknown>;
+};
+
+const attributeIcons: Record<Attribute, typeof Dumbbell> = {
+  strength: Dumbbell,
+  intelligence: Brain,
+  discipline: ShieldCheck,
+  social: MessageCircle,
+  vitality: HeartPulse,
+};
+
+const rankCopy: Record<string, { title: string; detail: string }> = {
+  S: { title: "Dia lendario", detail: "Muitas frentes reais avancaram hoje." },
+  A: { title: "Dia forte", detail: "Boa quantidade de acoes concretas registradas." },
+  B: { title: "Dia consistente", detail: "O sistema reconheceu progresso sustentavel." },
+  C: { title: "Dia iniciado", detail: "Pequenos avancos ainda contam no longo prazo." },
+  D: { title: "Dia de manutencao", detail: "Pouco foi registrado, mas o ciclo segue vivo." },
+};
+
+const AnimatedCounter = ({ value, active, delay = 0 }: { value: number; active: boolean; delay?: number }) => {
+  const [display, setDisplay] = useState(active ? 0 : value);
+
+  useEffect(() => {
+    if (!active) {
+      setDisplay(value);
+      return;
+    }
+
+    let animationId = 0;
+    const startAt = performance.now() + delay * 1000;
+    const duration = 850;
+
+    const tick = (time: number) => {
+      if (time < startAt) {
+        animationId = window.requestAnimationFrame(tick);
+        return;
+      }
+
+      const progress = Math.min(1, (time - startAt) / duration);
+      const eased = 1 - Math.pow(1 - progress, 3);
+      setDisplay(Math.round(value * eased));
+
+      if (progress < 1) {
+        animationId = window.requestAnimationFrame(tick);
+      }
+    };
+
+    setDisplay(0);
+    animationId = window.requestAnimationFrame(tick);
+
+    return () => window.cancelAnimationFrame(animationId);
+  }, [active, delay, value]);
+
+  return <strong>{display}</strong>;
 };
 
 export const DailyReviewOverlay = ({ isOpen, player, quests, date, onClose, onConfirm }: DailyReviewOverlayProps) => {
@@ -25,16 +92,23 @@ export const DailyReviewOverlay = ({ isOpen, player, quests, date, onClose, onCo
   const completedTotal = completedQuestIds.length + completedHabitIds.length;
   const xpEarned = history?.xpEarned ?? 0;
   const coinsEarned = history?.coinsEarned ?? 0;
-  const completedTitles = [...completedQuestIds, ...completedHabitIds]
-    .map((id) => quests.find((quest) => quest.id === id)?.title)
-    .filter(Boolean);
-  const evidenceItems = [...completedQuestIds, ...completedHabitIds]
+  const completedQuests = [...completedQuestIds, ...completedHabitIds]
     .map((id) => quests.find((quest) => quest.id === id))
-    .filter((quest): quest is Quest => Boolean(quest?.evidenceLog?.length))
+    .filter((quest): quest is Quest => Boolean(quest));
+  const completedTitles = completedQuests.map((quest) => quest.title);
+  const evidenceItems = completedQuests
+    .filter((quest) => Boolean(quest.evidenceLog?.length))
     .map((quest) => ({ title: quest.title, evidence: quest.evidenceLog?.[0]?.text ?? "" }))
     .slice(0, 4);
   const dayRank = existingReview?.rank ?? getDailyReviewRank(completedTotal);
   const bonus = existingReview?.bonus ?? getDailyReviewBonus(dayRank);
+  const rankDetails = rankCopy[dayRank] ?? rankCopy.D;
+  const attributeSummary = (Object.entries(attributeLabels) as Array<[Attribute, string]>)
+    .map(([attribute, label]) => {
+      const count = completedQuests.filter((quest) => quest.attribute === attribute).length;
+      return { attribute, label, count, Icon: attributeIcons[attribute] };
+    })
+    .filter((item) => item.count > 0);
 
   useEffect(() => {
     if (!isOpen) {
@@ -117,12 +191,22 @@ export const DailyReviewOverlay = ({ isOpen, player, quests, date, onClose, onCo
                 Encerramento do Dia
               </motion.h1>
               <motion.div
-                className="daily-rank"
+                className={`daily-rank daily-rank-${dayRank.toLowerCase()}`}
                 initial={{ scale: 0.2, rotate: -18, opacity: 0 }}
                 animate={{ scale: phase >= 3 ? 1.08 : 1, rotate: 0, opacity: 1 }}
                 transition={{ delay: 2.35, type: "spring", stiffness: 180, damping: 12 }}
               >
                 Rank {phase >= 3 ? dayRank : "?"}
+              </motion.div>
+              <motion.div
+                className="daily-rank-card"
+                initial={{ opacity: 0, y: 12 }}
+                animate={{ opacity: phase >= 3 ? 1 : 0, y: phase >= 3 ? 0 : 12 }}
+                transition={{ duration: 0.42 }}
+              >
+                <Trophy size={18} />
+                <strong>{rankDetails.title}</strong>
+                <span>{rankDetails.detail}</span>
               </motion.div>
             </div>
 
@@ -138,7 +222,7 @@ export const DailyReviewOverlay = ({ isOpen, player, quests, date, onClose, onCo
                   <div className="review-stat-label">
                     <Icon size={18} />
                     <span>{label}</span>
-                    <strong>{value}</strong>
+                    <AnimatedCounter value={value} active={phase >= 1} delay={0.12 + index * 0.08} />
                   </div>
                   <div className="review-track">
                     <motion.div
@@ -152,12 +236,37 @@ export const DailyReviewOverlay = ({ isOpen, player, quests, date, onClose, onCo
             </div>
 
             <motion.div
+              className="daily-attribute-summary"
+              initial={{ opacity: 0, y: 12 }}
+              animate={{ opacity: phase >= 2 ? 1 : 0, y: phase >= 2 ? 0 : 12 }}
+              transition={{ duration: 0.42 }}
+            >
+              <div className="daily-section-heading">
+                <Activity size={18} />
+                <strong>Atributos treinados</strong>
+              </div>
+              <div className="daily-attribute-grid">
+                {attributeSummary.length === 0 ? (
+                  <span className="daily-empty">Nenhum atributo evoluiu hoje.</span>
+                ) : (
+                  attributeSummary.map(({ attribute, label, count, Icon }) => (
+                    <div className="daily-attribute-pill" key={attribute}>
+                      <Icon size={18} />
+                      <span>{label}</span>
+                      <strong>{count}</strong>
+                    </div>
+                  ))
+                )}
+              </div>
+            </motion.div>
+
+            <motion.div
               className="daily-review-log"
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               transition={{ delay: 2.15 }}
             >
-              <div>
+              <div className="daily-section-heading">
                 <BarChart3 size={18} />
                 <strong>Atividades computadas</strong>
               </div>
@@ -173,18 +282,21 @@ export const DailyReviewOverlay = ({ isOpen, player, quests, date, onClose, onCo
               animate={{ opacity: phase >= 2 ? 1 : 0 }}
               transition={{ delay: 2.35 }}
             >
-              <div>
+              <div className="daily-section-heading">
                 <Sparkles size={18} />
                 <strong>Provas reais do dia</strong>
               </div>
               {evidenceItems.length === 0 ? (
                 <span>Nenhuma evidencia textual registrada hoje.</span>
               ) : (
-                evidenceItems.map((item) => (
-                  <span key={`${item.title}-${item.evidence}`}>
-                    {item.title}: {item.evidence}
-                  </span>
-                ))
+                <div className="daily-evidence-grid">
+                  {evidenceItems.map((item) => (
+                    <article className="daily-evidence-card" key={`${item.title}-${item.evidence}`}>
+                      <strong>{item.title}</strong>
+                      <span>{item.evidence}</span>
+                    </article>
+                  ))}
+                </div>
               )}
             </motion.div>
             <motion.div

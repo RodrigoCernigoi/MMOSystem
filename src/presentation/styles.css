@@ -2570,6 +2570,13 @@ h2 {
     0 0 34px rgba(132, 204, 22, 0.18);
 }
 
+.daily-section-heading {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  color: #e2e8f0;
+}
+
 .daily-rank {
   display: grid;
   width: 96px;
@@ -2586,6 +2593,44 @@ h2 {
   animation: rank-glow 1.4s ease-in-out infinite;
 }
 
+.daily-rank-s {
+  border-color: rgba(250, 204, 21, 0.58);
+  background: rgba(113, 63, 18, 0.26);
+  color: #fde68a;
+  box-shadow:
+    0 0 40px rgba(250, 204, 21, 0.34),
+    inset 0 0 28px rgba(250, 204, 21, 0.12);
+}
+
+.daily-rank-a {
+  border-color: rgba(34, 211, 238, 0.58);
+  background: rgba(8, 47, 73, 0.34);
+  color: #a5f3fc;
+}
+
+.daily-rank-card {
+  display: grid;
+  grid-template-columns: auto auto;
+  align-items: center;
+  justify-content: center;
+  gap: 6px 10px;
+  max-width: 420px;
+  border: 1px solid rgba(125, 211, 252, 0.2);
+  background:
+    linear-gradient(90deg, rgba(34, 211, 238, 0.1), rgba(132, 204, 22, 0.08)),
+    rgba(2, 6, 12, 0.56);
+  padding: 12px 16px;
+  text-align: left;
+  box-shadow: inset 0 0 20px rgba(125, 211, 252, 0.04);
+}
+
+.daily-rank-card span {
+  grid-column: 1 / -1;
+  color: #9fb5d0;
+  font-size: 0.88rem;
+  text-align: center;
+}
+
 .daily-review-grid {
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));
@@ -2596,7 +2641,9 @@ h2 {
   display: grid;
   gap: 12px;
   border: 1px solid rgba(148, 163, 184, 0.28);
-  background: rgba(10, 18, 30, 0.88);
+  background:
+    linear-gradient(135deg, rgba(34, 211, 238, 0.06), transparent 42%),
+    rgba(10, 18, 30, 0.88);
   padding: 16px;
   box-shadow: inset 0 0 18px rgba(34, 211, 238, 0.03);
 }
@@ -2614,6 +2661,14 @@ h2 {
   font-weight: 800;
 }
 
+.review-stat-label strong {
+  min-width: 38px;
+  color: #bef264;
+  font-size: 1.06rem;
+  text-align: right;
+  text-shadow: 0 0 18px rgba(132, 204, 22, 0.36);
+}
+
 .review-track {
   height: 14px;
   overflow: hidden;
@@ -2629,6 +2684,59 @@ h2 {
     0 0 44px rgba(132, 204, 22, 0.3);
 }
 
+.daily-attribute-summary {
+  display: grid;
+  gap: 12px;
+  border: 1px solid rgba(125, 211, 252, 0.2);
+  background:
+    radial-gradient(circle at 18% 50%, rgba(34, 211, 238, 0.1), transparent 32%),
+    rgba(8, 13, 24, 0.86);
+  padding: 16px;
+}
+
+.daily-attribute-grid {
+  display: grid;
+  grid-template-columns: repeat(5, minmax(0, 1fr));
+  gap: 10px;
+}
+
+.daily-attribute-pill {
+  display: grid;
+  min-height: 84px;
+  place-items: center;
+  gap: 5px;
+  border: 1px solid rgba(148, 163, 184, 0.22);
+  background: rgba(2, 6, 12, 0.5);
+  padding: 10px;
+  text-align: center;
+}
+
+.daily-attribute-pill svg {
+  color: #67e8f9;
+  filter: drop-shadow(0 0 10px rgba(34, 211, 238, 0.24));
+}
+
+.daily-attribute-pill span {
+  color: #cbd5e1;
+  font-size: 0.78rem;
+  font-weight: 800;
+}
+
+.daily-attribute-pill strong {
+  display: grid;
+  width: 28px;
+  height: 28px;
+  place-items: center;
+  border: 1px solid rgba(190, 242, 100, 0.32);
+  background: rgba(63, 98, 18, 0.22);
+  color: #bef264;
+  font-size: 0.86rem;
+}
+
+.daily-empty {
+  color: #9fb5d0;
+}
+
 .daily-review-log {
   display: grid;
   gap: 10px;
@@ -2637,7 +2745,7 @@ h2 {
   padding: 16px;
 }
 
-.daily-review-log div {
+.daily-review-log > .daily-section-heading {
   display: flex;
   align-items: center;
   gap: 8px;
@@ -2645,6 +2753,31 @@ h2 {
 
 .daily-review-log span {
   color: #9fb5d0;
+}
+
+.daily-evidence-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 10px;
+}
+
+.daily-evidence-card {
+  display: grid;
+  gap: 6px;
+  border: 1px solid rgba(34, 211, 238, 0.2);
+  background:
+    linear-gradient(135deg, rgba(34, 211, 238, 0.08), transparent 44%),
+    rgba(2, 6, 12, 0.54);
+  padding: 12px;
+}
+
+.daily-evidence-card strong {
+  color: #e2e8f0;
+}
+
+.daily-evidence-card span {
+  color: #9fb5d0;
+  line-height: 1.45;
 }
 
 .daily-review-footer {
@@ -5381,6 +5514,26 @@ h2 {
   }
 
   .daily-review-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .daily-rank {
+    width: 82px;
+    height: 82px;
+    font-size: 1rem;
+  }
+
+  .daily-rank-card {
+    width: 100%;
+    max-width: 100%;
+    padding: 10px 12px;
+  }
+
+  .daily-attribute-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .daily-evidence-grid {
     grid-template-columns: 1fr;
   }
 
