@@ -1,4 +1,4 @@
-import { Award, BadgeCheck, IdCard, Medal, Save, Sparkles, Swords } from "lucide-react";
+import { Award, BadgeCheck, Compass, Gauge, HeartHandshake, IdCard, Medal, Save, Sparkles, Swords } from "lucide-react";
 import { FormEvent, useState } from "react";
 import { achievements } from "../../domain/achievements";
 import { xpRequiredForLevel } from "../../domain/progression";
@@ -29,6 +29,19 @@ const avatarOptions = [
 ];
 
 const avatarLabel = (value?: string) => avatarOptions.find((option) => option.value === value)?.label ?? "Spark";
+
+const cadenceLabels = {
+  gentle: "Ritmo leve",
+  steady: "Ritmo constante",
+  intense: "Ritmo intenso",
+};
+
+const rewardStyleLabels = {
+  rest: "Descanso",
+  leisure: "Lazer",
+  learning: "Aprendizado",
+  social: "Social",
+};
 
 export const StatusPanel = ({ player, quests, onUpdateProfile, onFocusNavigate }: StatusPanelProps) => {
   const [isEditingProfile, setIsEditingProfile] = useState(false);
@@ -100,6 +113,12 @@ export const StatusPanel = ({ player, quests, onUpdateProfile, onFocusNavigate }
   const identitySummary = dominantAttribute
     ? `Fase marcada por ${attributeLabels[dominantAttribute].toLowerCase()}, ${openQuests.length} missoes abertas e ${unlockedSkills.length} habilidades registradas.`
     : "A ficha ganha identidade conforme voce registra missoes, foco e habilidades reais.";
+  const onboardingProfile = player.onboardingProfile;
+  const calibratedAreas = onboardingProfile?.primaryAreas?.length
+    ? onboardingProfile.primaryAreas
+    : dominantAttribute
+      ? [dominantAttribute]
+      : [];
 
   const handleProfileSubmit = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
@@ -193,6 +212,47 @@ export const StatusPanel = ({ player, quests, onUpdateProfile, onFocusNavigate }
       <div className="identity-summary-card">
         <BadgeCheck size={18} />
         <p>{identitySummary}</p>
+      </div>
+
+      <div className="status-calibration-card">
+        <div className="status-section-heading">
+          <Compass size={18} />
+          <div>
+            <p className="eyebrow">Calibragem pessoal</p>
+            <h2>Bussola do sistema</h2>
+          </div>
+        </div>
+        <div className="calibration-grid">
+          <article>
+            <Sparkles size={18} />
+            <span>Motivo</span>
+            <strong>{onboardingProfile?.reason || player.focus || "Defina um motivo para guiar suas missoes."}</strong>
+          </article>
+          <article>
+            <Gauge size={18} />
+            <span>Ritmo</span>
+            <strong>{onboardingProfile?.cadence ? cadenceLabels[onboardingProfile.cadence] : "Nao calibrado"}</strong>
+          </article>
+          <article>
+            <HeartHandshake size={18} />
+            <span>Recompensa</span>
+            <strong>
+              {onboardingProfile?.rewardStyle ? rewardStyleLabels[onboardingProfile.rewardStyle] : "Nao calibrada"}
+            </strong>
+          </article>
+        </div>
+        <div className="calibration-area-row">
+          {calibratedAreas.length === 0 ? (
+            <span className="muted-text">As areas prioritarias aparecem depois da calibragem inicial.</span>
+          ) : (
+            calibratedAreas.map((area) => (
+              <span key={area}>
+                <GameIcon name={attributeGameIcons[area]} size={17} />
+                {attributeLabels[area]}
+              </span>
+            ))
+          )}
+        </div>
       </div>
 
       <div className="attributes">

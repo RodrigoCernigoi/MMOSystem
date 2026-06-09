@@ -939,6 +939,66 @@ button:active {
   color: #9fb5d0;
 }
 
+.status-calibration-card {
+  display: grid;
+  gap: 14px;
+  border: 1px solid rgba(125, 211, 252, 0.2);
+  background:
+    radial-gradient(circle at 14% 16%, rgba(34, 211, 238, 0.08), transparent 36%),
+    rgba(8, 13, 24, 0.72);
+  padding: 14px;
+}
+
+.calibration-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 10px;
+}
+
+.calibration-grid article {
+  display: grid;
+  gap: 6px;
+  min-height: 106px;
+  align-content: start;
+  border: 1px solid rgba(148, 163, 184, 0.18);
+  background: rgba(2, 6, 12, 0.42);
+  padding: 12px;
+}
+
+.calibration-grid svg {
+  color: #7dd3fc;
+}
+
+.calibration-grid span {
+  color: #94a3b8;
+  font-size: 0.75rem;
+  font-weight: 900;
+  text-transform: uppercase;
+}
+
+.calibration-grid strong {
+  color: #e2e8f0;
+  line-height: 1.35;
+}
+
+.calibration-area-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.calibration-area-row span {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  border: 1px solid rgba(190, 242, 100, 0.22);
+  background: rgba(63, 98, 18, 0.14);
+  color: #d9f99d;
+  padding: 7px 10px;
+  font-size: 0.8rem;
+  font-weight: 900;
+}
+
 .status-section-heading {
   display: flex;
   align-items: center;
@@ -4549,10 +4609,46 @@ h2 {
   padding: 24px;
 }
 
+.onboarding-panel-expanded {
+  width: min(920px, 100%);
+  max-height: calc(100dvh - 36px);
+  overflow: auto;
+  background:
+    radial-gradient(circle at 18% 12%, rgba(34, 211, 238, 0.12), transparent 34%),
+    radial-gradient(circle at 82% 88%, rgba(132, 204, 22, 0.1), transparent 36%),
+    rgba(8, 13, 22, 0.97);
+}
+
+.onboarding-shell-heading {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 16px;
+}
+
+.onboarding-shell-heading h1 {
+  margin: 0;
+  font-size: clamp(2rem, 6vw, 3.8rem);
+  line-height: 0.95;
+}
+
+.onboarding-shell-heading > span {
+  border: 1px solid rgba(125, 211, 252, 0.22);
+  background: rgba(2, 6, 12, 0.54);
+  color: #bef264;
+  padding: 8px 10px;
+  font-size: 0.8rem;
+  font-weight: 900;
+}
+
 .onboarding-steps {
   display: grid;
   grid-template-columns: repeat(3, 1fr);
   gap: 8px;
+}
+
+.onboarding-steps-expanded {
+  grid-template-columns: repeat(5, minmax(0, 1fr));
 }
 
 .onboarding-step {
@@ -4565,9 +4661,27 @@ h2 {
   background: linear-gradient(90deg, #22d3ee, #84cc16);
 }
 
+.onboarding-step-pill {
+  min-height: 38px;
+  border: 1px solid rgba(148, 163, 184, 0.18);
+  background: rgba(2, 6, 12, 0.4);
+  color: #94a3b8;
+  padding: 0 10px;
+  font-size: 0.76rem;
+  font-weight: 900;
+}
+
+.onboarding-step-pill-active {
+  border-color: rgba(34, 211, 238, 0.34);
+  background: linear-gradient(90deg, rgba(34, 211, 238, 0.16), rgba(132, 204, 22, 0.12));
+  color: #e2e8f0;
+}
+
 .onboarding-page {
   display: grid;
   gap: 14px;
+  min-height: 390px;
+  align-content: start;
 }
 
 .onboarding-page h1 {
@@ -4576,8 +4690,33 @@ h2 {
   line-height: 0.96;
 }
 
+.onboarding-page h2 {
+  margin: 0;
+  font-size: clamp(1.65rem, 4vw, 2.6rem);
+  line-height: 1;
+}
+
 .onboarding-page p {
   color: #9fb5d0;
+}
+
+.onboarding-split {
+  grid-template-columns: minmax(0, 0.85fr) minmax(0, 1.15fr);
+  align-items: start;
+  gap: 20px;
+}
+
+.onboarding-field-stack {
+  display: grid;
+  gap: 12px;
+}
+
+.onboarding-field-stack label {
+  display: grid;
+  gap: 6px;
+  color: #cbd5e1;
+  font-size: 0.82rem;
+  font-weight: 900;
 }
 
 .onboarding-mini-flow {
@@ -4593,6 +4732,83 @@ h2 {
   border: 1px solid rgba(125, 211, 252, 0.18);
   background: rgba(2, 6, 12, 0.34);
   padding: 12px;
+}
+
+.onboarding-choice-grid,
+.onboarding-cadence-grid,
+.onboarding-reward-grid,
+.onboarding-area-grid {
+  display: grid;
+  gap: 10px;
+}
+
+.onboarding-choice-grid {
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+}
+
+.onboarding-cadence-grid {
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+}
+
+.onboarding-reward-grid {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
+.onboarding-area-grid {
+  grid-template-columns: repeat(5, minmax(0, 1fr));
+}
+
+.onboarding-choice,
+.onboarding-area-card {
+  display: grid;
+  min-height: 86px;
+  place-items: center;
+  gap: 6px;
+  border: 1px solid rgba(148, 163, 184, 0.18);
+  background:
+    linear-gradient(135deg, rgba(34, 211, 238, 0.04), transparent 48%),
+    rgba(2, 6, 12, 0.46);
+  color: #cbd5e1;
+  padding: 10px;
+  text-align: center;
+}
+
+.onboarding-choice strong,
+.onboarding-area-card strong {
+  color: #e2e8f0;
+  font-size: 0.85rem;
+}
+
+.onboarding-choice span,
+.onboarding-area-card span {
+  color: #9fb5d0;
+  font-size: 0.72rem;
+  line-height: 1.25;
+}
+
+.onboarding-choice.active,
+.onboarding-area-card.active {
+  border-color: rgba(190, 242, 100, 0.42);
+  background:
+    linear-gradient(135deg, rgba(34, 211, 238, 0.14), rgba(132, 204, 22, 0.1)),
+    rgba(2, 6, 12, 0.58);
+  box-shadow: 0 0 26px rgba(34, 211, 238, 0.1);
+}
+
+.onboarding-preset-cards button {
+  display: grid;
+  flex: 0 0 min(220px, 74vw);
+  min-height: 116px;
+  align-content: center;
+  justify-items: start;
+  border: 1px solid rgba(125, 211, 252, 0.22);
+  background: rgba(2, 6, 12, 0.5);
+  padding: 14px;
+  text-align: left;
+}
+
+.onboarding-preset-cards strong {
+  color: #f8fafc;
 }
 
 .onboarding-icon-preview .game-icon {
@@ -4613,6 +4829,32 @@ h2 {
   grid-template-columns: 34px minmax(0, 1fr);
   align-items: center;
   gap: 10px;
+}
+
+.onboarding-confirm-card {
+  display: grid;
+  gap: 10px;
+  border: 1px solid rgba(125, 211, 252, 0.2);
+  background: rgba(2, 6, 12, 0.42);
+  padding: 14px;
+}
+
+.onboarding-confirm-card > div:not(.onboarding-reward-input, .onboarding-reward-grid) {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  border-bottom: 1px solid rgba(148, 163, 184, 0.12);
+  padding-bottom: 8px;
+}
+
+.onboarding-confirm-card span {
+  color: #94a3b8;
+}
+
+.onboarding-confirm-card strong {
+  color: #e2e8f0;
+  text-align: right;
 }
 
 .onboarding-actions {
@@ -4999,10 +5241,15 @@ h2 {
   }
 
   .identity-summary-card,
+  .status-calibration-card,
   .training-distribution,
   .earned-title-grid,
   .evidence-list {
     padding: 12px;
+  }
+
+  .calibration-grid {
+    grid-template-columns: 1fr;
   }
 
   .training-row {
@@ -5499,6 +5746,64 @@ h2 {
 
   .settings-data-actions button {
     flex: 1 1 138px;
+  }
+
+  .onboarding-backdrop {
+    align-items: stretch;
+    padding: 10px;
+  }
+
+  .onboarding-panel-expanded {
+    width: 100%;
+    max-height: calc(100dvh - 20px);
+    padding: 16px;
+  }
+
+  .onboarding-shell-heading {
+    align-items: stretch;
+    flex-direction: column;
+    gap: 8px;
+  }
+
+  .onboarding-shell-heading > span {
+    width: fit-content;
+  }
+
+  .onboarding-steps-expanded {
+    display: flex;
+    overflow-x: auto;
+    padding-bottom: 4px;
+    scrollbar-width: none;
+  }
+
+  .onboarding-steps-expanded::-webkit-scrollbar {
+    display: none;
+  }
+
+  .onboarding-step-pill {
+    flex: 0 0 auto;
+  }
+
+  .onboarding-page {
+    min-height: auto;
+  }
+
+  .onboarding-split,
+  .onboarding-choice-grid,
+  .onboarding-cadence-grid,
+  .onboarding-reward-grid,
+  .onboarding-area-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .onboarding-preset-cards button {
+    flex-basis: min(230px, 78vw);
+  }
+
+  .onboarding-confirm-card > div:not(.onboarding-reward-input, .onboarding-reward-grid) {
+    align-items: flex-start;
+    flex-direction: column;
+    gap: 4px;
   }
 
   .daily-review-stage {

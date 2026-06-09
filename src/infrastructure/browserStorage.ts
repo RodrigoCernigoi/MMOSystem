@@ -91,6 +91,7 @@ export const createLocalPlayerRepository = (): PlayerRepository => ({
       bio: storedPlayer.bio ?? fallback.bio,
       avatarSymbol: storedPlayer.avatarSymbol ?? fallback.avatarSymbol,
       focus: storedPlayer.focus ?? fallback.focus,
+      onboardingProfile: storedPlayer.onboardingProfile ?? fallback.onboardingProfile,
       appPreferences: storedPlayer.appPreferences ?? fallback.appPreferences,
       totalXp: storedPlayer.totalXp ?? storedPlayer.xp ?? fallback.totalXp,
       skillPoints: storedPlayer.skillPoints ?? 0,

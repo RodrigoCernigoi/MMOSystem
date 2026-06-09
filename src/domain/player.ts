@@ -11,6 +11,7 @@ export type Player = {
   bio?: string;
   avatarSymbol?: string;
   focus?: string;
+  onboardingProfile?: OnboardingProfile;
   level: number;
   xp: number;
   totalXp: number;
@@ -25,6 +26,13 @@ export type Player = {
   dailyReviews: DailyReview[];
   attributes: AttributeMap;
   appPreferences?: AppPreferences;
+};
+
+export type OnboardingProfile = {
+  reason?: string;
+  primaryAreas?: Attribute[];
+  cadence?: "gentle" | "steady" | "intense";
+  rewardStyle?: "rest" | "leisure" | "learning" | "social";
 };
 
 export type AppPreferences = {
@@ -95,6 +103,7 @@ export const createNewPlayer = (name = "Hunter"): Player => ({
   bio: "",
   avatarSymbol: "spark",
   focus: "",
+  onboardingProfile: {},
   level: 1,
   xp: 0,
   totalXp: 0,

@@ -1,6 +1,6 @@
 import { unlockAvailableAchievements } from "../domain/achievements";
 import { applyQuestFailure, applyQuestReward, getRewardForQuest } from "../domain/progression";
-import type { AppPreferences, Player } from "../domain/player";
+import type { AppPreferences, OnboardingProfile, Player } from "../domain/player";
 import type { CompleteQuestInput, CreateQuestInput, Quest, UpdateQuestInput } from "../domain/task";
 import type { Clock, IdProvider, PlayerRepository, QuestRepository, QuestSuggestionGateway } from "./ports";
 
@@ -12,6 +12,7 @@ export type UpdatePlayerProfileInput = {
   bio?: string;
   avatarSymbol?: string;
   focus?: string;
+  onboardingProfile?: OnboardingProfile;
   appPreferences?: AppPreferences;
 };
 
@@ -111,6 +112,9 @@ export const createQuestService = ({
       bio: input.bio === undefined ? player.bio : input.bio.trim() || undefined,
       avatarSymbol: input.avatarSymbol?.trim() || player.avatarSymbol,
       focus: input.focus === undefined ? player.focus : input.focus.trim() || undefined,
+      onboardingProfile: input.onboardingProfile
+        ? { ...(player.onboardingProfile ?? {}), ...input.onboardingProfile }
+        : player.onboardingProfile,
       appPreferences: input.appPreferences ? { ...(player.appPreferences ?? {}), ...input.appPreferences } : player.appPreferences,
     };
 
