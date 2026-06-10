@@ -12,7 +12,7 @@ import {
 } from "../viewModels";
 
 type QuestFormProps = {
-  onCreateQuest: (input: CreateQuestInput) => Promise<void>;
+  onCreateQuest: (input: CreateQuestInput) => Promise<unknown>;
   onSuggestQuest: (goal: string) => Promise<CreateQuestInput>;
   projects?: Project[];
   intent?: CreateQuestIntent | null;

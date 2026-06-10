@@ -48,8 +48,9 @@ export const useDashboard = () => {
   const actions = useMemo(
     () => ({
       async createQuest(input: CreateQuestInput) {
-        await container.questService.createQuest(input);
+        const quest = await container.questService.createQuest(input);
         await refresh();
+        return quest;
       },
       async updatePlayerProfile(input: UpdatePlayerProfileInput) {
         await container.questService.updatePlayerProfile(input);

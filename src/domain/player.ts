@@ -51,6 +51,7 @@ export type AppViewPreference =
   | "missions"
   | "calendar"
   | "create"
+  | "journeys"
   | "projects"
   | "skills"
   | "rewards"

@@ -24,6 +24,7 @@ const loadCreateQuestView = () => import("./screens/CreateQuestView");
 const loadCreditsView = () => import("./screens/CreditsView");
 const loadEvidenceView = () => import("./screens/EvidenceView");
 const loadFocusView = () => import("./screens/FocusView");
+const loadJourneysView = () => import("./screens/JourneysView");
 const loadMissionsView = () => import("./screens/MissionsView");
 const loadProjectsView = () => import("./screens/ProjectsView");
 const loadRewardsView = () => import("./screens/RewardsView");
@@ -38,6 +39,7 @@ const lazyScreenLoaders = [
   loadCreditsView,
   loadEvidenceView,
   loadFocusView,
+  loadJourneysView,
   loadMissionsView,
   loadProjectsView,
   loadRewardsView,
@@ -53,6 +55,7 @@ const CreateQuestView = lazy(() => loadCreateQuestView().then((module) => ({ def
 const CreditsView = lazy(() => loadCreditsView().then((module) => ({ default: module.CreditsView })));
 const EvidenceView = lazy(() => loadEvidenceView().then((module) => ({ default: module.EvidenceView })));
 const FocusView = lazy(() => loadFocusView().then((module) => ({ default: module.FocusView })));
+const JourneysView = lazy(() => loadJourneysView().then((module) => ({ default: module.JourneysView })));
 const MissionsView = lazy(() => loadMissionsView().then((module) => ({ default: module.MissionsView })));
 const ProjectsView = lazy(() => loadProjectsView().then((module) => ({ default: module.ProjectsView })));
 const RewardsView = lazy(() => loadRewardsView().then((module) => ({ default: module.RewardsView })));
@@ -321,6 +324,7 @@ export const App = () => {
         intent={createQuestIntent}
       />
     ),
+    journeys: <JourneysView player={player} quests={quests} onCreateQuest={handleCreateQuest} />,
     projects: (
       <ProjectsView
         focus={appFocus?.type === "project" || appFocus?.type === "masterQuest" ? appFocus : null}

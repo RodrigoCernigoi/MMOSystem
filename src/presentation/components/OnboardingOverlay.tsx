@@ -23,7 +23,7 @@ import { attributeLabels, attributeOptions } from "../viewModels";
 import { GameIcon } from "./GameIcon";
 
 type OnboardingOverlayProps = {
-  onCreateQuest: (input: CreateQuestInput) => Promise<void>;
+  onCreateQuest: (input: CreateQuestInput) => Promise<unknown>;
   onUpdateProfile: (input: UpdatePlayerProfileInput) => Promise<unknown>;
   onDone: () => void;
 };

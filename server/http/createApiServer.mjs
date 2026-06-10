@@ -73,7 +73,7 @@ const deleteSupabaseAuthUser = async (accessToken) => {
   return { ok: true };
 };
 
-export const createApiServer = ({ http, questSuggestionGateway }) =>
+export const createApiServer = ({ http, questSuggestionGateway, journeySuggestionGateway }) =>
   http.createServer(async (request, response) => {
     if (request.method === "OPTIONS") {
       sendJson(response, 204, {});
@@ -101,6 +101,19 @@ export const createApiServer = ({ http, questSuggestionGateway }) =>
       }
 
       sendJson(response, 200, { ok: true });
+      return;
+    }
+
+    if (request.url === "/api/journey-suggestions") {
+      try {
+        const rawBody = await readBody(request);
+        const body = rawBody ? JSON.parse(rawBody) : {};
+        const journey = await journeySuggestionGateway.suggestJourney(body);
+
+        sendJson(response, 200, { journey });
+      } catch {
+        sendJson(response, 400, { error: "Nao foi possivel gerar a jornada." });
+      }
       return;
     }
 

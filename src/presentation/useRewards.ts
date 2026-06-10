@@ -40,8 +40,9 @@ export const useRewards = () => {
   const actions = useMemo(
     () => ({
       async createReward(input: CreateRewardInput) {
-        await container.rewardService.createReward(input);
+        const reward = await container.rewardService.createReward(input);
         await refresh();
+        return reward;
       },
       async redeemReward(id: string) {
         await container.rewardService.redeemReward(id);

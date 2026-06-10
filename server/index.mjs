@@ -1,5 +1,6 @@
 import http from "node:http";
 import { createApiServer } from "./http/createApiServer.mjs";
+import { createGroqJourneySuggestionGateway } from "./gateways/groqJourneySuggestionGateway.mjs";
 import { createGroqQuestSuggestionGateway } from "./gateways/groqQuestSuggestionGateway.mjs";
 
 const port = Number(process.env.API_PORT || 8787);
@@ -8,6 +9,7 @@ const hasGroqKey = Boolean(process.env.GROQ_API_KEY);
 const server = createApiServer({
   http,
   questSuggestionGateway: createGroqQuestSuggestionGateway(),
+  journeySuggestionGateway: createGroqJourneySuggestionGateway(),
 });
 
 server.on("error", (error) => {

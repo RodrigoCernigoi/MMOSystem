@@ -6,7 +6,7 @@ import { useProgressionSystem } from "../useProgressionSystem";
 
 type CreateQuestViewProps = {
   error: string | null;
-  onCreateQuest: (input: CreateQuestInput) => Promise<void>;
+  onCreateQuest: (input: CreateQuestInput) => Promise<unknown>;
   onSuggestQuest: (goal: string) => Promise<CreateQuestInput>;
   intent?: CreateQuestIntent | null;
 };

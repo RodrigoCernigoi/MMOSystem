@@ -49,16 +49,19 @@ export const useProgressionSystem = () => {
   const actions = useMemo(
     () => ({
       async createProject(input: CreateProjectInput) {
-        await container.progressionService.createProject(input);
+        const project = await container.progressionService.createProject(input);
         await refresh();
+        return project;
       },
       async createMasterQuest(input: CreateMasterQuestInput) {
-        await container.progressionService.createMasterQuest(input);
+        const masterQuest = await container.progressionService.createMasterQuest(input);
         await refresh();
+        return masterQuest;
       },
       async createSkill(input: CreateSkillInput) {
-        await container.progressionService.createSkill(input);
+        const skill = await container.progressionService.createSkill(input);
         await refresh();
+        return skill;
       },
       async updateSkill(id: string, input: UpdateSkillInput) {
         await container.progressionService.updateSkill(id, input);
