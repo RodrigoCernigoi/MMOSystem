@@ -41,6 +41,7 @@ export const createLocalQuestRepository = (): QuestRepository => ({
       attribute: quest.attribute ?? "discipline",
       difficulty: quest.difficulty ?? "normal",
       recurrence: quest.recurrence ?? "none",
+      recurrenceRule: quest.recurrenceRule,
       status: quest.status ?? "open",
       createdAt: quest.createdAt ?? new Date().toISOString(),
       dueAt: quest.dueAt,

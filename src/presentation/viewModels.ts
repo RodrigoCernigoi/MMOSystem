@@ -26,6 +26,7 @@ export const recurrenceLabels: Record<Recurrence, string> = {
   none: "Sem recorrencia",
   daily: "Diaria",
   weekly: "Semanal",
+  monthly: "Mensal",
 };
 
 export const statusLabels: Record<TaskStatus, string> = {

@@ -1,7 +1,8 @@
 import { Brain, CalendarClock, Dumbbell, Flame, HeartPulse, MessageCircle, Plus, Settings2, ShieldCheck, Sparkles, Target, WandSparkles } from "lucide-react";
 import { FormEvent, useEffect, useState } from "react";
 import type { Project } from "../../domain/progressionSystem";
-import type { Attribute, CreateQuestInput, QuestKind, Recurrence, TaskDifficulty } from "../../domain/task";
+import { monthDays, weekdayLabels, weekdays } from "../../domain/schedule";
+import type { Attribute, CreateQuestInput, QuestKind, Recurrence, RecurrenceRule, TaskDifficulty, Weekday } from "../../domain/task";
 import type { CreateQuestIntent } from "../navigation/navigationIntent";
 import {
   attributeOptions,
@@ -112,6 +113,7 @@ export const QuestForm = ({ onCreateQuest, onSuggestQuest, projects = [], intent
   const [attribute, setAttribute] = useState<Attribute>("discipline");
   const [difficulty, setDifficulty] = useState<TaskDifficulty>("normal");
   const [recurrence, setRecurrence] = useState<Recurrence>("none");
+  const [recurrenceRule, setRecurrenceRule] = useState<RecurrenceRule | undefined>();
   const [dueAt, setDueAt] = useState("");
   const [projectId, setProjectId] = useState("");
   const [importance, setImportance] = useState("");
@@ -127,6 +129,7 @@ export const QuestForm = ({ onCreateQuest, onSuggestQuest, projects = [], intent
     setAttribute(intent.attribute ?? "discipline");
     setDifficulty(intent.difficulty ?? "normal");
     setRecurrence(intent.recurrence ?? "none");
+    setRecurrenceRule(undefined);
     setDueAt(intent.dueAt ?? "");
     setProjectId(intent.projectId ?? "");
     setImportance(intent.importance ?? "");
@@ -135,7 +138,7 @@ export const QuestForm = ({ onCreateQuest, onSuggestQuest, projects = [], intent
 
   const handleSubmit = async (event: FormEvent) => {
     event.preventDefault();
-    await onCreateQuest({ title, kind, attribute, difficulty, recurrence, dueAt, projectId, importance, requiresEvidence });
+    await onCreateQuest({ title, kind, attribute, difficulty, recurrence, recurrenceRule, dueAt, projectId, importance, requiresEvidence });
     setTitle("");
     setImportance("");
     setRequiresEvidence(false);
@@ -144,6 +147,7 @@ export const QuestForm = ({ onCreateQuest, onSuggestQuest, projects = [], intent
   const applyTemplate = (nextKind: QuestKind) => {
     setKind(nextKind);
     setRecurrence(nextKind === "daily" || nextKind === "habit" ? "daily" : nextKind === "weekly" ? "weekly" : "none");
+    setRecurrenceRule(undefined);
     if (nextKind === "habit") {
       setDifficulty("easy");
     }
@@ -156,6 +160,7 @@ export const QuestForm = ({ onCreateQuest, onSuggestQuest, projects = [], intent
     setAttribute(template.attribute);
     setDifficulty(template.difficulty);
     setRecurrence(template.recurrence);
+    setRecurrenceRule(undefined);
     setRequiresEvidence(Boolean(template.requiresEvidence));
   };
 
@@ -166,11 +171,44 @@ export const QuestForm = ({ onCreateQuest, onSuggestQuest, projects = [], intent
     setAttribute(suggestion.attribute);
     setDifficulty(suggestion.difficulty);
     setRecurrence(suggestion.recurrence);
+    setRecurrenceRule(suggestion.recurrenceRule);
     setDueAt(suggestion.dueAt ?? "");
+  };
+  const toggleWeekday = (day: Weekday) => {
+    setRecurrenceRule((current) => {
+      const currentWeekdays = current?.weekdays ?? [];
+      const nextWeekdays = currentWeekdays.includes(day)
+        ? currentWeekdays.filter((item) => item !== day)
+        : [...currentWeekdays, day].sort((left, right) => left - right);
+
+      return {
+        ...(current ?? {}),
+        weekdays: nextWeekdays,
+      };
+    });
+  };
+  const toggleMonthDay = (day: number) => {
+    setRecurrenceRule((current) => {
+      const currentMonthDays = current?.monthDays ?? [];
+      const nextMonthDays = currentMonthDays.includes(day)
+        ? currentMonthDays.filter((item) => item !== day)
+        : [...currentMonthDays, day].sort((left, right) => left - right);
+
+      return {
+        ...(current ?? {}),
+        monthDays: nextMonthDays,
+      };
+    });
+  };
+  const handleRecurrenceChange = (nextRecurrence: Recurrence) => {
+    setRecurrence(nextRecurrence);
+    setRecurrenceRule(undefined);
   };
   const AttributeIcon = attributeIcons[attribute];
   const selectedProject = projects.find((project) => project.id === projectId);
   const activeTabIndex = activeTab === "base" ? 1 : activeTab === "settings" ? 2 : 3;
+  const selectedWeekdays = recurrenceRule?.weekdays ?? [];
+  const selectedMonthDays = recurrenceRule?.monthDays ?? [];
 
   return (
     <form className="quest-forge" onSubmit={handleSubmit}>
@@ -302,7 +340,7 @@ export const QuestForm = ({ onCreateQuest, onSuggestQuest, projects = [], intent
                 </label>
                 <label>
                   <span>Recorrencia</span>
-                  <select value={recurrence} onChange={(event) => setRecurrence(event.target.value as Recurrence)}>
+                  <select value={recurrence} onChange={(event) => handleRecurrenceChange(event.target.value as Recurrence)}>
                     {recurrenceOptions.map((option) => (
                       <option key={option.value} value={option.value}>
                         {option.label}
@@ -310,6 +348,46 @@ export const QuestForm = ({ onCreateQuest, onSuggestQuest, projects = [], intent
                     ))}
                   </select>
                 </label>
+                {(recurrence === "daily" || recurrence === "weekly") && (
+                  <div className="forge-field-wide recurrence-builder">
+                    <div>
+                      <span>Dias da semana</span>
+                      <small>Deixe vazio para repetir todos os dias aplicaveis.</small>
+                    </div>
+                    <div className="weekday-picker">
+                      {weekdays.map((day) => (
+                        <button
+                          className={recurrenceRule?.weekdays?.includes(day) ? "active" : ""}
+                          type="button"
+                          key={day}
+                          onClick={() => toggleWeekday(day)}
+                        >
+                          {weekdayLabels[day]}
+                        </button>
+                      ))}
+                    </div>
+                  </div>
+                )}
+                {recurrence === "monthly" && (
+                  <div className="forge-field-wide recurrence-builder">
+                    <div>
+                      <span>Dias do mes</span>
+                      <small>Escolha um ou mais dias. Ex: 1 e 15 para duas vezes ao mes.</small>
+                    </div>
+                    <div className="month-day-picker">
+                      {monthDays.map((day) => (
+                        <button
+                          className={recurrenceRule?.monthDays?.includes(day) ? "active" : ""}
+                          type="button"
+                          key={day}
+                          onClick={() => toggleMonthDay(day)}
+                        >
+                          {day}
+                        </button>
+                      ))}
+                    </div>
+                  </div>
+                )}
                 <label>
                   <span>Prazo</span>
                   <input
@@ -385,6 +463,10 @@ export const QuestForm = ({ onCreateQuest, onSuggestQuest, projects = [], intent
           <span className="quest-rank">Rank {difficultyOptions.find((option) => option.value === difficulty)?.label}</span>
           <span>{questKindOptions.find((option) => option.value === kind)?.label}</span>
           <span>{attributeOptions.find((option) => option.value === attribute)?.label}</span>
+          {selectedWeekdays.length > 0 && (
+            <span>{selectedWeekdays.map((day) => weekdayLabels[day]).join(", ")}</span>
+          )}
+          {selectedMonthDays.length > 0 && <span>Dias {selectedMonthDays.join(", ")}</span>}
           {requiresEvidence && <span>Evidencia obrigatoria</span>}
           {dueAt && <span>{new Date(`${dueAt}T00:00:00`).toLocaleDateString("pt-BR")}</span>}
           {selectedProject && <span>{selectedProject.title}</span>}

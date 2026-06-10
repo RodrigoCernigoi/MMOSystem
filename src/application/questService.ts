@@ -1,7 +1,8 @@
 import { unlockAvailableAchievements } from "../domain/achievements";
 import { applyQuestFailure, applyQuestReward, getRewardForQuest } from "../domain/progression";
 import type { AppPreferences, OnboardingProfile, Player } from "../domain/player";
-import type { CompleteQuestInput, CreateQuestInput, Quest, UpdateQuestInput } from "../domain/task";
+import { isDifferentMonth, isQuestScheduledForDate } from "../domain/schedule";
+import type { CompleteQuestInput, CreateQuestInput, Quest, UpdateQuestInput, Weekday } from "../domain/task";
 import type { Clock, IdProvider, PlayerRepository, QuestRepository, QuestSuggestionGateway } from "./ports";
 
 export type QuestService = ReturnType<typeof createQuestService>;
@@ -41,10 +42,20 @@ export const createQuestService = ({
     const updatedQuests = quests.map((quest) => {
       if (quest.status === "completed" && quest.recurrence !== "none" && quest.completedAt) {
         const completedDate = quest.completedAt.slice(0, 10);
-        const shouldRenewDaily = quest.recurrence === "daily" && completedDate < today;
-        const shouldRenewWeekly = quest.recurrence === "weekly" && isDifferentWeek(new Date(quest.completedAt), now);
+        const hasSpecificSchedule = Boolean(
+          quest.recurrenceRule?.weekdays?.length || quest.recurrenceRule?.monthDays?.length,
+        );
+        const shouldRenewDaily = quest.recurrence === "daily" && completedDate < today && isQuestScheduledForDate(quest, now);
+        const shouldRenewWeekly =
+          quest.recurrence === "weekly" &&
+          (hasSpecificSchedule ? completedDate < today && isQuestScheduledForDate(quest, now) : isDifferentWeek(new Date(quest.completedAt), now));
+        const shouldRenewMonthly =
+          quest.recurrence === "monthly" &&
+          (hasSpecificSchedule
+            ? completedDate < today && isQuestScheduledForDate(quest, now)
+            : isDifferentMonth(new Date(quest.completedAt), now));
 
-        if (shouldRenewDaily || shouldRenewWeekly) {
+        if (shouldRenewDaily || shouldRenewWeekly || shouldRenewMonthly) {
           changed = true;
           return {
             ...quest,
@@ -84,6 +95,7 @@ export const createQuestService = ({
       attribute: input.attribute,
       difficulty: input.difficulty,
       recurrence: input.recurrence,
+      recurrenceRule: normalizeRecurrenceRule(input.recurrenceRule),
       status: "open",
       createdAt: clock.now().toISOString(),
       dueAt: input.dueAt || undefined,
@@ -142,6 +154,7 @@ export const createQuestService = ({
       ...quest,
       ...input,
       title: input.title === undefined ? quest.title : input.title.trim(),
+      recurrenceRule: input.recurrenceRule === undefined ? quest.recurrenceRule : normalizeRecurrenceRule(input.recurrenceRule),
       dueAt: input.dueAt || undefined,
       projectId: input.projectId || undefined,
       importance: input.importance === undefined ? quest.importance : input.importance.trim() || undefined,
@@ -266,6 +279,24 @@ const isDifferentWeek = (left: Date, right: Date) => {
   };
 
   return startOfWeek(left) !== startOfWeek(right);
+};
+
+const normalizeRecurrenceRule = (rule: Quest["recurrenceRule"]): Quest["recurrenceRule"] | undefined => {
+  const weekdays = Array.from(new Set(rule?.weekdays ?? []))
+    .filter((day) => Number.isInteger(day) && day >= 0 && day <= 6)
+    .sort((left, right) => left - right) as Weekday[];
+  const monthDays = Array.from(new Set(rule?.monthDays ?? []))
+    .filter((day) => Number.isInteger(day) && day >= 1 && day <= 31)
+    .sort((left, right) => left - right);
+
+  if (!weekdays.length && !monthDays.length) {
+    return undefined;
+  }
+
+  return {
+    ...(weekdays.length ? { weekdays } : {}),
+    ...(monthDays.length ? { monthDays } : {}),
+  };
 };
 
 const recordDailyCompletion = (

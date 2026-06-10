@@ -1,15 +1,18 @@
 import { Search } from "lucide-react";
-import { FormEvent, useMemo, useState } from "react";
+import { FormEvent, useEffect, useMemo, useState } from "react";
 import type {
   Attribute,
   Quest,
   CompleteQuestInput,
   QuestKind,
   Recurrence,
+  RecurrenceRule,
   TaskDifficulty,
   TaskStatus,
+  Weekday,
   UpdateQuestInput,
 } from "../../domain/task";
+import { monthDays, weekdayLabels, weekdays } from "../../domain/schedule";
 import { QuestCard } from "../components/QuestCard";
 import { QuestDetailModal } from "../components/QuestDetailModal";
 import { Tabs } from "../components/Tabs";
@@ -60,6 +63,7 @@ export const MissionsView = ({
   const [attributeFilter, setAttributeFilter] = useState<Attribute | "all">("all");
   const [projectFilter, setProjectFilter] = useState<string>("all");
   const [editingQuest, setEditingQuest] = useState<Quest | null>(null);
+  const [editRecurrence, setEditRecurrence] = useState<Recurrence>("none");
   const [selectedQuest, setSelectedQuest] = useState<Quest | null>(null);
   const { progression } = useProgressionSystem();
   const activeProjects = progression.projects.filter((project) => project.status === "active");
@@ -116,6 +120,10 @@ export const MissionsView = ({
     }
   };
 
+  useEffect(() => {
+    setEditRecurrence(editingQuest?.recurrence ?? "none");
+  }, [editingQuest]);
+
   const handleSubmitEdit = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
 
@@ -124,12 +132,29 @@ export const MissionsView = ({
     }
 
     const formData = new FormData(event.currentTarget);
+    const recurrence = String(formData.get("recurrence")) as Recurrence;
+    const recurrenceRule: RecurrenceRule | undefined = recurrence === "monthly"
+      ? {
+          monthDays: formData
+            .getAll("monthDays")
+            .map(Number)
+            .filter((day) => Number.isInteger(day) && day >= 1 && day <= 31),
+        }
+      : recurrence === "daily" || recurrence === "weekly"
+        ? {
+            weekdays: formData
+              .getAll("weekdays")
+              .map(Number)
+              .filter((day) => Number.isInteger(day) && day >= 0 && day <= 6) as Weekday[],
+          }
+        : undefined;
     await onUpdateQuest(editingQuest.id, {
       title: String(formData.get("title") ?? ""),
       kind: String(formData.get("kind")) as QuestKind,
       attribute: String(formData.get("attribute")) as Attribute,
       difficulty: String(formData.get("difficulty")) as TaskDifficulty,
-      recurrence: String(formData.get("recurrence")) as Recurrence,
+      recurrence,
+      recurrenceRule,
       dueAt: String(formData.get("dueAt") ?? ""),
       projectId: String(formData.get("projectId") ?? ""),
       importance: String(formData.get("importance") ?? ""),
@@ -224,13 +249,53 @@ export const MissionsView = ({
               </option>
             ))}
           </select>
-          <select name="recurrence" defaultValue={editingQuest.recurrence}>
+          <select
+            name="recurrence"
+            value={editRecurrence}
+            onChange={(event) => setEditRecurrence(event.target.value as Recurrence)}
+          >
             {recurrenceOptions.map((option) => (
               <option key={option.value} value={option.value}>
                 {option.label}
               </option>
             ))}
           </select>
+          {(editRecurrence === "daily" || editRecurrence === "weekly") && (
+            <div className="edit-recurrence-options">
+              <span>Dias da semana</span>
+              <div className="weekday-picker">
+                {weekdays.map((day) => (
+                  <label key={day}>
+                    <input
+                      name="weekdays"
+                      type="checkbox"
+                      value={day}
+                      defaultChecked={editingQuest.recurrenceRule?.weekdays?.includes(day)}
+                    />
+                    {weekdayLabels[day]}
+                  </label>
+                ))}
+              </div>
+            </div>
+          )}
+          {editRecurrence === "monthly" && (
+            <div className="edit-recurrence-options">
+              <span>Dias do mes</span>
+              <div className="month-day-picker">
+                {monthDays.map((day) => (
+                  <label key={day}>
+                    <input
+                      name="monthDays"
+                      type="checkbox"
+                      value={day}
+                      defaultChecked={editingQuest.recurrenceRule?.monthDays?.includes(day)}
+                    />
+                    {day}
+                  </label>
+                ))}
+              </div>
+            </div>
+          )}
           <input name="dueAt" type="date" defaultValue={editingQuest.dueAt ?? ""} aria-label="Prazo da missao" />
           <select name="projectId" defaultValue={editingQuest.projectId ?? ""}>
             <option value="">Sem projeto</option>

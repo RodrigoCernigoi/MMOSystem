@@ -6,7 +6,14 @@ export type TaskStatus = "open" | "completed" | "failed" | "archived";
 
 export type QuestKind = "single" | "daily" | "weekly" | "habit";
 
-export type Recurrence = "none" | "daily" | "weekly";
+export type Recurrence = "none" | "daily" | "weekly" | "monthly";
+
+export type Weekday = 0 | 1 | 2 | 3 | 4 | 5 | 6;
+
+export type RecurrenceRule = {
+  weekdays?: Weekday[];
+  monthDays?: number[];
+};
 
 export type Quest = {
   id: string;
@@ -15,6 +22,7 @@ export type Quest = {
   attribute: Attribute;
   difficulty: TaskDifficulty;
   recurrence: Recurrence;
+  recurrenceRule?: RecurrenceRule;
   status: TaskStatus;
   createdAt: string;
   dueAt?: string;
@@ -40,6 +48,7 @@ export type CreateQuestInput = {
   attribute: Attribute;
   difficulty: TaskDifficulty;
   recurrence: Recurrence;
+  recurrenceRule?: RecurrenceRule;
   dueAt?: string;
   projectId?: string;
   importance?: string;
