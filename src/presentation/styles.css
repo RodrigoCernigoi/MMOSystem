@@ -2337,6 +2337,48 @@ h2 {
   flex: 1 1 280px;
 }
 
+.settings-row-danger {
+  align-items: flex-start;
+  flex-wrap: wrap;
+  border-color: rgba(248, 113, 113, 0.32);
+  background:
+    linear-gradient(135deg, rgba(248, 113, 113, 0.08), transparent 42%),
+    rgba(15, 23, 42, 0.64);
+}
+
+.settings-row-danger > svg {
+  color: #fca5a5;
+}
+
+.settings-row-danger > div:first-of-type {
+  flex: 1 1 280px;
+}
+
+.settings-row-danger small {
+  color: #fca5a5;
+}
+
+.delete-account-confirmation {
+  display: grid !important;
+  flex: 1 1 100%;
+  gap: 10px;
+  border: 1px solid rgba(248, 113, 113, 0.28);
+  background: rgba(69, 10, 10, 0.22);
+  padding: 12px;
+}
+
+.delete-account-confirmation strong {
+  color: #fecaca;
+}
+
+.delete-account-confirmation span {
+  color: #cbd5e1;
+}
+
+.delete-account-confirmation input {
+  border-color: rgba(248, 113, 113, 0.34);
+}
+
 .credits-hero,
 .license-note {
   display: flex;

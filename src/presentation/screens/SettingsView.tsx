@@ -1,6 +1,19 @@
-import { CloudUpload, Database, Download, LogOut, RefreshCw, ShieldCheck, Trash2, Upload, UserRound, Volume2 } from "lucide-react";
+import {
+  AlertTriangle,
+  CloudUpload,
+  Database,
+  Download,
+  LogOut,
+  RefreshCw,
+  ShieldCheck,
+  Trash2,
+  Upload,
+  UserRound,
+  Volume2,
+} from "lucide-react";
 import { useEffect, useRef, useState } from "react";
 import type { ChangeEvent } from "react";
+import { deleteCurrentAccount } from "../../infrastructure/accountDeletion";
 import type { AppBackup, SyncStatus } from "../../infrastructure/dataBackup";
 import {
   clearLocalBackupData,
@@ -27,7 +40,11 @@ export const SettingsView = ({ preferences, onChangePreferences }: SettingsViewP
   const [dataActionMessage, setDataActionMessage] = useState<string | null>(null);
   const [dataActionError, setDataActionError] = useState<string | null>(null);
   const [isDataActionRunning, setIsDataActionRunning] = useState(false);
+  const [isDeleteAccountOpen, setIsDeleteAccountOpen] = useState(false);
+  const [deleteAccountConfirmation, setDeleteAccountConfirmation] = useState("");
+  const [isDeletingAccount, setIsDeletingAccount] = useState(false);
   const importInputRef = useRef<HTMLInputElement | null>(null);
+  const expectedDeleteConfirmation = user?.email ?? "EXCLUIR";
 
   const refreshSyncStatus = async () => {
     try {
@@ -115,6 +132,33 @@ export const SettingsView = ({ preferences, onChangePreferences }: SettingsViewP
     }
 
     await runDataAction(async () => clearLocalBackupData(), "Dados locais apagados. Recarregando...", true);
+  };
+
+  const handleDeleteAccount = async () => {
+    if (deleteAccountConfirmation !== expectedDeleteConfirmation) {
+      setDataActionError(
+        user ? "Digite exatamente o email da conta para confirmar." : "Digite EXCLUIR para confirmar.",
+      );
+      return;
+    }
+
+    setIsDeletingAccount(true);
+    setDataActionError(null);
+    setDataActionMessage(null);
+
+    try {
+      const result = await deleteCurrentAccount();
+      setDataActionMessage(
+        result.mode === "supabase"
+          ? "Conta excluida. Recarregando..."
+          : "Dados locais excluidos. Recarregando...",
+      );
+      window.setTimeout(() => window.location.reload(), 900);
+    } catch (error) {
+      setDataActionError(error instanceof Error ? error.message : "Erro ao excluir conta.");
+    } finally {
+      setIsDeletingAccount(false);
+    }
   };
 
   return (
@@ -272,6 +316,58 @@ export const SettingsView = ({ preferences, onChangePreferences }: SettingsViewP
               onPointerUp={() => emitVisualEvent("ui-confirm")}
             />
           </div>
+        </div>
+        <div className="settings-row settings-row-danger">
+          <AlertTriangle size={20} />
+          <div>
+            <strong>Excluir conta</strong>
+            <span>
+              {isSupabaseConfigured && user
+                ? "Remove sua conta do Supabase Auth e apaga os dados vinculados por cascade."
+                : "Remove os dados deste navegador. Nao existe conta remota no modo local."}
+            </span>
+            {isSupabaseConfigured && user && (
+              <small>
+                Requer SUPABASE_SERVICE_ROLE_KEY configurada no servidor/Vercel. Essa chave nunca deve usar prefixo VITE_.
+              </small>
+            )}
+          </div>
+          <button
+            type="button"
+            className="danger-button"
+            onClick={() => {
+              setIsDeleteAccountOpen((current) => !current);
+              setDeleteAccountConfirmation("");
+            }}
+            disabled={isDeletingAccount}
+          >
+            <Trash2 size={16} />
+            Excluir
+          </button>
+          {isDeleteAccountOpen && (
+            <div className="delete-account-confirmation">
+              <strong>Essa acao nao pode ser desfeita.</strong>
+              <span>
+                Para confirmar, digite{" "}
+                <b>{isSupabaseConfigured && user ? "o email da conta" : "EXCLUIR"}</b>.
+              </span>
+              <input
+                value={deleteAccountConfirmation}
+                onChange={(event) => setDeleteAccountConfirmation(event.target.value)}
+                placeholder={expectedDeleteConfirmation}
+                aria-label="Confirmacao de exclusao de conta"
+              />
+              <button
+                type="button"
+                className="danger-button"
+                onClick={handleDeleteAccount}
+                disabled={isDeletingAccount || deleteAccountConfirmation !== expectedDeleteConfirmation}
+              >
+                <Trash2 size={16} />
+                {isDeletingAccount ? "Excluindo..." : "Confirmar exclusao"}
+              </button>
+            </div>
+          )}
         </div>
       </div>
     </section>
