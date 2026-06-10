@@ -51,11 +51,45 @@ export type BossEncounter = {
   defeatedAt?: string;
 };
 
+export type JourneyStatus = "active" | "completed" | "archived";
+
+export type JourneyRecord = {
+  id: string;
+  title: string;
+  summary: string;
+  status: JourneyStatus;
+  questIds: string[];
+  projectIds: string[];
+  skillIds: string[];
+  masterQuestIds: string[];
+  rewardIds: string[];
+  milestones: Array<{
+    title: string;
+    description: string;
+    attribute: Attribute;
+  }>;
+  createdAt: string;
+  completedAt?: string;
+  archivedAt?: string;
+};
+
 export type ProgressionSystem = {
+  journeys: JourneyRecord[];
   projects: Project[];
   masterQuests: MasterQuest[];
   skills: SkillNode[];
   bosses: BossEncounter[];
+};
+
+export type CreateJourneyInput = {
+  title: string;
+  summary: string;
+  questIds: string[];
+  projectIds: string[];
+  skillIds: string[];
+  masterQuestIds: string[];
+  rewardIds: string[];
+  milestones: JourneyRecord["milestones"];
 };
 
 export type CreateProjectInput = {
@@ -98,6 +132,7 @@ export type UnlockSkillInput = {
 };
 
 export const createEmptyProgressionSystem = (): ProgressionSystem => ({
+  journeys: [],
   projects: [],
   masterQuests: [],
   skills: [],

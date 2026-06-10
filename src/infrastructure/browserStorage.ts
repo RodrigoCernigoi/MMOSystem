@@ -66,6 +66,7 @@ export const createLocalProgressionRepository = (): ProgressionRepository => ({
     const storedProgression = readJson<Partial<ProgressionSystem>>(progressionKey, fallback);
 
     return {
+      journeys: storedProgression.journeys ?? [],
       projects: storedProgression.projects ?? [],
       masterQuests: storedProgression.masterQuests ?? [],
       skills: (storedProgression.skills ?? []).map((skill) => ({

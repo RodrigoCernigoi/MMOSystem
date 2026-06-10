@@ -147,6 +147,7 @@ export const createSupabaseProgressionRepository = (): ProgressionRepository => 
     const progression = (data?.progression ?? createEmptyProgressionSystem()) as Partial<ProgressionSystem>;
 
     return {
+      journeys: progression.journeys ?? [],
       projects: progression.projects ?? [],
       masterQuests: progression.masterQuests ?? [],
       skills: (progression.skills ?? []).map((skill) => ({

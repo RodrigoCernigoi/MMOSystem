@@ -18,6 +18,7 @@ const makeQuest = (id: string, status: Quest["status"]): Quest => ({
 describe("progressionService", () => {
   it("completes a project when every linked quest is completed", async () => {
     let progression: ProgressionSystem = {
+      journeys: [],
       projects: [
         {
           id: "project-1",
@@ -63,6 +64,7 @@ describe("progressionService", () => {
 
   it("also counts quests linked by projectId", async () => {
     let progression: ProgressionSystem = {
+      journeys: [],
       projects: [
         {
           id: "project-1",
@@ -107,6 +109,7 @@ describe("progressionService", () => {
 
   it("manually completes a master quest and unlocks its skill", async () => {
     let progression: ProgressionSystem = {
+      journeys: [],
       projects: [],
       masterQuests: [
         {

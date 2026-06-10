@@ -158,7 +158,7 @@ export const writeSupabaseBackup = async (backup: AppBackup) => {
   const profilePayload = {
     id: userId,
     player,
-    progression: backup.data.progression ?? { projects: [], masterQuests: [], skills: [], bosses: [] },
+    progression: backup.data.progression ?? { journeys: [], projects: [], masterQuests: [], skills: [], bosses: [] },
     rewards: backup.data.rewards,
     focus_sessions: backup.data.focusSessions,
     updated_at: new Date().toISOString(),

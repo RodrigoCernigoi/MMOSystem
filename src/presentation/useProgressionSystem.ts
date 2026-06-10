@@ -1,6 +1,7 @@
 import { useCallback, useEffect, useMemo, useState } from "react";
 import type {
   CreateMasterQuestInput,
+  CreateJourneyInput,
   CreateProjectInput,
   CreateSkillInput,
   ProgressionSystem,
@@ -23,7 +24,7 @@ type ProgressionState = {
 
 export const useProgressionSystem = () => {
   const [state, setState] = useState<ProgressionState>({
-    progression: { projects: [], masterQuests: [], skills: [], bosses: [] },
+    progression: { journeys: [], projects: [], masterQuests: [], skills: [], bosses: [] },
     quests: [],
     isLoading: true,
     error: null,
@@ -52,6 +53,19 @@ export const useProgressionSystem = () => {
         const project = await container.progressionService.createProject(input);
         await refresh();
         return project;
+      },
+      async createJourney(input: CreateJourneyInput) {
+        const journey = await container.progressionService.createJourney(input);
+        await refresh();
+        return journey;
+      },
+      async archiveJourney(id: string) {
+        await container.progressionService.archiveJourney(id);
+        await refresh();
+      },
+      async completeJourney(id: string) {
+        await container.progressionService.completeJourney(id);
+        await refresh();
       },
       async createMasterQuest(input: CreateMasterQuestInput) {
         const masterQuest = await container.progressionService.createMasterQuest(input);

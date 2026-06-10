@@ -1,5 +1,6 @@
 import {
   createEmptyProgressionSystem,
+  type CreateJourneyInput,
   type CreateSkillInput,
   type CreateMasterQuestInput,
   type CreateProjectInput,
@@ -40,6 +41,58 @@ export const createProgressionService = ({
     }
 
     return { progression: updatedProgression, quests };
+  },
+
+  async createJourney(input: CreateJourneyInput) {
+    const progression = await progressionRepository.get();
+    const journey = {
+      id: idProvider.createId(),
+      title: input.title.trim(),
+      summary: input.summary.trim(),
+      status: "active" as const,
+      questIds: input.questIds,
+      projectIds: input.projectIds,
+      skillIds: input.skillIds,
+      masterQuestIds: input.masterQuestIds,
+      rewardIds: input.rewardIds,
+      milestones: input.milestones,
+      createdAt: clock.now().toISOString(),
+    };
+
+    if (!journey.title) {
+      throw new Error("Journey title is required.");
+    }
+
+    await progressionRepository.save({
+      ...progression,
+      journeys: [journey, ...(progression.journeys ?? [])],
+    });
+
+    return journey;
+  },
+
+  async archiveJourney(journeyId: string): Promise<void> {
+    const progression = await progressionRepository.get();
+    await progressionRepository.save({
+      ...progression,
+      journeys: (progression.journeys ?? []).map((journey) =>
+        journey.id === journeyId
+          ? { ...journey, status: "archived" as const, archivedAt: clock.now().toISOString() }
+          : journey,
+      ),
+    });
+  },
+
+  async completeJourney(journeyId: string): Promise<void> {
+    const progression = await progressionRepository.get();
+    await progressionRepository.save({
+      ...progression,
+      journeys: (progression.journeys ?? []).map((journey) =>
+        journey.id === journeyId
+          ? { ...journey, status: "completed" as const, completedAt: clock.now().toISOString() }
+          : journey,
+      ),
+    });
   },
 
   async createProject(input: CreateProjectInput): Promise<Project> {
